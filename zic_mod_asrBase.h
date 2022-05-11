@@ -3,7 +3,7 @@
 
 #include "zic_wave_base.h"
 
-template <typename T>
+template <typename T, typename TData = int16_t>
 class Zic_Mod_AsrBase
 {
 protected:
@@ -97,7 +97,7 @@ public:
      * @param data
      * @return int16_t
      */
-    int16_t next(int16_t data = 100)
+    TData next(TData data = 100)
     {
         switch (phase)
         {
