@@ -71,7 +71,10 @@ uint8_t loadWavetableFromSD(Zic_Wavetable_Base *wavetable, const char *filename)
     {
         int16_t bit;
         file.read((uint8_t *)&bit, sizeof(int16_t));
-        wavetable->table[pos] = (float)bit / INT16_MAX;
+        // TODO switch from float to int16
+        // wavetable->table[pos] = (float)bit / INT16_MAX; // float
+        // wavetable->table[pos] = ((float)bit / INT16_MAX) * 10000;
+        wavetable->table[pos] = bit;
     }
     // Serial.printf("Len %d\n", pos);
     // for (int i = 0; i < 255; i++)
