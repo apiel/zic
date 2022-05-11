@@ -1,10 +1,10 @@
 #ifndef ZIC_WAVETABLE_SYNTH_H_
 #define ZIC_WAVETABLE_SYNTH_H_
 
-#include <zic/zic_mod_asr.h>
+#include "zic_mod_asr.h"
 // #include <zic/zic_mod_asrFast.h>
 // #include <zic/zic_mod_asrFastQ.h>
-#include <zic/zic_wave_wavetable.h>
+#include "zic_wave_wavetable.h"
 
 /**
  * @brief Basic wavetable synth combining wave, modulation, effect...
