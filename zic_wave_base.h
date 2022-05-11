@@ -34,21 +34,19 @@
 #define FREQ_PI M_PI / FREQ_MULT
 #endif
 
-// Q format https://www.pathpartnertech.com/representing-decimal-data-in-q-format/
-
 class Zic_Wave_Base
 {
 protected:
     float time = 0.0;
 
     virtual int16_t sample(uint32_t *freq);
-
     uint32_t frequency = 103.82617439443122f * FREQ_MULT; // C3
-    uint16_t amplitude = 100;
-    // float pitch = 1.0f;
 
     // Pre-calculation
     uint32_t freq = frequency; // * pitch;
+
+    uint16_t amplitude = 100;
+    // float pitch = 1.0f;
 
     uint16_t phase = 0; // 0 to 360
 
@@ -65,13 +63,12 @@ public:
 
     int16_t next()
     {
-        uint32_t _freq = freq; // need to do something with picth modulation: pitchMod;
         time += DELTA_TIME;
 
         // use bitwise >> 8 to reduce amplitude (division by 256)
         // we could have a higher quality wavetable to int32 using a higher bitwise value
         // but is it really necessary? int16 make a gain on firmware size!
-        return (amplitude * sample(&_freq)) >> 8;
+        return (amplitude * sample(&freq)) >> 8;
     }
 
     /**

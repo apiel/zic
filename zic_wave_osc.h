@@ -35,7 +35,7 @@ const char *getOscName(uint8_t _oscType)
     return "Unknown";
 }
 
-// FIXME switch to int16 instead of double and bloat
+// FIXME switch to int16 instead of double and float
 // however, i would argue to use wavetable in general
 // unless those wave can be edited
 
