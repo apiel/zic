@@ -136,6 +136,31 @@ const char* getNoteDot(uint8_t initialNote) {
 }
 uint8_t getNoteOctave(uint8_t initialNote) { return (initialNote / 12) - 1; }
 
+const uint8_t naturalNotes[] = {
+    _C0, _D0, _E0, _F0, _G0, _A0, _B0,
+    _C1, _D1, _E1, _F1, _G1, _A1, _B1,
+    _C2, _D2, _E2, _F2, _G2, _A2, _B2,
+    _C3, _D3, _E3, _F3, _G3, _A3, _B3,
+    _C4, _D4, _E4, _F4, _G4, _A4, _B4,
+    _C5, _D5, _E5, _F5, _G5, _A5, _B5,
+    _C6, _D6, _E6, _F6, _G6, _A6, _B6,
+    _C7, _D7, _E7, _F7, _G7, _A7, _B7,
+    _C8, _D8, _E8, _F8, _G8, _A8, _B8,
+};
+
+const uint8_t naturalNotesDown[] = {
+    _C8, _D8, _E8, _F8, _G8, _A8, _B8,
+    _C7, _D7, _E7, _F7, _G7, _A7, _B7,
+    _C6, _D6, _E6, _F6, _G6, _A6, _B6,
+    _C5, _D5, _E5, _F5, _G5, _A5, _B5,
+    _C4, _D4, _E4, _F4, _G4, _A4, _B4,
+    _C3, _D3, _E3, _F3, _G3, _A3, _B3,
+    _C2, _D2, _E2, _F2, _G2, _A2, _B2,
+    _C1, _D1, _E1, _F1, _G1, _A1, _B1,
+    _C0, _D0, _E0, _F0, _G0, _A0, _B0,
+};
+
+// maybe switch to https://pages.mtu.edu/~suits/notefreqs.html
 const float NOTE_FREQ[] = {
     8.1757989156,       8.661957217980946,  9.177023997369927,
     9.72271824126305,   10.300861153472118, 10.913382232223029,
