@@ -108,7 +108,7 @@ public:
             }
             else
             {
-                Serial.println("end ATTACK_PHASE");
+                // Serial.println("end ATTACK_PHASE");
                 value = stepTarget;
                 phase = nextPhase;
                 nextPhase = END_PHASE;
@@ -123,7 +123,7 @@ public:
             }
             else
             {
-                Serial.println("end RELEASE_PHASE");
+                // Serial.println("end RELEASE_PHASE");
                 value = 0;
                 phase = END_PHASE;
             }
@@ -142,7 +142,7 @@ public:
      */
     void on(uint8_t _note = 0)
     {
-        Serial.println("start ATTACK_PHASE");
+        // Serial.println("start ATTACK_PHASE");
         note = _note;
         value = 0;
         nextPhase = noSustain ? RELEASE_PHASE : SUSTAIN_PHASE;
