@@ -56,16 +56,17 @@ public:
         }
     }
 
-    void setCutoff(float value)
+    // TODO
+    // on lower freq "value" should be more step, so going expodentially down
+    // at least for LPF, might be the opposite for HPF
+    void setCutoff(float _cutoff)
     {
-        cutoff = value;
-        calculateFeedbackAmount();
+        set(_cutoff, resonance);
     };
 
-    void setResonance(float value)
+    void setResonance(float _res)
     {
-        resonance = value;
-        calculateFeedbackAmount();
+        set(cutoff, _res);
     };
 
     void set(float _cutoff, float _res)
