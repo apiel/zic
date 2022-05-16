@@ -24,14 +24,15 @@ protected:
     // NOTE maybe set feedback manually, just to try
     // or at least try mult 2 or 3
     // also cutoff cannot be 1.0 else div by zero, maybe use mult instead
-    uint16_t feedback;
+    // uint16_t feedback;
+    float feedback;
     void calculateVar()
     {
         cutoffCalc = cutoff;
         // cutoffCalc = 1.0f - cutoff * cutoff;
         feedback = resonance + resonance / (1.0 - cutoffCalc);
-        // Serial.printf("cutoff %.2f calc %.2f res %.2f feedback %.2f\n", cutoff, cutoffCalc, resonance, feedback);
-        Serial.printf("cutoff %.2f calc %.2f res %.2f feedback %d\n", cutoff, cutoffCalc, resonance, feedback);
+        Serial.printf("cutoff %.2f calc %.2f res %.2f feedback %.2f\n", cutoff, cutoffCalc, resonance, feedback);
+        // Serial.printf("cutoff %.2f calc %.2f res %.2f feedback %d\n", cutoff, cutoffCalc, resonance, feedback);
     }
 
 public:
