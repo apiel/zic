@@ -4,3 +4,5 @@
 - parameter lock: allow multiple synth param per track, with a master one for the keyboard...
 
 - can the filter be directly applied to the wavetable? (but then not usable for EG filter)
+
+- wavetable directly from SD without to load it in mem
