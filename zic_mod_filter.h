@@ -6,15 +6,6 @@
 class Zic_Mod_Filter
 {
 protected:
-    enum FilterMode
-    {
-        FILTER_MODE_OFF,
-        FILTER_MODE_LOWPASS,
-        FILTER_MODE_HIGHPASS,
-        FILTER_MODE_BANDPASS,
-        FILTER_MODE_COUNT,
-    };
-
     int16_t buf0 = 0.0;
     int16_t buf1 = 0.0;
     int16_t buf2 = 0.0;
@@ -32,6 +23,15 @@ protected:
     }
 
 public:
+    enum FilterMode
+    {
+        FILTER_MODE_OFF,
+        FILTER_MODE_LOWPASS,
+        FILTER_MODE_HIGHPASS,
+        FILTER_MODE_BANDPASS,
+        FILTER_MODE_COUNT,
+    };
+
     float cutoff = 0.2;
     float resonance = 0.9;
     FilterMode mode = FILTER_MODE_LOWPASS;
@@ -87,6 +87,26 @@ public:
     void setFilterMode(FilterMode value)
     {
         mode = value;
+    }
+
+    void setFilterMode(uint8_t value)
+    {
+        mode = (FilterMode)(value % FILTER_MODE_COUNT);
+    }
+
+    const char *getName()
+    {
+        switch (mode)
+        {
+        case FILTER_MODE_LOWPASS:
+            return "LPF";
+        case FILTER_MODE_HIGHPASS:
+            return "HPF";
+        case FILTER_MODE_BANDPASS:
+            return "BPF";
+        default:
+            return "OFF";
+        }
     }
 };
 
