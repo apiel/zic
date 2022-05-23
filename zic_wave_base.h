@@ -9,7 +9,7 @@
 
 // sample frequency = 44100 Hz, so one second equals 44100 samples.
 #ifndef DELTA_TIME
-#define DELTA_TIME 1.0f / 44100
+#define DELTA_TIME 1.0f / SAMPLE_RATE
 #endif
 
 #ifndef SAMPLE_PER_MS
