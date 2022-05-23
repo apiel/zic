@@ -45,7 +45,7 @@ class Zic_Wave_Base
 protected:
     float time = 0.0;
 
-    virtual int16_t sample(uint32_t *freq) {}
+    virtual int16_t sample(uint32_t *freq) { return 0; }
     uint32_t frequency = 103.82617439443122f * FREQ_MULT; // C3
 
     // Pre-calculation
