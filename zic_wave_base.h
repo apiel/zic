@@ -1,6 +1,8 @@
 #ifndef ZIC_WAVE_BASE_H_
 #define ZIC_WAVE_BASE_H_
 
+#include <math.h>
+
 #ifndef SAMPLE_RATE
 #define SAMPLE_RATE 44100
 #endif
@@ -43,7 +45,7 @@ class Zic_Wave_Base
 protected:
     float time = 0.0;
 
-    virtual int16_t sample(uint32_t *freq);
+    virtual int16_t sample(uint32_t *freq) {}
     uint32_t frequency = 103.82617439443122f * FREQ_MULT; // C3
 
     // Pre-calculation
