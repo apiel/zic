@@ -19,6 +19,11 @@ public:
         set(80);
     }
 
+    /**
+     * @brief Set tempo in beat per minutes (BPM)
+     *
+     * @param _bpm
+     */
     void set(uint16_t _bpm)
     {
         bpm = _bpm;
