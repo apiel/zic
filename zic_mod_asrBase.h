@@ -81,12 +81,13 @@ public:
 
     virtual void debug()
     {
-        Serial.print("stepTarget ");
-        Serial.println(stepTarget);
-        Serial.printf("attack %d step ", attackMs);
-        Serial.println(attackStep);
-        Serial.printf("release %d step ", releaseMs);
-        Serial.println(releaseStep);
+        // TODO add generic print
+        // Serial.print("stepTarget ");
+        // Serial.println(stepTarget);
+        // Serial.printf("attack %d step ", attackMs);
+        // Serial.println(attackStep);
+        // Serial.printf("release %d step ", releaseMs);
+        // Serial.println(releaseStep);
     }
 
     /**
