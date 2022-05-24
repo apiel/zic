@@ -69,6 +69,7 @@ protected:\n\
         printf(".");
         for (int p = 0; p < samplesRead; p++)
         {
+            // TODO and why not 16383?
             snprintf(buffer, BUF_SIZE, "        %d,\n", (int)(data[p] * 10000));
             fwrite(buffer, sizeof(char), getSize(buffer, '\n'), file);
         }
