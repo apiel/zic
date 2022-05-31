@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#define _NOTE_START _C0
+#define _NOTE_END _B8
+
 #define _C0 12
 #define _C_0 13
 #define _D0 14
@@ -120,6 +123,13 @@
 #define _A_8 118
 #define _B8 119
 
+const char* getNoteDash(uint8_t initialNote) {
+    const char* noteNames[] = {"C-",  "C#", "D-",  "D#", "E-",  "F-",
+                               "F#", "G-",  "G#", "A-",  "A#", "B-"};
+
+    uint8_t idx = (initialNote % 12);
+    return noteNames[idx];
+}
 const char* getNoteStr(uint8_t initialNote) {
     const char* noteNames[] = {"C",  "C#", "D",  "D#", "E",  "F",
                                "F#", "G",  "G#", "A",  "A#", "B"};
