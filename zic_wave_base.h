@@ -17,6 +17,8 @@
 #define FREQ_PI M_PI / FREQ_MULT
 #endif
 
+#define RESET_TIME DELTA_TIME * 360 * 10000
+
 class Zic_Wave_Base
 {
 protected:
@@ -47,6 +49,12 @@ public:
     int16_t next()
     {
         time += DELTA_TIME;
+
+        // FIXME trying to fix changing tone, maybe this would work...
+        if (time >= RESET_TIME) {
+            // SDL_Log("Reset timing %.6f", time);
+            time = 0.0;
+        }
 
         // use bitwise >> 8 to reduce amplitude (division by 256)
         // we could have a higher quality wavetable to int32 using a higher bitwise value
