@@ -8,42 +8,41 @@
 
 typedef uint8_t Pat[MAX_STEPS_IN_PATTERN][2];
 
-class Zic_Seq_Step
-{
+class Zic_Seq_Step {
 public:
+    uint8_t instrument = 0;
     uint8_t note = 0;
     uint8_t velocity = 127;
     bool slide = false;
 
-    Zic_Seq_Step() {}
+    Zic_Seq_Step() { }
 
     Zic_Seq_Step(uint8_t _note, bool _slide)
     {
-        note = _note;
-        slide = _slide;
+        set(_note, _slide);
+    }
+
+    Zic_Seq_Step(uint8_t _instrument, uint8_t _note, bool _slide)
+    {
+        set(_instrument, _note, _slide);
     }
 
     void reset()
     {
+        instrument = 0;
         note = 0;
         velocity = 127;
         slide = false;
     }
 
-    void set(Zic_Seq_Step *step)
+    void set(Zic_Seq_Step* step)
     {
-        set(step->note, step->velocity, step->slide);
+        set(step->instrument, step->note, step->velocity, step->slide);
     }
 
     void set(uint8_t _note)
     {
         note = _note;
-    }
-
-    void set(uint8_t _note, uint8_t _velocity)
-    {
-        velocity = _velocity;
-        set(_note);
     }
 
     void set(uint8_t _note, bool _slide)
@@ -52,25 +51,32 @@ public:
         set(_note);
     }
 
-    void set(uint8_t _note, uint8_t _velocity, bool _slide)
+    void set(uint8_t _instrument, uint8_t _note, bool _slide)
     {
-        slide = _slide;
-        set(_note, _velocity);
+        instrument = _instrument;
+        set(_note, _slide);
+    }
+
+    void set(uint8_t _instrument, uint8_t _note, uint8_t _velocity, bool _slide)
+    {
+        velocity = _velocity;
+        set(_instrument, _note, _velocity);
     }
 };
 
-class Zic_Seq_Pattern
-{
+class Zic_Seq_Pattern {
 public:
     uint8_t stepCount = MAX_STEPS_IN_PATTERN;
     Zic_Seq_Step steps[MAX_STEPS_IN_PATTERN];
 
+    Zic_Seq_Pattern()
+    {
+    }
+
     Zic_Seq_Pattern(Pat _steps)
     {
-        for (uint8_t pos = 0; pos < MAX_STEPS_IN_PATTERN; pos++)
-        {
-            if (_steps[pos][0] == END)
-            {
+        for (uint8_t pos = 0; pos < MAX_STEPS_IN_PATTERN; pos++) {
+            if (_steps[pos][0] == END) {
                 stepCount = pos;
                 break;
             }
