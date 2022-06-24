@@ -66,6 +66,7 @@ public:
 
 class Zic_Seq_Pattern {
 public:
+    uint16_t id = 0;
     uint8_t stepCount = MAX_STEPS_IN_PATTERN;
     Zic_Seq_Step steps[MAX_STEPS_IN_PATTERN];
 
