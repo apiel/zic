@@ -13,7 +13,7 @@ protected:
         int16_t bit;
         bool r = audioFile.read(&bit, sizeof(bit)); // sizeof(int16_t)
         if (!r) {
-            audioFile.seekFromStart(0);
+            audioFile.gotoStart();
         }
         // printf("bit: %d\n", bit);
         return bit;

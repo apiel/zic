@@ -31,6 +31,11 @@ public:
         return false;
     }
 
+    uint64_t tell()
+    {
+        return 0;
+    }
+
     bool seekFromStart(uint64_t offset)
     {
         return false;

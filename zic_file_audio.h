@@ -24,6 +24,8 @@ protected:
     WavHeader header;
 
 public:
+    uint64_t start = 0;
+
     Zic_File_Audio()
     {
     }
@@ -41,7 +43,6 @@ public:
         // skip over any other chunks before the "data" chunk
         bool additionalHeaderDataPresent = false;
         while (header.Subchunk2ID != 1635017060) {
-            // FIXME this is wrong
             seekFromCurrent(4);
             read((uint8_t*)&header.Subchunk2ID, 4);
             additionalHeaderDataPresent = true;
@@ -52,9 +53,16 @@ public:
             read((uint8_t*)&header.Subchunk2Size, 4);
         }
 
-        printf("Audio file %d %d\n", header.BitsPerSample, header.AudioFormat);
+        start = tell();
+
+        printf("Audio file %d %d start %ld\n", header.BitsPerSample, header.AudioFormat, start);
 
         return file;
+    }
+
+    void gotoStart()
+    {
+        seekFromStart(start);
     }
 };
 
