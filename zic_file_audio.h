@@ -3,7 +3,7 @@
 
 #include "zic_file.h"
 
-class Zic_File_Audio {
+class Zic_File_Audio: public Zic_File {
 protected:
     typedef struct WavHeader {
         uint32_t ChunkID;
@@ -24,26 +24,24 @@ protected:
     WavHeader header;
 
 public:
-    void* file;
-
     Zic_File_Audio()
     {
-        file = zic_file_open("samples/59.wav", "rb");
-        // file = zic_file_open("samples/kick.wav", "rb");
+        // open("samples/59.wav", "rb");
+        open("samples/kick.wav", "rb");
 
-        zic_file_read(file, (uint8_t*)&header, sizeof(WavHeader));
+        read((uint8_t*)&header, sizeof(WavHeader));
 
         // skip over any other chunks before the "data" chunk
         bool additionalHeaderDataPresent = false;
         while (header.Subchunk2ID != 1635017060) {
-            zic_file_seek(file, 4);
-            zic_file_read(file, (uint8_t*)&header.Subchunk2ID, 4);
+            seek(4);
+            read((uint8_t*)&header.Subchunk2ID, 4);
             additionalHeaderDataPresent = true;
         }
 
         if (additionalHeaderDataPresent) {
             // read the value of Subchunk2Size, the one populated when reading 'WavHeader' structure is wrong
-            zic_file_read(file, (uint8_t*)&header.Subchunk2Size, 4);
+            read((uint8_t*)&header.Subchunk2Size, 4);
         }
 
         printf("Audio file %d %d\n", header.BitsPerSample, header.AudioFormat);

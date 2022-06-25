@@ -3,26 +3,44 @@
 
 #include <stdint.h>
 
-// TODO should this be a class?
+class Zic_File {
+public:
+    void* file;
 
-void* zic_file_open(const char* filename, const char* mode)
-{
-    return NULL;
-}
+    Zic_File()
+    {
+    }
 
-bool zic_file_read(void* file, void* ptr, uint16_t size)
-{
-    return false;
-}
 
-bool zic_file_seek(void* file, uint64_t offset)
-{
-    return false;
-}
+    Zic_File(const char* filename, const char* mode)
+    {
+        open(filename, mode);
+    }
 
-bool zic_file_close(void* file)
-{
-    return false;
-}
+    ~Zic_File()
+    {
+        close();
+    }
+
+    void* open(const char* filename, const char* mode)
+    {
+        return NULL;
+    }
+
+    bool read(void* ptr, uint16_t size)
+    {
+        return false;
+    }
+
+    bool seek(uint64_t offset)
+    {
+        return false;
+    }
+
+    bool close()
+    {
+        return false;
+    }
+};
 
 #endif

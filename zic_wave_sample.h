@@ -11,9 +11,9 @@ protected:
     int16_t sample(uint32_t* _freq)
     {
         int16_t bit;
-        bool r = zic_file_read(audioFile.file, &bit, sizeof(bit)); // sizeof(int16_t)
+        bool r = audioFile.read(&bit, sizeof(bit)); // sizeof(int16_t)
         if (!r) {
-            zic_file_seek(audioFile.file, 0);
+            audioFile.seek(0);
         }
         // printf("bit: %d\n", bit);
         return bit;
