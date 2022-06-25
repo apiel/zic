@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+// TODO should this be a class?
+
 void* zic_file_open(const char* filename, const char* mode)
 {
     return NULL;
