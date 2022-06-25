@@ -20,7 +20,7 @@ public:
     // Zic_Mod_AsrFastQ asr;
     Zic_Mod_Filter filter;
 
-    Zic_Synth_Sample(Zic_File_ReadAudio* _file) : wave(_file)
+    Zic_Synth_Sample()
     {
     }
 
