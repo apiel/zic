@@ -1,5 +1,5 @@
-#ifndef ZIC_WAVETABLE_SYNTH_H_
-#define ZIC_WAVETABLE_SYNTH_H_
+#ifndef ZIC_SYNTH_SAMPLE_H_
+#define ZIC_SYNTH_SAMPLE_H_
 
 #include "zic_mod_asr.h"
 // #include <zic/zic_mod_asrFast.h>
@@ -11,7 +11,7 @@
  * @brief Basic wavetable synth combining wave, modulation, effect...
  *
  */
-class Zic_Wavetable_Synth
+class Zic_Synth_Sample
 {
 public:
     Zic_Wave_Wavetable wave;
@@ -20,7 +20,7 @@ public:
     // Zic_Mod_AsrFastQ asr;
     Zic_Mod_Filter filter;
 
-    Zic_Wavetable_Synth(Zic_Wavetable_Base *wavetable) : wave(wavetable)
+    Zic_Synth_Sample(Zic_Wavetable_Base *wavetable) : wave(wavetable)
     {
     }
 
