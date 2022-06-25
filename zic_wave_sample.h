@@ -13,7 +13,7 @@ protected:
         int16_t bit;
         bool r = audioFile.read(&bit, sizeof(bit)); // sizeof(int16_t)
         if (!r) {
-            audioFile.seek(0);
+            audioFile.seekFromStart(0);
         }
         // printf("bit: %d\n", bit);
         return bit;
@@ -24,7 +24,7 @@ public:
     Zic_Wave_Sample()
     {
         // file = zic_file_open("samples/59.wav", "rb");
-        // // file = zic_file_open("samples/kick.wav", "rb");
+        audioFile.open("samples/kick.wav");
     }
 };
 

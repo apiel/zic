@@ -11,7 +11,6 @@ public:
     {
     }
 
-
     Zic_File(const char* filename, const char* mode)
     {
         open(filename, mode);
@@ -32,7 +31,12 @@ public:
         return false;
     }
 
-    bool seek(uint64_t offset)
+    bool seekFromStart(uint64_t offset)
+    {
+        return false;
+    }
+
+    bool seekFromCurrent(uint64_t offset)
     {
         return false;
     }

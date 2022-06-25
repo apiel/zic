@@ -45,6 +45,7 @@ uint8_t loadWavetableFromSD(Zic_Wavetable_Base *wavetable, const char *filename)
     bool additionalHeaderDataPresent = false;
     while (header.Subchunk2ID != 1635017060)
     {
+        // FIXME this is wrong
         file.seek(4);
         file.read((uint8_t *)&header.Subchunk2ID, 4);
         additionalHeaderDataPresent = true;
