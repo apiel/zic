@@ -10,21 +10,36 @@ protected:
 
     int16_t sample(uint32_t* _freq)
     {
-        int16_t bit;
-        bool r = audioFile.read(&bit, sizeof(bit)); // sizeof(int16_t)
-        if (!r) {
-            audioFile.gotoStart();
+        if (!audioFile.file) {
+            return 0;
         }
-        // printf("bit: %d\n", bit);
+        int16_t bit;
+        bool r = audioFile.read(&bit, sizeof(bit));
+        if (!r) {
+            onEnd();
+        }
         return bit;
-        // return 0;
     }
 
 public:
+    bool loop = false;
+
     Zic_Wave_Sample()
     {
         // file = zic_file_open("samples/59.wav", "rb");
         audioFile.open("samples/kick.wav");
+    }
+
+    void onEnd()
+    {
+        if (loop) {
+            restart();
+        }
+    }
+
+    void restart()
+    {
+        audioFile.restart();
     }
 };
 

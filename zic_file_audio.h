@@ -60,7 +60,7 @@ public:
         return file;
     }
 
-    void gotoStart()
+    void restart()
     {
         seekFromStart(start);
     }
