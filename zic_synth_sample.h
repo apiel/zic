@@ -5,22 +5,22 @@
 // #include <zic/zic_mod_asrFast.h>
 // #include <zic/zic_mod_asrFastQ.h>
 #include "zic_mod_filter.h"
-#include "zic_wave_wavetable.h"
+#include "zic_wave_sample.h"
 
 /**
- * @brief Basic wavetable synth combining wave, modulation, effect...
+ * @brief Basic sample synth
  *
  */
 class Zic_Synth_Sample
 {
 public:
-    Zic_Wave_Wavetable wave;
+    Zic_Wave_Sample wave;
     Zic_Mod_Asr asr;
     // Zic_Mod_AsrFast asr;
     // Zic_Mod_AsrFastQ asr;
     Zic_Mod_Filter filter;
 
-    Zic_Synth_Sample(Zic_Wavetable_Base *wavetable) : wave(wavetable)
+    Zic_Synth_Sample(Zic_File_ReadAudio* _file) : wave(_file)
     {
     }
 

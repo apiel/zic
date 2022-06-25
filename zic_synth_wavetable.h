@@ -8,7 +8,7 @@
 #include "zic_wave_wavetable.h"
 
 /**
- * @brief Basic wavetable synth combining wave, modulation, effect...
+ * @brief Basic wavetable synth
  *
  */
 class Zic_Synth_Wavetable
