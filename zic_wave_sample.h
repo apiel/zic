@@ -10,8 +10,8 @@ protected:
 
     int16_t sample(uint32_t* _freq)
     {
-        int16_t bit;
-        file.read(&bit, sizeof(bit)); // sizeof(int16_t)
+        // int16_t bit;
+        // file->read(&bit, sizeof(bit)); // sizeof(int16_t)
         // return bit;
         return 0;
     }
