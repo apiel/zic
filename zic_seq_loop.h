@@ -66,7 +66,9 @@ public:
         {
             stepOff.set(&stepOn);
             stepOn.set(&pattern->steps[currentStep]);
-            stepOn.note += (int)play - (int)REF_NOTE;
+            if (stepOn.note) {
+                stepOn.note += (int)play - (int)REF_NOTE;
+            }
             stepOn.velocity = velocity;
             currentStep = (currentStep + 1) % pattern->stepCount;
         }
