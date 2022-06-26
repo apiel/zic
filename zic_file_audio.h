@@ -25,6 +25,8 @@ protected:
 
 public:
     uint64_t start = 0;
+    uint64_t end = 0;
+    uint64_t sampleCount = 0;
 
     Zic_File_Audio()
     {
@@ -56,11 +58,27 @@ public:
             read((uint8_t*)&header.Subchunk2Size, 4);
         }
 
-        start = tell();
+        // Should we do this?
+        // if (header.BitsPerSample != 16 || header.AudioFormat != 1) {
+        //     file = NULL;
+        //     return NULL;
+        // }
 
-        printf("Audio file %d %d start %ld\n", header.BitsPerSample, header.AudioFormat, start);
+        start = tell();
+        seekFromEnd(0);
+        end = tell();
+        restart();
+        sampleCount = (end - start) / (header.BitsPerSample); // * header.NumChannels
+
+        printf("Audio file %d %d %d start %ld end %ld sampleCount %ld\n",
+            header.BitsPerSample, header.AudioFormat, header.NumChannels, start, end, sampleCount);
 
         return file;
+    }
+
+    void seekToSample(uint64_t pos)
+    {
+        seekFromStart(start + (pos * header.BitsPerSample)); // * header.NumChannels
     }
 
     void restart()

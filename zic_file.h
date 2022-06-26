@@ -46,6 +46,11 @@ public:
         return false;
     }
 
+    bool seekFromEnd(uint64_t offset)
+    {
+        return false;
+    }
+
     bool close()
     {
         return false;

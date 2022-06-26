@@ -13,6 +13,12 @@ protected:
         if (!audioFile.file) {
             return 0;
         }
+
+        // // this seemed to work with wavetable samples, but not with basic wav samples
+        // // but does not work :p
+        // int i = (FREQ_PI * (*_freq) * time) * audioFile.sampleCount;
+        // audioFile.seekToSample(i % audioFile.sampleCount);
+
         int16_t bit;
         bool r = audioFile.read(&bit, sizeof(bit));
         if (!r) {
@@ -23,10 +29,11 @@ protected:
 
 public:
     bool loop = false;
+    // bool loop = true;
 
     Zic_Wave_Sample()
     {
-        // file = zic_file_open("samples/59.wav", "rb");
+        // audioFile.open("samples/59.wav");
         audioFile.open("samples/kick.wav");
     }
 
