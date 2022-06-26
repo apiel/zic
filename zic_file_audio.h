@@ -37,7 +37,10 @@ public:
 
     void* open(const char* filename)
     {
-        Zic_File::open(filename, "rb");
+        if (Zic_File::open(filename, "rb") == NULL) {
+            return NULL;
+        }
+
         read((uint8_t*)&header, sizeof(WavHeader));
 
         // skip over any other chunks before the "data" chunk
