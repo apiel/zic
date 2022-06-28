@@ -85,6 +85,8 @@ public:
     {
         seekFromStart(start);
     }
+
+    void setPitchSemiTones(float newPitch) { }
 };
 
 #endif
