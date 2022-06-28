@@ -26,28 +26,40 @@ protected:
 
     WavHeader header;
 
-    // SoundTouch soundTouch();
+    SoundTouch soundTouch;
 
     void setupSoundTouch()
     {
-        printf("Setup soundTouch %s\n", SoundTouch::getVersionString());
+        // printf("Setup soundTouch %s\n", SoundTouch::getVersionString());
 
-        // soundTouch.setSampleRate(header.SampleRate);
-        // soundTouch.setChannels(header.NumChannels);
-        // // soundTouch.setTempo(1.0);
-        // // soundTouch.setPitchSemiTones(0.0);
-        // // soundTouch.setRate(1.0);
-
-        // // sampleRate = (int)inFile->getSampleRate();
-        // // channels = (int)inFile->getNumChannels();
-        // // pSoundTouch->setSampleRate(sampleRate);
-        // // pSoundTouch->setChannels(channels);
+        soundTouch.setSampleRate(header.SampleRate);
+        soundTouch.setChannels(header.NumChannels);
+        soundTouch.setTempo(1.0f);
+        soundTouch.setPitchSemiTones(0.0f);
+        soundTouch.setRate(1.0f);
     }
 
 public:
     uint64_t start = 0;
     uint64_t end = 0;
     uint64_t sampleCount = 0;
+    bool resample = true;
+
+    // bool read(void* ptr, uint16_t size) override
+    // {
+    //     bool res = Zic_File::read(ptr, size);
+    //     if (resample) {
+    //         soundTouch.putSamples((SAMPLETYPE*)ptr, 1);
+    //         soundTouch.receiveSamples((SAMPLETYPE*)ptr, size);
+    //         soundTouch.flush();
+    //     }
+    //     return res;
+    // }
+
+    // void setPitchSemiTones(float newPitch)
+    // {
+    //     soundTouch.setPitchSemiTones(newPitch);
+    // }
 
     Zic_File_Audio()
     {
@@ -64,19 +76,19 @@ public:
             return NULL;
         }
 
-        read((uint8_t*)&header, sizeof(WavHeader));
+        Zic_File::read((uint8_t*)&header, sizeof(WavHeader));
 
         // skip over any other chunks before the "data" chunk
         bool additionalHeaderDataPresent = false;
         while (header.Subchunk2ID != 1635017060) {
             seekFromCurrent(4);
-            read((uint8_t*)&header.Subchunk2ID, 4);
+            Zic_File::read((uint8_t*)&header.Subchunk2ID, 4);
             additionalHeaderDataPresent = true;
         }
 
         if (additionalHeaderDataPresent) {
             // read the value of Subchunk2Size, the one populated when reading 'WavHeader' structure is wrong
-            read((uint8_t*)&header.Subchunk2Size, 4);
+            Zic_File::read((uint8_t*)&header.Subchunk2Size, 4);
         }
 
         // Should we do this?
@@ -91,7 +103,6 @@ public:
         restart();
         sampleCount = (end - start) / (header.BitsPerSample); // * header.NumChannels
 
-        // SoundTouch soundTouch;
         setupSoundTouch();
 
         printf("Audio file %d %d %d start %ld end %ld sampleCount %ld\n",
@@ -108,12 +119,6 @@ public:
     void restart()
     {
         seekFromStart(start);
-    }
-
-    void setPitchSemiTones(float newPitch)
-    {
-        // SoundTouch soundTouch();
-        // soundTouch().setPitchSemiTones(newPitch);
     }
 };
 

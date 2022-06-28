@@ -6,8 +6,6 @@
 
 class Zic_Wave_Sample : public Zic_Wave_Base {
 protected:
-    Zic_File_Audio audioFile;
-
     int16_t sample(uint32_t* _freq)
     {
         if (!audioFile.file) {
@@ -28,6 +26,8 @@ protected:
     }
 
 public:
+    Zic_File_Audio audioFile;
+
     bool loop = false;
     // bool loop = true;
 
@@ -48,6 +48,12 @@ public:
     {
         audioFile.restart();
     }
+
+    // void setNote(uint8_t note) override
+    // {
+    //     // setFrequency(Zic::NOTE_FREQ[note]);
+    //     audioFile.setPitchSemiTones(Zic::_NOTE_C4 - note);
+    // }
 };
 
 #endif

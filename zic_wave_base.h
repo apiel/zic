@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include "zic_def.h"
+#include "zic_note.h"
 
 #ifndef FREQ_MULT
 #define FREQ_MULT 100
@@ -100,6 +101,16 @@ public:
     uint16_t getAmplitude()
     {
         return amplitude;
+    }
+
+    /**
+     * @brief Set the Frequency using note.
+     *
+     * @param value
+     */
+    virtual void setNote(uint8_t note)
+    {
+        setFrequency(Zic::NOTE_FREQ[note]);
     }
 
     /**

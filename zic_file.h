@@ -21,37 +21,37 @@ public:
         close();
     }
 
-    void* open(const char* filename, const char* mode)
+    virtual void* open(const char* filename, const char* mode)
     {
         return NULL;
     }
 
-    bool read(void* ptr, uint16_t size)
+    virtual bool read(void* ptr, uint16_t size)
     {
         return false;
     }
 
-    uint64_t tell()
+    virtual uint64_t tell()
     {
         return 0;
     }
 
-    bool seekFromStart(uint64_t offset)
+    virtual bool seekFromStart(uint64_t offset)
     {
         return false;
     }
 
-    bool seekFromCurrent(uint64_t offset)
+    virtual bool seekFromCurrent(uint64_t offset)
     {
         return false;
     }
 
-    bool seekFromEnd(uint64_t offset)
+    virtual bool seekFromEnd(uint64_t offset)
     {
         return false;
     }
 
-    bool close()
+    virtual bool close()
     {
         return false;
     }
