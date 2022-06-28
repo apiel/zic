@@ -1,7 +1,10 @@
 #ifndef ZIC_FILE_AUDIO_H_
 #define ZIC_FILE_AUDIO_H_
 
+#include "SoundTouch/SoundTouch.h"
 #include "zic_file.h"
+
+using namespace soundtouch;
 
 class Zic_File_Audio : public Zic_File {
 protected:
@@ -22,6 +25,24 @@ protected:
     } WavHeader;
 
     WavHeader header;
+
+    // SoundTouch soundTouch();
+
+    void setupSoundTouch()
+    {
+        printf("Setup soundTouch %s\n", SoundTouch::getVersionString());
+
+        // soundTouch.setSampleRate(header.SampleRate);
+        // soundTouch.setChannels(header.NumChannels);
+        // // soundTouch.setTempo(1.0);
+        // // soundTouch.setPitchSemiTones(0.0);
+        // // soundTouch.setRate(1.0);
+
+        // // sampleRate = (int)inFile->getSampleRate();
+        // // channels = (int)inFile->getNumChannels();
+        // // pSoundTouch->setSampleRate(sampleRate);
+        // // pSoundTouch->setChannels(channels);
+    }
 
 public:
     uint64_t start = 0;
@@ -70,6 +91,9 @@ public:
         restart();
         sampleCount = (end - start) / (header.BitsPerSample); // * header.NumChannels
 
+        // SoundTouch soundTouch;
+        setupSoundTouch();
+
         printf("Audio file %d %d %d start %ld end %ld sampleCount %ld\n",
             header.BitsPerSample, header.AudioFormat, header.NumChannels, start, end, sampleCount);
 
@@ -86,7 +110,11 @@ public:
         seekFromStart(start);
     }
 
-    void setPitchSemiTones(float newPitch) { }
+    void setPitchSemiTones(float newPitch)
+    {
+        // SoundTouch soundTouch();
+        // soundTouch().setPitchSemiTones(newPitch);
+    }
 };
 
 #endif

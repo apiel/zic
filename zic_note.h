@@ -3,125 +3,129 @@
 
 #include <stdint.h>
 
-#define _NOTE_START _C0
-#define _NOTE_END _B8
+namespace Zic {
+enum {
+    _NOTE_START = 12,
 
-#define _C0 12
-#define _C_0 13
-#define _D0 14
-#define _D_0 15
-#define _E0 16
-#define _F0 17
-#define _F_0 18
-#define _G0 19
-#define _G_0 20
-#define _A0 21
-#define _A_0 22
-#define _B0 23
+    _NOTE_C0 = 12,
+    _NOTE_Cs0 = 13,
+    _NOTE_D0 = 14,
+    _NOTE_Ds0 = 15,
+    _NOTE_E0 = 16,
+    _NOTE_F0 = 17,
+    _NOTE_Fs0 = 18,
+    _NOTE_G0 = 19,
+    _NOTE_Gs0 = 20,
+    _NOTE_A0 = 21,
+    _NOTE_As0 = 22,
+    _NOTE_B0 = 23,
 
-#define _C1 24
-#define _C_1 25
-#define _D1 26
-#define _D_1 27
-#define _E1 28
-#define _F1 29
-#define _F_1 30
-#define _G1 31
-#define _G_1 32
-#define _A1 33
-#define _A_1 34
-#define _B1 35
+    _NOTE_C1 = 24,
+    _NOTE_Cs1 = 25,
+    _NOTE_D1 = 26,
+    _NOTE_Ds1 = 27,
+    _NOTE_E1 = 28,
+    _NOTE_F1 = 29,
+    _NOTE_Fs1 = 30,
+    _NOTE_G1 = 31,
+    _NOTE_Gs1 = 32,
+    _NOTE_A1 = 33,
+    _NOTE_As1 = 34,
+    _NOTE_B1 = 35,
 
-#define _C2 36
-#define _C_2 37
-#define _D2 38
-#define _D_2 39
-#define _E2 40
-#define _F2 41
-#define _F_2 42
-#define _G2 43
-#define _G_2 44
-#define _A2 45
-#define _A_2 46
-#define _B2 47
+    _NOTE_C2 = 36,
+    _NOTE_Cs2 = 37,
+    _NOTE_D2 = 38,
+    _NOTE_Ds2 = 39,
+    _NOTE_E2 = 40,
+    _NOTE_F2 = 41,
+    _NOTE_Fs2 = 42,
+    _NOTE_G2 = 43,
+    _NOTE_Gs2 = 44,
+    _NOTE_A2 = 45,
+    _NOTE_As2 = 46,
+    _NOTE_B2 = 47,
 
-#define _C3 48
-#define _C_3 49
-#define _D3 50
-#define _D_3 51
-#define _E3 52
-#define _F3 53
-#define _F_3 54
-#define _G3 55
-#define _G_3 56
-#define _A3 57
-#define _A_3 58
-#define _B3 59
+    _NOTE_C3 = 48,
+    _NOTE_Cs3 = 49,
+    _NOTE_D3 = 50,
+    _NOTE_Ds3 = 51,
+    _NOTE_E3 = 52,
+    _NOTE_F3 = 53,
+    _NOTE_Fs3 = 54,
+    _NOTE_G3 = 55,
+    _NOTE_Gs3 = 56,
+    _NOTE_A3 = 57,
+    _NOTE_As3 = 58,
+    _NOTE_B3 = 59,
 
-#define _C4 60
-#define _C_4 61
-#define _D4 62
-#define _D_4 63
-#define _E4 64
-#define _F4 65
-#define _F_4 66
-#define _G4 67
-#define _G_4 68
-#define _A4 69
-#define _A_4 70
-#define _B4 71
+    _NOTE_C4 = 60,
+    _NOTE_Cs4 = 61,
+    _NOTE_D4 = 62,
+    _NOTE_Ds4 = 63,
+    _NOTE_E4 = 64,
+    _NOTE_F4 = 65,
+    _NOTE_Fs4 = 66,
+    _NOTE_G4 = 67,
+    _NOTE_Gs4 = 68,
+    _NOTE_A4 = 69,
+    _NOTE_As4 = 70,
+    _NOTE_B4 = 71,
 
-#define _C5 72
-#define _C_5 73
-#define _D5 74
-#define _D_5 75
-#define _E5 76
-#define _F5 77
-#define _F_5 78
-#define _G5 79
-#define _G_5 80
-#define _A5 81
-#define _A_5 82
-#define _B5 83
+    _NOTE_C5 = 72,
+    _NOTE_Cs5 = 73,
+    _NOTE_D5 = 74,
+    _NOTE_Ds5 = 75,
+    _NOTE_E5 = 76,
+    _NOTE_F5 = 77,
+    _NOTE_Fs5 = 78,
+    _NOTE_G5 = 79,
+    _NOTE_Gs5 = 80,
+    _NOTE_A5 = 81,
+    _NOTE_As5 = 82,
+    _NOTE_B5 = 83,
 
-#define _C6 84
-#define _C_6 85
-#define _D6 86
-#define _D_6 87
-#define _E6 88
-#define _F6 89
-#define _F_6 90
-#define _G6 91
-#define _G_6 92
-#define _A6 93
-#define _A_6 94
-#define _B6 95
+    _NOTE_C6 = 84,
+    _NOTE_Cs6 = 85,
+    _NOTE_D6 = 86,
+    _NOTE_Ds6 = 87,
+    _NOTE_E6 = 88,
+    _NOTE_F6 = 89,
+    _NOTE_Fs6 = 90,
+    _NOTE_G6 = 91,
+    _NOTE_Gs6 = 92,
+    _NOTE_A6 = 93,
+    _NOTE_As6 = 94,
+    _NOTE_B6 = 95,
 
-#define _C7 96
-#define _C_7 97
-#define _D7 98
-#define _D_7 99
-#define _E7 100
-#define _F7 101
-#define _F_7 102
-#define _G7 103
-#define _G_7 104
-#define _A7 105
-#define _A_7 106
-#define _B7 107
+    _NOTE_C7 = 96,
+    _NOTE_Cs7 = 97,
+    _NOTE_D7 = 98,
+    _NOTE_Ds7 = 99,
+    _NOTE_E7 = 100,
+    _NOTE_F7 = 101,
+    _NOTE_Fs7 = 102,
+    _NOTE_G7 = 103,
+    _NOTE_Gs7 = 104,
+    _NOTE_A7 = 105,
+    _NOTE_As7 = 106,
+    _NOTE_B7 = 107,
 
-#define _C8 108
-#define _C_8 109
-#define _D8 110
-#define _D_8 111
-#define _E8 112
-#define _F8 113
-#define _F_8 114
-#define _G8 115
-#define _G_8 116
-#define _A8 117
-#define _A_8 118
-#define _B8 119
+    _NOTE_C8 = 108,
+    _NOTE_Cs8 = 109,
+    _NOTE_D8 = 110,
+    _NOTE_Ds8 = 111,
+    _NOTE_E8 = 112,
+    _NOTE_F8 = 113,
+    _NOTE_Fs8 = 114,
+    _NOTE_G8 = 115,
+    _NOTE_Gs8 = 116,
+    _NOTE_A8 = 117,
+    _NOTE_As8 = 118,
+    _NOTE_B8 = 119,
+
+    _NOTE_END = 119,
+};
 
 // uint8_t charNotetoInt(char * note)
 // {
@@ -169,135 +173,135 @@ const char* getNoteDot(uint8_t initialNote)
 uint8_t getNoteOctave(uint8_t initialNote) { return (initialNote / 12) - 1; }
 
 const uint8_t naturalNotes[] = {
-    _C0,
-    _D0,
-    _E0,
-    _F0,
-    _G0,
-    _A0,
-    _B0,
-    _C1,
-    _D1,
-    _E1,
-    _F1,
-    _G1,
-    _A1,
-    _B1,
-    _C2,
-    _D2,
-    _E2,
-    _F2,
-    _G2,
-    _A2,
-    _B2,
-    _C3,
-    _D3,
-    _E3,
-    _F3,
-    _G3,
-    _A3,
-    _B3,
-    _C4,
-    _D4,
-    _E4,
-    _F4,
-    _G4,
-    _A4,
-    _B4,
-    _C5,
-    _D5,
-    _E5,
-    _F5,
-    _G5,
-    _A5,
-    _B5,
-    _C6,
-    _D6,
-    _E6,
-    _F6,
-    _G6,
-    _A6,
-    _B6,
-    _C7,
-    _D7,
-    _E7,
-    _F7,
-    _G7,
-    _A7,
-    _B7,
-    _C8,
-    _D8,
-    _E8,
-    _F8,
-    _G8,
-    _A8,
-    _B8,
+    _NOTE_C0,
+    _NOTE_D0,
+    _NOTE_E0,
+    _NOTE_F0,
+    _NOTE_G0,
+    _NOTE_A0,
+    _NOTE_B0,
+    _NOTE_C1,
+    _NOTE_D1,
+    _NOTE_E1,
+    _NOTE_F1,
+    _NOTE_G1,
+    _NOTE_A1,
+    _NOTE_B1,
+    _NOTE_C2,
+    _NOTE_D2,
+    _NOTE_E2,
+    _NOTE_F2,
+    _NOTE_G2,
+    _NOTE_A2,
+    _NOTE_B2,
+    _NOTE_C3,
+    _NOTE_D3,
+    _NOTE_E3,
+    _NOTE_F3,
+    _NOTE_G3,
+    _NOTE_A3,
+    _NOTE_B3,
+    _NOTE_C4,
+    _NOTE_D4,
+    _NOTE_E4,
+    _NOTE_F4,
+    _NOTE_G4,
+    _NOTE_A4,
+    _NOTE_B4,
+    _NOTE_C5,
+    _NOTE_D5,
+    _NOTE_E5,
+    _NOTE_F5,
+    _NOTE_G5,
+    _NOTE_A5,
+    _NOTE_B5,
+    _NOTE_C6,
+    _NOTE_D6,
+    _NOTE_E6,
+    _NOTE_F6,
+    _NOTE_G6,
+    _NOTE_A6,
+    _NOTE_B6,
+    _NOTE_C7,
+    _NOTE_D7,
+    _NOTE_E7,
+    _NOTE_F7,
+    _NOTE_G7,
+    _NOTE_A7,
+    _NOTE_B7,
+    _NOTE_C8,
+    _NOTE_D8,
+    _NOTE_E8,
+    _NOTE_F8,
+    _NOTE_G8,
+    _NOTE_A8,
+    _NOTE_B8,
 };
 
 const uint8_t naturalNotesDown[] = {
-    _C8,
-    _D8,
-    _E8,
-    _F8,
-    _G8,
-    _A8,
-    _B8,
-    _C7,
-    _D7,
-    _E7,
-    _F7,
-    _G7,
-    _A7,
-    _B7,
-    _C6,
-    _D6,
-    _E6,
-    _F6,
-    _G6,
-    _A6,
-    _B6,
-    _C5,
-    _D5,
-    _E5,
-    _F5,
-    _G5,
-    _A5,
-    _B5,
-    _C4,
-    _D4,
-    _E4,
-    _F4,
-    _G4,
-    _A4,
-    _B4,
-    _C3,
-    _D3,
-    _E3,
-    _F3,
-    _G3,
-    _A3,
-    _B3,
-    _C2,
-    _D2,
-    _E2,
-    _F2,
-    _G2,
-    _A2,
-    _B2,
-    _C1,
-    _D1,
-    _E1,
-    _F1,
-    _G1,
-    _A1,
-    _B1,
-    _C0,
-    _D0,
-    _E0,
-    _F0,
-    _G0,
-    _A0,
-    _B0,
+    _NOTE_C8,
+    _NOTE_D8,
+    _NOTE_E8,
+    _NOTE_F8,
+    _NOTE_G8,
+    _NOTE_A8,
+    _NOTE_B8,
+    _NOTE_C7,
+    _NOTE_D7,
+    _NOTE_E7,
+    _NOTE_F7,
+    _NOTE_G7,
+    _NOTE_A7,
+    _NOTE_B7,
+    _NOTE_C6,
+    _NOTE_D6,
+    _NOTE_E6,
+    _NOTE_F6,
+    _NOTE_G6,
+    _NOTE_A6,
+    _NOTE_B6,
+    _NOTE_C5,
+    _NOTE_D5,
+    _NOTE_E5,
+    _NOTE_F5,
+    _NOTE_G5,
+    _NOTE_A5,
+    _NOTE_B5,
+    _NOTE_C4,
+    _NOTE_D4,
+    _NOTE_E4,
+    _NOTE_F4,
+    _NOTE_G4,
+    _NOTE_A4,
+    _NOTE_B4,
+    _NOTE_C3,
+    _NOTE_D3,
+    _NOTE_E3,
+    _NOTE_F3,
+    _NOTE_G3,
+    _NOTE_A3,
+    _NOTE_B3,
+    _NOTE_C2,
+    _NOTE_D2,
+    _NOTE_E2,
+    _NOTE_F2,
+    _NOTE_G2,
+    _NOTE_A2,
+    _NOTE_B2,
+    _NOTE_C1,
+    _NOTE_D1,
+    _NOTE_E1,
+    _NOTE_F1,
+    _NOTE_G1,
+    _NOTE_A1,
+    _NOTE_B1,
+    _NOTE_C0,
+    _NOTE_D0,
+    _NOTE_E0,
+    _NOTE_F0,
+    _NOTE_G0,
+    _NOTE_A0,
+    _NOTE_B0,
 };
 
 // maybe switch to https://pages.mtu.edu/~suits/notefreqs.html
@@ -343,5 +347,6 @@ const float NOTE_FREQ[] = {
     5919.910763354502, 6271.926975674461, 6644.875161243596,
     7039.999999962365, 7458.620184249568, 7902.132820055737
 };
+}
 
 #endif

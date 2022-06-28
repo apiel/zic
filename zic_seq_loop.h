@@ -4,7 +4,7 @@
 #include "zic_note.h"
 #include "zic_seq_pattern.h"
 
-#define REF_NOTE _C4
+#define REF_NOTE Zic::_NOTE_C4
 
 #ifndef SEQ_LOOP_DEFAULT_VELOCITY
 #define SEQ_LOOP_DEFAULT_VELOCITY 100
