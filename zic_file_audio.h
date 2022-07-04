@@ -1,10 +1,7 @@
 #ifndef ZIC_FILE_AUDIO_H_
 #define ZIC_FILE_AUDIO_H_
 
-#include "SoundTouch/SoundTouch.h"
 #include "zic_file.h"
-
-using namespace soundtouch;
 
 #define BUFF_SIZE 6720
 
@@ -28,73 +25,10 @@ protected:
 
     WavHeader header;
 
-    SoundTouch soundTouch;
-
-    void setupSoundTouch()
-    {
-        // printf("Setup soundTouch %s\n", SoundTouch::getVersionString());
-
-        soundTouch.setSampleRate(header.SampleRate);
-        soundTouch.setChannels(header.NumChannels);
-        soundTouch.setTempo(1.0f);
-        soundTouch.setPitchSemiTones(0.0f);
-        soundTouch.setRate(1.0f);
-
-        doResample(0.0f);
-    }
-
-    void doResample(float newPitch)
-    {
-        SDL_RWops *fileOut = SDL_RWFromFile("samples/kick_re.wav", "wb");
-
-        soundTouch.setPitchSemiTones(newPitch);
-
-        SAMPLETYPE sampleBuffer[BUFF_SIZE];
-        int buffSizeSamples = BUFF_SIZE / header.NumChannels;;
-        uint16_t nSamples;
-
-        // header should not be necessary
-        SDL_RWwrite(fileOut, (uint8_t*)&header, sizeof(WavHeader), 1);
-
-        while (read(sampleBuffer, BUFF_SIZE)) {
-            // printf("Read %d buff\n", num);
-            nSamples = BUFF_SIZE / header.NumChannels;
-            soundTouch.putSamples(sampleBuffer, nSamples);
-            do {
-                nSamples = soundTouch.receiveSamples(sampleBuffer, buffSizeSamples);
-                SDL_RWwrite(fileOut, sampleBuffer, nSamples * header.NumChannels, 1);
-            } while (nSamples != 0);
-        }
-        soundTouch.flush();
-        do {
-            nSamples = soundTouch.receiveSamples(sampleBuffer, buffSizeSamples);
-            SDL_RWwrite(fileOut, sampleBuffer, nSamples * header.NumChannels, 1);
-        } while (nSamples != 0);
-
-        SDL_RWclose(fileOut);
-    }
-
 public:
     uint64_t start = 0;
     uint64_t end = 0;
     uint64_t sampleCount = 0;
-    bool resample = true;
-
-    // bool read(void* ptr, uint16_t size) override
-    // {
-    //     bool res = Zic_File::read(ptr, size);
-    //     if (resample) {
-    //         soundTouch.putSamples((SAMPLETYPE*)ptr, 1);
-    //         soundTouch.receiveSamples((SAMPLETYPE*)ptr, size);
-    //         soundTouch.flush();
-    //     }
-    //     return res;
-    // }
-
-    // void setPitchSemiTones(float newPitch)
-    // {
-    //     soundTouch.setPitchSemiTones(newPitch);
-    // }
 
     Zic_File_Audio()
     {
@@ -137,8 +71,6 @@ public:
         end = tell();
         restart();
         sampleCount = (end - start) / (header.BitsPerSample); // * header.NumChannels
-
-        setupSoundTouch();
 
         printf("Audio file %d %d %d start %ld end %ld sampleCount %ld\n",
             header.BitsPerSample, header.AudioFormat, header.NumChannels, start, end, sampleCount);
