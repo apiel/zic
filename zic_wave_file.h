@@ -30,8 +30,10 @@ public:
 
     Zic_Wave_File()
     {
-        // audioFile.open("samples/59.wav");
-        audioFile.open("samples/kick.wav");
+        // audioFile.open("samples/kick.wav");
+
+        audioFile.open("wavetables/59.wav");
+        isWavetable = true;
     }
 
     void restart()
