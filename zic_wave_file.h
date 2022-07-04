@@ -30,10 +30,14 @@ public:
 
     Zic_Wave_File()
     {
-        // audioFile.open("samples/kick.wav");
+        // open("samples/kick.wav");
+        open("wavetables/59.wav", true);
+    }
 
-        audioFile.open("wavetables/59.wav");
-        isWavetable = true;
+    void open(const char *filename, bool _isWavetable = false)
+    {
+        audioFile.open(filename);
+        isWavetable = _isWavetable;
     }
 
     void restart()

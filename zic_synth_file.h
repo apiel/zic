@@ -20,9 +20,9 @@ public:
     // Zic_Mod_AsrFastQ asr;
     Zic_Mod_Filter filter;
 
-    Zic_Synth_File()
-    {
-    }
+    // Zic_Synth_File()
+    // {
+    // }
 
     int16_t next()
     {
