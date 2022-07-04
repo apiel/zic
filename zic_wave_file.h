@@ -1,5 +1,5 @@
-#ifndef ZIC_WAVE_SAMPLE_H_
-#define ZIC_WAVE_SAMPLE_H_
+#ifndef ZIC_WAVE_FILE_H_
+#define ZIC_WAVE_FILE_H_
 
 #include "zic_file_audio.h"
 #include "zic_wave_base.h"

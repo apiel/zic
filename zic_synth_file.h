@@ -1,5 +1,5 @@
-#ifndef ZIC_SYNTH_SAMPLE_H_
-#define ZIC_SYNTH_SAMPLE_H_
+#ifndef ZIC_SYNTH_FILE_H_
+#define ZIC_SYNTH_FILE_H_
 
 #include "zic_mod_asr.h"
 // #include <zic/zic_mod_asrFast.h>
@@ -11,7 +11,7 @@
  * @brief Basic sample synth
  *
  */
-class Zic_Synth_Sample
+class Zic_Synth_File
 {
 public:
     Zic_Wave_File wave;
@@ -20,7 +20,7 @@ public:
     // Zic_Mod_AsrFastQ asr;
     Zic_Mod_Filter filter;
 
-    Zic_Synth_Sample()
+    Zic_Synth_File()
     {
     }
 
