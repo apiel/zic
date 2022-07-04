@@ -12,15 +12,13 @@ protected:
             return 0;
         }
 
-        // // this seemed to work with wavetable samples, but not with basic wav samples
-        // // but does not work :p
-        // int i = (FREQ_PI * (*_freq) * time) * audioFile.sampleCount;
-        // audioFile.seekToSample(i % audioFile.sampleCount);
-
         int16_t bit;
-        bool r = audioFile.read(&bit, sizeof(bit));
-        if (!r) {
-            onEnd();
+        if (isWavetable) {
+            int i = (FREQ_PI * (*_freq) * time) * audioFile.sampleCount;
+            audioFile.seekToSample(i % audioFile.sampleCount);
+            audioFile.read(&bit, sizeof(bit));
+        } else {
+            audioFile.read(&bit, sizeof(bit));
         }
         return bit;
     }
@@ -28,8 +26,7 @@ protected:
 public:
     Zic_File_Audio audioFile;
 
-    bool loop = false;
-    // bool loop = true;
+    bool isWavetable = false;
 
     Zic_Wave_File()
     {
@@ -37,23 +34,10 @@ public:
         audioFile.open("samples/kick.wav");
     }
 
-    void onEnd()
-    {
-        if (loop) {
-            restart();
-        }
-    }
-
     void restart()
     {
         audioFile.restart();
     }
-
-    // void setNote(uint8_t note) override
-    // {
-    //     // setFrequency(Zic::NOTE_FREQ[note]);
-    //     audioFile.setPitchSemiTones(Zic::_NOTE_C4 - note);
-    // }
 };
 
 #endif
