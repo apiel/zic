@@ -4,7 +4,7 @@
 #include "zic_file_audio.h"
 #include "zic_wave_base.h"
 
-class Zic_Wave_Sample : public Zic_Wave_Base {
+class Zic_Wave_File : public Zic_Wave_Base {
 protected:
     int16_t sample(uint32_t* _freq)
     {
@@ -31,7 +31,7 @@ public:
     bool loop = false;
     // bool loop = true;
 
-    Zic_Wave_Sample()
+    Zic_Wave_File()
     {
         // audioFile.open("samples/59.wav");
         audioFile.open("samples/kick.wav");

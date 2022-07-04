@@ -5,7 +5,7 @@
 // #include <zic/zic_mod_asrFast.h>
 // #include <zic/zic_mod_asrFastQ.h>
 #include "zic_mod_filter.h"
-#include "zic_wave_sample.h"
+#include "zic_wave_file.h"
 
 /**
  * @brief Basic sample synth
@@ -14,7 +14,7 @@
 class Zic_Synth_Sample
 {
 public:
-    Zic_Wave_Sample wave;
+    Zic_Wave_File wave;
     Zic_Mod_Asr asr;
     // Zic_Mod_AsrFast asr;
     // Zic_Mod_AsrFastQ asr;
