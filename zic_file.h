@@ -26,9 +26,9 @@ public:
         return NULL;
     }
 
-    virtual bool read(void* ptr, uint16_t size)
+    virtual uint64_t read(void* ptr, uint16_t size)
     {
-        return false;
+        return 0;
     }
 
     virtual uint64_t tell()

@@ -6,6 +6,8 @@
 
 using namespace soundtouch;
 
+#define BUFF_SIZE 6720
+
 class Zic_File_Audio : public Zic_File {
 protected:
     typedef struct WavHeader {
@@ -37,6 +39,39 @@ protected:
         soundTouch.setTempo(1.0f);
         soundTouch.setPitchSemiTones(0.0f);
         soundTouch.setRate(1.0f);
+
+        doResample(0.0f);
+    }
+
+    void doResample(float newPitch)
+    {
+        SDL_RWops *fileOut = SDL_RWFromFile("samples/kick_re.wav", "wb");
+
+        soundTouch.setPitchSemiTones(newPitch);
+
+        SAMPLETYPE sampleBuffer[BUFF_SIZE];
+        int buffSizeSamples = BUFF_SIZE / header.NumChannels;;
+        uint16_t nSamples;
+
+        // header should not be necessary
+        SDL_RWwrite(fileOut, (uint8_t*)&header, sizeof(WavHeader), 1);
+
+        while (read(sampleBuffer, BUFF_SIZE)) {
+            // printf("Read %d buff\n", num);
+            nSamples = BUFF_SIZE / header.NumChannels;
+            soundTouch.putSamples(sampleBuffer, nSamples);
+            do {
+                nSamples = soundTouch.receiveSamples(sampleBuffer, buffSizeSamples);
+                SDL_RWwrite(fileOut, sampleBuffer, nSamples * header.NumChannels, 1);
+            } while (nSamples != 0);
+        }
+        soundTouch.flush();
+        do {
+            nSamples = soundTouch.receiveSamples(sampleBuffer, buffSizeSamples);
+            SDL_RWwrite(fileOut, sampleBuffer, nSamples * header.NumChannels, 1);
+        } while (nSamples != 0);
+
+        SDL_RWclose(fileOut);
     }
 
 public:
