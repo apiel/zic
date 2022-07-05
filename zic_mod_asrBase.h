@@ -69,6 +69,16 @@ public:
     }
 
     /**
+     * @brief Return the Attack in millisecond.
+     *
+     * @param ms
+     */
+    uint16_t getAttack()
+    {
+        return attackMs;
+    }
+
+    /**
      * @brief Set the Release in millisecond.
      *
      * @param ms
@@ -77,6 +87,16 @@ public:
     {
         releaseMs = ms;
         releaseStep = stepTarget / ((float)ms * SAMPLE_PER_MS);
+    }
+
+    /**
+     * @brief Return the Release in millisecond.
+     *
+     * @param ms
+     */
+    uint16_t getRelease()
+    {
+        return releaseMs;
     }
 
     virtual void debug()
