@@ -21,6 +21,11 @@ public:
         close();
     }
 
+    virtual bool isOpen()
+    {
+        return file != NULL;
+    }
+
     virtual void* open(const char* filename, const char* mode)
     {
         return NULL;
