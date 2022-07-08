@@ -28,12 +28,6 @@ public:
 
     bool isWavetable = false;
 
-    Zic_Wave_File()
-    {
-        // open("samples/kick.wav");
-        open("wavetables/59.wav", true);
-    }
-
     void open(const char* filename, bool _isWavetable = false)
     {
         audioFile.open(filename);
