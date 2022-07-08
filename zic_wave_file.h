@@ -34,7 +34,7 @@ public:
         open("wavetables/59.wav", true);
     }
 
-    void open(const char *filename, bool _isWavetable = false)
+    void open(const char* filename, bool _isWavetable = false)
     {
         audioFile.open(filename);
         isWavetable = _isWavetable;
