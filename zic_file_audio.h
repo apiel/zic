@@ -72,8 +72,8 @@ public:
         restart();
         sampleCount = (end - start) / (header.BitsPerSample); // * header.NumChannels
 
-        printf("Audio file %d %d %d start %ld end %ld sampleCount %ld\n",
-            header.BitsPerSample, header.AudioFormat, header.NumChannels, start, end, sampleCount);
+        // printf("Audio file %d %d %d start %ld end %ld sampleCount %ld\n",
+        //     header.BitsPerSample, header.AudioFormat, header.NumChannels, (long)start, (long)end, (long)sampleCount);
 
         return file;
     }
