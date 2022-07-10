@@ -31,7 +31,7 @@ protected:
     // Pre-calculation
     uint32_t freq = frequency; // * pitch;
 
-    uint16_t amplitude = 100;
+    int8_t amplitude = 100;
     // float pitch = 1.0f;
 
     uint16_t phase = 0; // 0 to 360
@@ -70,7 +70,7 @@ public:
      */
     void setPhase(uint16_t value)
     {
-        phase = between(value, 0, 360);
+        phase = range(value, 0, 360);
     }
 
     /**
@@ -88,9 +88,9 @@ public:
      *
      * @param value between 0 and 100
      */
-    void setAmplitude(uint16_t value)
+    void setAmplitude(int8_t value)
     {
-        amplitude = between(value, 0, 100);
+        amplitude = range(value, 0, 100);
     }
 
     /**

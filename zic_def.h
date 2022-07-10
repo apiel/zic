@@ -18,8 +18,8 @@
 #define MAX_FREQUENCY SAMPLE_RATE * 0.25
 #endif
 
-#ifndef between
-#define between(x, a, b) (((a) <= (x)) && ((x) <= (b)))
+#ifndef isBetween
+#define isBetween(x, a, b) (((a) <= (x)) && ((x) <= (b)))
 #endif
 
 #ifndef range

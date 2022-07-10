@@ -20,7 +20,7 @@ protected:
         } else {
             audioFile.read(&bit, sizeof(bit));
         }
-        return bit;
+        return bit * amplitude / 100;
     }
 
 public:
