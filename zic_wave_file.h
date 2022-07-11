@@ -39,7 +39,9 @@ public:
 
     void restart()
     {
-        audioFile.restart();
+        if (!isWavetable) {
+            audioFile.restart();
+        }
     }
 };
 

@@ -53,9 +53,15 @@ public:
             return NULL;
         }
 
-        // To avoid to trigger off again set slide to true
-        stepOff.slide = true;
+        // TODO bad idea, instead use something like `step.isOn` or `step.playing`
+        // // To avoid to trigger off again set slide to true
+        // stepOff.slide = true;
         return &stepOff;
+    }
+
+    bool wasSlide()
+    {
+        return stepOff.slide;
     }
 
     void next()

@@ -60,7 +60,7 @@ public:
     void set(uint8_t _instrument, uint8_t _note, uint8_t _velocity, bool _slide)
     {
         velocity = _velocity;
-        set(_instrument, _note, _velocity);
+        set(_instrument, _note, _slide);
     }
 };
 

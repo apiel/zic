@@ -4,8 +4,7 @@
 #include "zic_wave_base.h"
 
 template <typename T, typename TData = int16_t>
-class Zic_Mod_AsrBase
-{
+class Zic_Mod_AsrBase {
 protected:
     uint8_t phase = END_PHASE;
     uint8_t nextPhase = END_PHASE;
@@ -19,8 +18,13 @@ protected:
 
     uint8_t note = 0;
 
-    enum
+    virtual int16_t getData(int16_t data)
     {
+        return value * data;
+    }
+
+public:
+    enum {
         ATTACK_PHASE,
         SUSTAIN_PHASE,
         RELEASE_PHASE,
@@ -28,12 +32,6 @@ protected:
         PHASE_COUNT
     };
 
-    virtual int16_t getData(int16_t data)
-    {
-        return value * data;
-    }
-
-public:
     /**
      * @brief set to true to skip substain phase
      */
@@ -120,15 +118,11 @@ public:
      */
     TData next(TData data = 100)
     {
-        switch (phase)
-        {
+        switch (phase) {
         case ATTACK_PHASE:
-            if (value < stepTarget)
-            {
+            if (value < stepTarget) {
                 value += attackStep;
-            }
-            else
-            {
+            } else {
                 // Serial.println("end ATTACK_PHASE");
                 value = stepTarget;
                 phase = nextPhase;
@@ -136,14 +130,12 @@ public:
             }
             break;
         case SUSTAIN_PHASE:
+            value = stepTarget;
             break;
         case RELEASE_PHASE:
-            if (value > releaseStep)
-            {
+            if (value > releaseStep) {
                 value -= releaseStep;
-            }
-            else
-            {
+            } else {
                 // Serial.println("end RELEASE_PHASE");
                 value = 0;
                 phase = END_PHASE;
@@ -161,13 +153,23 @@ public:
      *
      * @param _note
      */
-    void on(uint8_t _note = 0)
+    void on(uint8_t _phase = ATTACK_PHASE, uint8_t _note = 0)
     {
         // Serial.println("start ATTACK_PHASE");
         note = _note;
         value = 0;
         nextPhase = noSustain ? RELEASE_PHASE : SUSTAIN_PHASE;
-        phase = ATTACK_PHASE;
+        phase = _phase;
+    }
+
+    /**
+     * @brief Skip attack phase and go directly to sustain phase
+     *
+     * @param _note
+     */
+    void slide(uint8_t _note = 0)
+    {
+        on(SUSTAIN_PHASE, _note);
     }
 
     /**
@@ -177,8 +179,7 @@ public:
      */
     void off(uint8_t _note = 0)
     {
-        if (_note && _note != note)
-        {
+        if (_note && _note != note) {
             return;
         }
 
@@ -192,17 +193,13 @@ public:
      */
     void nextOff(uint8_t _note = 0)
     {
-        if (_note && _note != note)
-        {
+        if (_note && _note != note) {
             return;
         }
 
-        if (nextPhase != END_PHASE)
-        {
+        if (nextPhase != END_PHASE) {
             nextPhase = RELEASE_PHASE;
-        }
-        else
-        {
+        } else {
             off(_note);
         }
     }
