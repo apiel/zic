@@ -10,8 +10,7 @@
 #define SEQ_LOOP_DEFAULT_VELOCITY 100
 #endif
 
-class Zic_Seq_Loop
-{
+class Zic_Seq_Loop {
 protected:
     uint8_t currentStep = 0;
     Zic_Seq_Step stepOn;
@@ -22,48 +21,46 @@ protected:
 public:
     bool loopOn = false;
     uint8_t play = 0;
-    uint8_t previousLoopNote = 0;
+    uint8_t previousLoopNote = REF_NOTE;
     uint8_t nextToPlay = 0;
 
-    Zic_Seq_Pattern *nextPattern = NULL;
-    Zic_Seq_Pattern *pattern = NULL;
+    Zic_Seq_Pattern* nextPattern = NULL;
+    Zic_Seq_Pattern* pattern = NULL;
 
-    Zic_Seq_Loop() {}
-    Zic_Seq_Loop(Zic_Seq_Pattern *_pattern)
+    Zic_Seq_Loop() { }
+    Zic_Seq_Loop(Zic_Seq_Pattern* _pattern)
     {
         pattern = _pattern;
         nextPattern = _pattern;
     }
 
-    void setNextPattern(Zic_Seq_Pattern *_nextPattern)
+    void setNextPattern(Zic_Seq_Pattern* _nextPattern)
     {
         nextPattern = _nextPattern;
     }
 
-    Zic_Seq_Step *getNoteOn()
+    Zic_Seq_Step* getNoteOn()
     {
-        if (play && stepOn.note > 0)
-        {
+        if (play && stepOn.note > 0) {
             return &stepOn;
         }
         return NULL;
     }
 
-    Zic_Seq_Step *getNoteOff()
+    Zic_Seq_Step* getNoteOff()
     {
-        if (!stepOff.slide)
-        {
-            // To avoid repeating this again, let set slide to true
-            stepOff.slide = true;
-            return &stepOff;
+        if (stepOff.slide && getNoteOn()) {
+            return NULL;
         }
-        return NULL;
+
+        // To avoid to trigger off again set slide to true
+        stepOff.slide = true;
+        return &stepOff;
     }
 
     void next()
     {
-        if (play && pattern)
-        {
+        if (play && pattern) {
             stepOff.set(&stepOn);
             stepOn.set(&pattern->steps[currentStep]);
             if (stepOn.note) {
@@ -73,8 +70,7 @@ public:
             currentStep = (currentStep + 1) % pattern->stepCount;
         }
 
-        if (currentStep == 0)
-        {
+        if (currentStep == 0) {
             pattern = nextPattern;
             play = nextToPlay ? nextToPlay : 0;
             velocity = nextVelocity;
@@ -89,8 +85,7 @@ public:
 
     void off(uint8_t note)
     {
-        if (!loopOn && note == nextToPlay)
-        {
+        if (!loopOn && note == nextToPlay) {
             nextToPlay = 0;
         }
     }
@@ -100,12 +95,9 @@ public:
     void setLoopMode(bool value = true)
     {
         loopOn = value;
-        if (loopOn)
-        {
+        if (loopOn) {
             nextToPlay = previousLoopNote;
-        }
-        else
-        {
+        } else {
             previousLoopNote = nextToPlay;
             nextToPlay = 0;
         }
