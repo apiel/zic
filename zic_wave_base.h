@@ -20,17 +20,18 @@
 
 #define RESET_TIME DELTA_TIME * 360 * 10000
 
-class Zic_Wave_Base
-{
+class Zic_Wave_Base {
 protected:
     float time = 0.0;
 
-    virtual int16_t sample(uint32_t *freq) { return 0; }
+    virtual int16_t sample(uint32_t* freq) { return 0; }
     uint32_t frequency = 103.82617439443122f * FREQ_MULT; // C3
 
     // Pre-calculation
     uint32_t freq = frequency; // * pitch;
 
+    bool skipSample = false;
+    bool mute = false;
     int8_t amplitude = 100;
     // float pitch = 1.0f;
 
@@ -41,6 +42,12 @@ protected:
     void updateFreq()
     {
         freq = frequency; // and do something with pitch
+    }
+
+    virtual bool setSkipSample()
+    {
+        skipSample = mute || amplitude <= 0;
+        return skipSample;
     }
 
 public:
@@ -57,10 +64,36 @@ public:
             time = 0.0;
         }
 
+        if (skipSample) {
+            return 0;
+        }
+
         // use bitwise >> 8 to reduce amplitude (division by 256)
         // we could have a higher quality wavetable to int32 using a higher bitwise value
         // but is it really necessary? int16 make a gain on firmware size!
         return (amplitude * sample(&freq)) >> 8;
+    }
+
+    /**
+     * @brief Set wave on mute
+     *
+     * @param _mute
+     */
+    void setMute(bool _mute = true)
+    {
+        mute = _mute;
+        setSkipSample();
+    }
+
+    /**
+     * @brief return muted status
+     *
+     * @return true
+     * @return false
+     */
+    bool isMuted()
+    {
+        return mute;
     }
 
     /**
@@ -91,6 +124,7 @@ public:
     void setAmplitude(int8_t value)
     {
         amplitude = range(value, 0, 100);
+        setSkipSample();
     }
 
     /**
