@@ -22,7 +22,7 @@ public:
     void set(int8_t _detune, uint8_t _velocity = 100)
     {
         velocity = _velocity;
-        detune = _detune;
+        detune = range(_detune, -99, 99);
     }
 
     void setPattern(Zic_Seq_Pattern* _pattern)
