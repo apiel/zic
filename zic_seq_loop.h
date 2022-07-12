@@ -4,44 +4,65 @@
 #include "zic_note.h"
 #include "zic_seq_pattern.h"
 
-#define REF_NOTE Zic::_NOTE_C4
+class Zic_Seq_Loop_State {
+public:
+    int8_t detune = 0;
+    uint8_t velocity = 100;
+    Zic_Seq_Pattern* pattern = NULL;
+    bool playing = false;
 
-#ifndef SEQ_LOOP_DEFAULT_VELOCITY
-#define SEQ_LOOP_DEFAULT_VELOCITY 100
-#endif
+    void set(Zic_Seq_Loop_State* state)
+    {
+        detune = state->detune;
+        velocity = state->velocity;
+        pattern = state->pattern;
+        playing = state->playing;
+    }
+
+    void set(int8_t _detune, uint8_t _velocity = 100)
+    {
+        velocity = _velocity;
+        detune = _detune;
+    }
+
+    void setPattern(Zic_Seq_Pattern* _pattern)
+    {
+        pattern = _pattern;
+    }
+
+    void togglePlay() { play(!playing); }
+
+    void stop()
+    {
+        play(false);
+    }
+
+    void play(bool value = true)
+    {
+        playing = value;
+    }
+};
 
 class Zic_Seq_Loop {
 protected:
     uint8_t currentStep = 0;
     Zic_Seq_Step stepOn;
     Zic_Seq_Step stepOff;
-    uint8_t velocity = SEQ_LOOP_DEFAULT_VELOCITY;
-    uint8_t nextVelocity = SEQ_LOOP_DEFAULT_VELOCITY;
 
 public:
-    bool loopOn = false;
-    uint8_t play = 0;
-    uint8_t previousLoopNote = REF_NOTE;
-    uint8_t nextToPlay = 0;
-
-    Zic_Seq_Pattern* nextPattern = NULL;
-    Zic_Seq_Pattern* pattern = NULL;
+    Zic_Seq_Loop_State state;
+    Zic_Seq_Loop_State nextState;
 
     Zic_Seq_Loop() { }
     Zic_Seq_Loop(Zic_Seq_Pattern* _pattern)
     {
-        pattern = _pattern;
-        nextPattern = _pattern;
-    }
-
-    void setNextPattern(Zic_Seq_Pattern* _nextPattern)
-    {
-        nextPattern = _nextPattern;
+        state.setPattern(_pattern);
+        nextState.setPattern(_pattern);
     }
 
     Zic_Seq_Step* getNoteOn()
     {
-        if (play && stepOn.note > 0) {
+        if (state.playing && stepOn.note > 0) {
             return &stepOn;
         }
         return NULL;
@@ -66,46 +87,18 @@ public:
 
     void next()
     {
-        if (play && pattern) {
+        if (state.playing && state.pattern) {
             stepOff.set(&stepOn);
-            stepOn.set(&pattern->steps[currentStep]);
+            stepOn.set(&state.pattern->steps[currentStep]);
             if (stepOn.note) {
-                stepOn.note += (int)play - (int)REF_NOTE;
+                stepOn.note += state.detune;
             }
-            stepOn.velocity = velocity;
-            currentStep = (currentStep + 1) % pattern->stepCount;
+            stepOn.velocity = state.velocity;
+            currentStep = (currentStep + 1) % state.pattern->stepCount;
         }
 
         if (currentStep == 0) {
-            pattern = nextPattern;
-            play = nextToPlay ? nextToPlay : 0;
-            velocity = nextVelocity;
-        }
-    }
-
-    void on(uint8_t note, uint8_t _velocity = SEQ_LOOP_DEFAULT_VELOCITY)
-    {
-        nextVelocity = _velocity;
-        nextToPlay = note;
-    }
-
-    void off(uint8_t note)
-    {
-        if (!loopOn && note == nextToPlay) {
-            nextToPlay = 0;
-        }
-    }
-
-    void toggleLoopMode() { setLoopMode(!loopOn); }
-
-    void setLoopMode(bool value = true)
-    {
-        loopOn = value;
-        if (loopOn) {
-            nextToPlay = previousLoopNote;
-        } else {
-            previousLoopNote = nextToPlay;
-            nextToPlay = 0;
+            state.set(&nextState);
         }
     }
 };
