@@ -139,7 +139,7 @@ uint8_t charNotetoInt(char letter, char sharp, char octave)
 
     uint8_t note = 0;
     for (; note < 12; note++) {
-        if (noteNames[note][0] != letter && (sharp != '#' || noteNames[note][1] == '#')) {
+        if (noteNames[note][0] == letter && (sharp != '#' || noteNames[note][1] == '#')) {
             break;
         }
     }
