@@ -36,6 +36,11 @@ public:
         return 0;
     }
 
+    virtual uint64_t write(void* ptr, uint16_t size)
+    {
+        return 0;
+    }
+
     virtual uint64_t tell()
     {
         return 0;
