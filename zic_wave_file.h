@@ -8,7 +8,7 @@ class Zic_Wave_File : public Zic_Wave_Base {
 protected:
     int16_t sample(uint32_t* _freq)
     {
-        int16_t bit;
+        int16_t bit = 0;
         if (isWavetable) {
             int i = (FREQ_PI * (*_freq) * time) * audioFile.sampleCount;
             audioFile.seekToSample(i % audioFile.sampleCount);
