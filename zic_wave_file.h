@@ -37,8 +37,9 @@ public:
         setSkipSample();
     }
 
-    void restart()
+    void reset()
     {
+        Zic_Wave_Base::reset();
         if (!isWavetable) {
             audioFile.restart();
         }

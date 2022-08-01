@@ -18,8 +18,6 @@
 #define FREQ_PI M_PI / FREQ_MULT
 #endif
 
-#define RESET_TIME DELTA_TIME * 360 * 10000
-
 class Zic_Wave_Base {
 protected:
     float time = 0.0;
@@ -58,11 +56,7 @@ public:
     {
         time += DELTA_TIME;
 
-        // FIXME trying to fix changing tone, maybe this would work...
-        if (time >= RESET_TIME) {
-            // SDL_Log("Reset timing %.6f", time);
-            time = 0.0;
-        }
+        // Should we reset time if it over a certain value?
 
         if (skipSample) {
             return 0;
@@ -72,6 +66,16 @@ public:
         // we could have a higher quality wavetable to int32 using a higher bitwise value
         // but is it really necessary? int16 make a gain on firmware size!
         return (amplitude * sample(&freq)) >> 8;
+    }
+
+    float getTime()
+    {
+        return time;
+    }
+
+    virtual void reset()
+    {
+        time = 0.0;
     }
 
     /**
