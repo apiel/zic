@@ -26,8 +26,18 @@ public:
      */
     void set(uint16_t _bpm)
     {
-        bpm = _bpm;
+        bpm = range(_bpm, 10, 250);
         tempo = 60000 / (bpm * STEP_PER_BEAT);
+    }
+
+    /**
+     * @brief Get tempo in beat per minutes (BPM)
+     *
+     * @return uint16_t
+     */
+    uint16_t getBpm()
+    {
+        return bpm;
     }
 
     /**
