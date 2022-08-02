@@ -33,7 +33,7 @@ public:
     };
 
     float cutoff = 0.2;
-    float resonance = 0.9;
+    float resonance = 0.0;
     FilterMode mode = FILTER_MODE_LOWPASS;
 
     Zic_Mod_Filter()
