@@ -10,6 +10,7 @@ public:
     uint8_t velocity = 100;
     Zic_Seq_Pattern* pattern = NULL;
     bool playing = false;
+    uint8_t* currentStepSync = NULL;
 
     void set(Zic_Seq_Loop_State* state)
     {
@@ -17,6 +18,7 @@ public:
         velocity = state->velocity;
         pattern = state->pattern;
         playing = state->playing;
+        currentStepSync = state->currentStepSync;
     }
 
     void set(int8_t _detune, uint8_t _velocity = 100)
@@ -45,11 +47,11 @@ public:
 
 class Zic_Seq_Loop {
 protected:
-    uint8_t currentStep = 0;
     Zic_Seq_Step stepOn;
     Zic_Seq_Step stepOff;
 
 public:
+    uint8_t currentStep = 0;
     Zic_Seq_Loop_State state;
     Zic_Seq_Loop_State nextState;
 
@@ -80,6 +82,11 @@ public:
         return &stepOff;
     }
 
+    uint8_t getStepsLeft()
+    {
+        return state.pattern->stepCount - (currentStep + 1);
+    }
+
     bool wasSlide()
     {
         return stepOff.slide;
@@ -87,6 +94,7 @@ public:
 
     void next()
     {
+
         if (state.playing && state.pattern) {
             stepOff.set(&stepOn);
             stepOn.set(&state.pattern->steps[currentStep]);
@@ -96,9 +104,13 @@ public:
             stepOn.velocity = state.velocity;
             currentStep = (currentStep + 1) % state.pattern->stepCount;
         }
-
-        if (currentStep == 0) {
-            state.set(&nextState);
+        if (currentStep == 0 && (state.playing || nextState.playing)) {
+            if (nextState.currentStepSync == NULL) {
+                state.set(&nextState);
+            } else if (*nextState.currentStepSync == 0) {
+                nextState.currentStepSync = NULL;
+                state.set(&nextState);
+            }
         }
     }
 };
