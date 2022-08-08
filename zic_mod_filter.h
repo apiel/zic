@@ -3,6 +3,8 @@
 
 // http://www.martin-finke.de/blog/articles/audio-plugins-013-filter/
 
+// TODO rename this to Zic_Effect_Filter
+
 class Zic_Mod_Filter
 {
 protected:

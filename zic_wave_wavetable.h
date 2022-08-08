@@ -12,6 +12,7 @@ protected:
     {
         int i = (FREQ_PI * (*_freq) * time + phase) * sampleCount;
         // return table[i % sampleCount];
+        // FIXME modulo, dont use motulo but comparison
         return table[((i % sampleCount) + pos) % size];
     }
 
