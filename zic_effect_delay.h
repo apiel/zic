@@ -16,7 +16,7 @@ class Zic_Effect_DelayState {
 protected:
     uint32_t* historyIndex;
     int16_t* history;
-    uint32_t delayIndex = 0;
+    // uint32_t delayIndex = 0;
 
 public:
     float sec = 0;
@@ -30,9 +30,9 @@ public:
 
     void set(float _sec, float _amplitude)
     {
-        sec = range(_sec, 0.0, (float)DELAY_HISTORY_SEC);
-        delayIndex = (*historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(sec * SAMPLE_RATE)) % DELAY_HISTORY_SAMPLES;
         amplitude = _amplitude;
+        sec = range(_sec, 0.01, (float)DELAY_HISTORY_SEC);
+        // delayIndex = (*historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(SAMPLE_RATE * sec)) % DELAY_HISTORY_SAMPLES;
     }
 
     int16_t sample()
@@ -40,11 +40,12 @@ public:
         if (amplitude == 0.0) {
             return 0;
         }
-        if (delayIndex++ >= DELAY_HISTORY_SAMPLES) {
-            delayIndex = 0;
-        }
-        return (history[delayIndex] * amplitude);
-        // return (history[(*historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(DELAY_HISTORY_SAMPLES * 0.1)) % DELAY_HISTORY_SAMPLES] * 0.40);
+        return (history[(*historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(SAMPLE_RATE * sec)) % DELAY_HISTORY_SAMPLES] * amplitude);
+
+        // if (delayIndex++ >= DELAY_HISTORY_SAMPLES) {
+        //     delayIndex = 0;
+        // }
+        // return (history[delayIndex] * amplitude);
     }
 };
 
@@ -63,11 +64,17 @@ public:
         , states3(&historyIndex, &history[0])
         , states4(&historyIndex, &history[0])
     {
-        states0.set(0.1, 0.5);
-        states1.set(0.2, 0.4);
-        states2.set(0.3, 0.3);
-        states3.set(0.4, 0.2);
-        states4.set(0.5, 0.1);
+        // states0.set(0.1, 0.5);
+        // states1.set(0.2, 0.4);
+        // states2.set(0.3, 0.3);
+        // states3.set(0.4, 0.2);
+        // states4.set(0.5, 0.1);
+
+        states0.set(0.5, 0.5);
+        states1.set(1.0, 0.4);
+        states2.set(1.5, 0.3);
+        states3.set(2.0, 0.2);
+        states4.set(2.5, 0.1);
     }
 
     int16_t sample(int16_t in)
@@ -91,6 +98,18 @@ public:
         // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(DELAY_HISTORY_SAMPLES * 0.4)) % DELAY_HISTORY_SAMPLES] * 0.25)
         // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(DELAY_HISTORY_SAMPLES * 0.5)) % DELAY_HISTORY_SAMPLES] * 0.20)
         // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(DELAY_HISTORY_SAMPLES * 0.6)) % DELAY_HISTORY_SAMPLES] * 0.15);
+
+        // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(SAMPLE_RATE * 0.1)) % DELAY_HISTORY_SAMPLES] * 0.5)
+        // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(SAMPLE_RATE * 0.2)) % DELAY_HISTORY_SAMPLES] * 0.4)
+        // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(SAMPLE_RATE * 0.3)) % DELAY_HISTORY_SAMPLES] * 0.3)
+        // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(SAMPLE_RATE * 0.4)) % DELAY_HISTORY_SAMPLES] * 0.2)
+        // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(SAMPLE_RATE * 0.5)) % DELAY_HISTORY_SAMPLES] * 0.1);
+
+        // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(SAMPLE_RATE * 0.5)) % DELAY_HISTORY_SAMPLES] * 0.5)
+        // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(SAMPLE_RATE * 1.0)) % DELAY_HISTORY_SAMPLES] * 0.4)
+        // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(SAMPLE_RATE * 1.5)) % DELAY_HISTORY_SAMPLES] * 0.3)
+        // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(SAMPLE_RATE * 2.0)) % DELAY_HISTORY_SAMPLES] * 0.2)
+        // + (history[(historyIndex + DELAY_HISTORY_SAMPLES - (uint32_t)(SAMPLE_RATE * 2.5)) % DELAY_HISTORY_SAMPLES] * 0.1);
     }
 };
 
