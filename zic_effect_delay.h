@@ -41,7 +41,7 @@ protected:
     // uint32_t delayIndex = 0;
 
 public:
-    float sec = 0;
+    float sec = 0.1f;
     float amplitude = 0.0f;
     float feedback = 0.0f;
 
@@ -53,6 +53,8 @@ public:
     Zic_Effect_Delay(Zic_Effect_DelayHistory* _history)
         : history(_history)
     {
+        // To ensure that default sets values respect range
+        set(sec, amplitude, feedback);
     }
 
     /**
