@@ -162,14 +162,7 @@ const char* getNoteStr(uint8_t initialNote)
     uint8_t idx = (initialNote % 12);
     return noteNames[idx];
 }
-const char* getNoteDot(uint8_t initialNote)
-{
-    const char* noteNames[] = { "C", "C.", "D", "D.", "E", "F",
-        "F.", "G", "G.", "A", "A.", "B" };
 
-    uint8_t idx = (initialNote % 12);
-    return noteNames[idx];
-}
 uint8_t getNoteOctave(uint8_t initialNote) { return (initialNote / 12) - 1; }
 
 const uint8_t naturalNotes[] = {
