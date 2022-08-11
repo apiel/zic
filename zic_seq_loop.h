@@ -24,7 +24,12 @@ public:
     void set(int8_t _detune, uint8_t _velocity = 100)
     {
         velocity = _velocity;
-        detune = range(_detune, -99, 99);
+        setDetune(_detune);
+    }
+
+    void setDetune(int8_t _detune)
+    {
+        detune = range(_detune, -35, 35);
     }
 
     void setPattern(Zic_Seq_Pattern* _pattern)
