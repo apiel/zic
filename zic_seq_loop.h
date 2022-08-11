@@ -52,7 +52,7 @@ protected:
 
     virtual void setNextState()
     {
-          if (state.playing || nextState.playing) {
+        if (state.playing || nextState.playing) {
             if (nextState.currentStepSync == NULL) {
                 state.set(&nextState);
             } else if (*nextState.currentStepSync == 0) {
