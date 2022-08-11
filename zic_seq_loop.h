@@ -4,7 +4,7 @@
 #include "zic_note.h"
 #include "zic_seq_pattern.h"
 
-class Zic_Seq_Loop_State {
+class Zic_Seq_LoopState {
 public:
     int8_t detune = 0;
     uint8_t velocity = 100;
@@ -12,7 +12,7 @@ public:
     bool playing = false;
     uint8_t* currentStepSync = NULL;
 
-    void set(Zic_Seq_Loop_State* state)
+    void set(Zic_Seq_LoopState* state)
     {
         detune = state->detune;
         velocity = state->velocity;
@@ -50,10 +50,22 @@ protected:
     Zic_Seq_Step stepOn;
     Zic_Seq_Step stepOff;
 
+    virtual void setNextState()
+    {
+          if (state.playing || nextState.playing) {
+            if (nextState.currentStepSync == NULL) {
+                state.set(&nextState);
+            } else if (*nextState.currentStepSync == 0) {
+                nextState.currentStepSync = NULL;
+                state.set(&nextState);
+            }
+        }
+    }
+
 public:
     uint8_t currentStep = 0;
-    Zic_Seq_Loop_State state;
-    Zic_Seq_Loop_State nextState;
+    Zic_Seq_LoopState state;
+    Zic_Seq_LoopState nextState;
 
     Zic_Seq_Loop() { }
     Zic_Seq_Loop(Zic_Seq_Pattern* _pattern)
@@ -104,13 +116,8 @@ public:
             stepOn.velocity = state.velocity;
             currentStep = (currentStep + 1) % state.pattern->stepCount;
         }
-        if (currentStep == 0 && (state.playing || nextState.playing)) {
-            if (nextState.currentStepSync == NULL) {
-                state.set(&nextState);
-            } else if (*nextState.currentStepSync == 0) {
-                nextState.currentStepSync = NULL;
-                state.set(&nextState);
-            }
+        if (currentStep == 0) {
+            setNextState();
         }
     }
 };
