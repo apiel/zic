@@ -4,8 +4,11 @@
 #include "zic_wave_base.h"
 #include "zic_wavetable_base.h"
 
-// TODO coundlt we just store the incrementation step/rate per frequency
+// TODO coundlt we just cache the incrementation step/rate per frequency
 // as we most likely always use same frequencies base on musical notes...
+// and then always increment with this step
+
+// TODO use linear interpolation for the wavetable?
 
 class Zic_Wave_Wavetable : public Zic_Wave_Base
 {

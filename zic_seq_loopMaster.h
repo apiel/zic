@@ -13,11 +13,12 @@ enum {
     SEQ_CONDITION_X4,
     SEQ_CONDITION_X5,
     SEQ_CONDITION_STOP,
+    SEQ_CONDITION_RESTART,
     SEQ_CONDITION_MUTE,
     SEQ_CONDITIONS_COUNT,
 };
 
-const char *SEQ_CONDITIONS_NAMES[SEQ_CONDITIONS_COUNT] = {
+const char* SEQ_CONDITIONS_NAMES[SEQ_CONDITIONS_COUNT] = {
     "x0",
     "x1",
     "x2",
@@ -25,6 +26,7 @@ const char *SEQ_CONDITIONS_NAMES[SEQ_CONDITIONS_COUNT] = {
     "x4",
     "x5",
     "! ",
+    "<<"
     "--",
 };
 
@@ -43,6 +45,29 @@ protected:
     uint8_t componentCount;
     Zic_Seq_PatternComponent* components;
     uint8_t currentComponent = 0;
+    uint8_t loopInComponent = 0;
+
+    void setNextComponent()
+    {
+        loopInComponent = 0;
+        currentComponent = (currentComponent + 1) % componentCount;
+    }
+
+    void backToFirstComponent()
+    {
+        loopInComponent = 0;
+        currentComponent = 0;
+    }
+
+    void setLoopInComponent(uint8_t count)
+    {
+        if (loopInComponent < count) {
+            loopInComponent++;
+            nextState.set(&components[currentComponent]);
+        } else {
+            setNextComponent();
+        }
+    }
 
 public:
     Zic_Seq_LoopMaster(Zic_Seq_PatternComponent* _components, uint8_t count)
@@ -57,16 +82,55 @@ public:
         }
     }
 
+    // void setNextState() override
+    // {
+    //     if (state.playing || nextState.playing) {
+    //         if (nextState.currentStepSync == NULL) {
+    //             state.set(&nextState);
+    //         } else if (*nextState.currentStepSync == 0) {
+    //             nextState.currentStepSync = NULL;
+    //             state.set(&nextState);
+    //         }
+    //     }
+    // }
+
     void setNextState() override
     {
-        if (state.playing || nextState.playing) {
-            if (nextState.currentStepSync == NULL) {
-                state.set(&nextState);
-            } else if (*nextState.currentStepSync == 0) {
-                nextState.currentStepSync = NULL;
-                state.set(&nextState);
-            }
+        // if (!state.playing) {
+        //     return;
+        // }
+
+        Zic_Seq_PatternComponent* component = &components[currentComponent];
+        switch (component->condition) {
+        case SEQ_CONDITION_X0:
+            break;
+        case SEQ_CONDITION_X1:
+            setNextComponent();
+            break;
+        case SEQ_CONDITION_X2:
+            setLoopInComponent(2);
+            break;
+        case SEQ_CONDITION_X3:
+            setLoopInComponent(3);
+            break;
+        case SEQ_CONDITION_X4:
+            setLoopInComponent(4);
+            break;
+        case SEQ_CONDITION_X5:
+            setLoopInComponent(5);
+            break;
+        case SEQ_CONDITION_STOP:
+            state.stop();
+            return;
+        case SEQ_CONDITION_RESTART:
+            backToFirstComponent();
+            break;
+        case SEQ_CONDITION_MUTE:
+            // To be implemented
+            break;
         }
+        state.set(&components[currentComponent]);
+        state.play(); // should this stay??
     }
 };
 
