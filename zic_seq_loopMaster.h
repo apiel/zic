@@ -26,7 +26,7 @@ const char* SEQ_CONDITIONS_NAMES[SEQ_CONDITIONS_COUNT] = {
     "x4",
     "x5",
     "! ",
-    "<<"
+    "<<",
     "--",
 };
 
@@ -36,7 +36,7 @@ public:
 
     void setCondition(uint8_t _condition)
     {
-        condition = _condition % SEQ_CONDITIONS_COUNT;
+        condition = (_condition + SEQ_CONDITIONS_COUNT) % SEQ_CONDITIONS_COUNT;
     }
 };
 
