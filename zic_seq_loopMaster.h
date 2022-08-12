@@ -34,7 +34,7 @@ class Zic_Seq_PatternComponent : public Zic_Seq_LoopState {
 public:
     uint8_t condition = 0;
 
-    void setCondition(uint8_t _condition)
+    void setCondition(int8_t _condition)
     {
         condition = (_condition + SEQ_CONDITIONS_COUNT) % SEQ_CONDITIONS_COUNT;
     }
