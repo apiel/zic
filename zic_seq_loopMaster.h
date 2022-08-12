@@ -82,6 +82,11 @@ public:
         }
     }
 
+    bool isComponentPlaying(uint8_t index)
+    {
+        return currentComponent == index && state.playing;
+    }
+
     void setNextState() override
     {
         // if (!state.playing) {
