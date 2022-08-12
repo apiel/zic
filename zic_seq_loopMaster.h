@@ -82,18 +82,6 @@ public:
         }
     }
 
-    // void setNextState() override
-    // {
-    //     if (state.playing || nextState.playing) {
-    //         if (nextState.currentStepSync == NULL) {
-    //             state.set(&nextState);
-    //         } else if (*nextState.currentStepSync == 0) {
-    //             nextState.currentStepSync = NULL;
-    //             state.set(&nextState);
-    //         }
-    //     }
-    // }
-
     void setNextState() override
     {
         // if (!state.playing) {
@@ -130,7 +118,9 @@ public:
             break;
         }
         state.set(&components[currentComponent]);
-        state.play(); // should this stay??
+        if (state.pattern != NULL) {
+            state.play();
+        }
     }
 };
 
