@@ -111,7 +111,6 @@ public:
 
     void next()
     {
-
         if (state.playing && state.pattern) {
             stepOff.set(&stepOn);
             stepOn.set(&state.pattern->steps[currentStep]);

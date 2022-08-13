@@ -121,6 +121,9 @@ public:
             break;
         case SEQ_CONDITION_MUTE:
             // To be implemented
+            // The mute should be part of the next
+            // if mute and pattern
+            // increase step pos...
             break;
         }
         state.set(&components[currentComponent]);
