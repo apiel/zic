@@ -136,6 +136,11 @@ public:
     {
         playing = !playing;
     }   
+
+    bool isPlaying()
+    {
+        return playing;
+    }
 };
 
 #endif
