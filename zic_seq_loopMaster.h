@@ -46,6 +46,7 @@ protected:
     Zic_Seq_PatternComponent* components;
     uint8_t currentComponent = 0;
     uint8_t loopInComponent = 0;
+    bool playing = false;
 
     void setNextComponent()
     {
@@ -123,10 +124,15 @@ public:
             break;
         }
         state.set(&components[currentComponent]);
-        if (state.pattern != NULL) {
+        if (state.pattern != NULL && playing) {
             state.play();
         }
     }
+
+    void togglePlay()
+    {
+        playing = !playing;
+    }   
 };
 
 #endif
