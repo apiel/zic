@@ -30,6 +30,7 @@ protected:
 
     bool skipSample = false;
     bool mute = false;
+    int8_t level = 100;
     int8_t amplitude = 100;
     // int8_t velocity = 100;
     // float pitch = 1.0f;
@@ -49,6 +50,12 @@ protected:
         return skipSample;
     }
 
+    void setLevel(float _level = 1.0f)
+    {
+        level = amplitude * _level;
+        setSkipSample();
+    }
+
 public:
     // TODO dont use float for that
     // float pitchMod = 1.0f;
@@ -66,7 +73,7 @@ public:
         // use bitwise >> 8 to reduce amplitude (division by 256)
         // we could have a higher quality wavetable to int32 using a higher bitwise value
         // but is it really necessary? int16 make a gain on firmware size!
-        return (amplitude * sample(&freq)) >> 8;
+        return (level * sample(&freq)) >> 8;
     }
 
     float getTime()
@@ -129,7 +136,7 @@ public:
     void setAmplitude(int8_t value)
     {
         amplitude = range(value, 0, 100);
-        setSkipSample();
+        setLevel();
     }
 
     /**
@@ -144,13 +151,7 @@ public:
 
     void setVelocity(int8_t value)
     {
-        // TODO
-    }
-
-    uint8_t getVelocity()
-    {
-        // TODO
-        return 0;
+        setLevel((float)value / 127.0f);
     }
 
     /**
