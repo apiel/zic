@@ -31,6 +31,7 @@ protected:
     bool skipSample = false;
     bool mute = false;
     int8_t amplitude = 100;
+    // int8_t velocity = 100;
     // float pitch = 1.0f;
 
     uint16_t phase = 0; // 0 to 360
@@ -139,6 +140,17 @@ public:
     uint16_t getAmplitude()
     {
         return amplitude;
+    }
+
+    void setVelocity(int8_t value)
+    {
+        // TODO
+    }
+
+    uint8_t getVelocity()
+    {
+        // TODO
+        return 0;
     }
 
     /**

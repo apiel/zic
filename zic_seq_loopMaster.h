@@ -95,10 +95,7 @@ public:
 
     void setNextState() override
     {
-        // if (!state.playing) {
-        //     return;
-        // }
-
+        mute = false;
         Zic_Seq_PatternComponent* component = &components[currentComponent];
         switch (component->condition) {
         case SEQ_CONDITION_X0:
@@ -125,10 +122,7 @@ public:
             backToFirstComponent();
             break;
         case SEQ_CONDITION_MUTE:
-            // To be implemented
-            // The mute should be part of the next
-            // if mute and pattern
-            // increase step pos...
+            mute = true;
             break;
         }
         state.set(&components[currentComponent]);
@@ -140,7 +134,7 @@ public:
     void togglePlay()
     {
         playing = !playing;
-    }   
+    }
 
     bool isPlaying()
     {
