@@ -64,7 +64,7 @@ public:
             } else if (chunkID == 544501094) { // fmt
                 Zic_File::read(&chunkSize, 4);
                 if (Zic_File::read((uint8_t*)&header, sizeof(WavHeader)) != chunkSize) {
-                    printf("Something went wrong reading the fmt chunk\n");
+                    // printf("Something went wrong reading the fmt chunk\n");
                     // return NULL; // we cann still continue
                 }
             }
