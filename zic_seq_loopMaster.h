@@ -136,6 +136,12 @@ public:
         playing = !playing;
     }
 
+    void reset()
+    {
+        playing = false;
+        currentComponent = 0;
+    }
+
     bool isPlaying()
     {
         return playing;
