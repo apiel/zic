@@ -14,7 +14,7 @@ protected:
     {
         int16_t bit = 0;
         if (isWavetable) {
-            // TODO should we use linear interpolation for the wavetable? https://www.youtube.com/watch?v=fufNzqgjej0
+            // // TODO should we use linear interpolation for the wavetable? https://www.youtube.com/watch?v=fufNzqgjej0
             sampleIndex += sampleStep;
             while (sampleIndex >= sampleCount) {
                 sampleIndex -= sampleCount;

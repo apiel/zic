@@ -19,9 +19,10 @@ protected:
 public:
     uint64_t start = 0;
     uint64_t end = 0;
-    uint64_t length = 0;
+    uint64_t bitsCount = 0;
     uint64_t sampleCount = 0;
-    uint16_t wavetableCount= 1;
+    uint16_t wavetableCount = 1;
+    uint8_t bytesPerSample = sizeof(int16_t);
 
     Zic_File_Audio()
     {
@@ -49,10 +50,10 @@ public:
             // 544501094 -> fmt
             // Could check that first chunk is RIFF and 3th one is WAVE
             if (chunkID == 1635017060) { // data
-                Zic_File::read(&length, 4);
+                Zic_File::read(&bitsCount, 4);
                 start = tell();
-                end = start + length;
-                seekFromCurrent(length);
+                end = start + bitsCount;
+                seekFromCurrent(bitsCount);
             } else if (chunkID == 544501094) { // fmt
                 Zic_File::read(&chunkSize, 4);
                 if (Zic_File::read((uint8_t*)&header, sizeof(WavHeader)) != chunkSize) {
@@ -73,19 +74,23 @@ public:
         }
 
         restart();
-        // FIXME this is false, it should be (end - start) / (header.BitsPerSample / 8)
-        // as 16 bits is made of 2 bytes (of 8 bits)
-        sampleCount = (end - start) / (header.BitsPerSample); // * header.NumChannels
 
-        // printf("Audio file %d %d %d start %ld end %ld sampleCount %ld\n",
-        //     header.BitsPerSample, header.AudioFormat, header.NumChannels, (long)start, (long)end, (long)sampleCount);
+        if (header.BitsPerSample != 16) {
+            // printf("Only 16 bit WAV files are supported\n");
+            return NULL;
+        }
+        sampleCount = bitsCount / bytesPerSample; // * header.NumChannels
+
+        // printf("Audio file %s bitPerSample %d  format %d chan %d rate %d start %ld end %ld sampleCount %ld\n", filename,
+        //     header.BitsPerSample, header.AudioFormat, header.NumChannels, header.SampleRate,
+        //     (long)start, (long)end, (long)sampleCount);
 
         return end ? file : NULL;
     }
 
     void seekToSample(uint64_t pos)
     {
-        seekFromStart(start + (pos * header.BitsPerSample)); // * header.NumChannels
+        seekFromStart(start + (pos * bytesPerSample));
     }
 
     void restart()
