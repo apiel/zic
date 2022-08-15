@@ -8,7 +8,6 @@ class Zic_Wave_File : public Zic_Wave_Base {
 protected:
     float sampleIndex = 0.0f;
     float sampleStep = 0.0f;
-    uint64_t sampleCount = 0;
 
     int16_t sample()
     {
@@ -16,8 +15,8 @@ protected:
         if (isWavetable) {
             // // TODO should we use linear interpolation for the wavetable? https://www.youtube.com/watch?v=fufNzqgjej0
             sampleIndex += sampleStep;
-            while (sampleIndex >= sampleCount) {
-                sampleIndex -= sampleCount;
+            while (sampleIndex >= audioFile.sampleCount) {
+                sampleIndex -= audioFile.sampleCount;
             }
             audioFile.seekToSample((uint64_t)sampleIndex);
         }
@@ -31,7 +30,7 @@ protected:
         // could even cache frequency / SAMPLE_RATE or even the whole calc for each frequency
         // however, this happen only once every noteOn, it is not that much that it would require
         // to cache it
-        sampleStep = sampleCount * frequency / SAMPLE_RATE;
+        sampleStep = audioFile.sampleCount * frequency / SAMPLE_RATE;
     }
 
     bool setSkipSample() override
@@ -49,7 +48,6 @@ public:
     {
         audioFile.open(filename);
         isWavetable = _isWavetable;
-        sampleCount = audioFile.sampleCount;
         setSkipSample();
     }
 
