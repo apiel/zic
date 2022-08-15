@@ -4,12 +4,6 @@
 #include "zic_file_audio.h"
 #include "zic_wave_base.h"
 
-// TODO coundlt we just cache the incrementation step/rate per frequency
-// as we most likely always use same frequencies base on musical notes...
-// and then always increment with this step
-
-// TODO use linear interpolation for the wavetable?
-
 class Zic_Wave_File : public Zic_Wave_Base {
 protected:
     float sampleIndex = 0.0f;
@@ -20,6 +14,7 @@ protected:
     {
         int16_t bit = 0;
         if (isWavetable) {
+            // TODO should we use linear interpolation for the wavetable? https://www.youtube.com/watch?v=fufNzqgjej0
             sampleIndex += sampleStep;
             while (sampleIndex >= sampleCount) {
                 sampleIndex -= sampleCount;
@@ -33,6 +28,9 @@ protected:
 
     void frequencyUpdated() override
     {
+        // could even cache frequency / SAMPLE_RATE or even the whole calc for each frequency
+        // however, this happen only once every noteOn, it is not that much that it would require
+        // to cache it
         sampleStep = sampleCount * frequency / SAMPLE_RATE;
     }
 
@@ -57,7 +55,6 @@ public:
 
     void reset()
     {
-        // Zic_Wave_Base::reset();
         if (!isWavetable) {
             audioFile.restart();
         }
