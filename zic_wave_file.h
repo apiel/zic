@@ -13,24 +13,27 @@
 class Zic_Wave_File : public Zic_Wave_Base {
 protected:
     float sampleIndex = 0.0f;
+    float sampleStep = 0.0f;
+    uint64_t sampleCount = 0;
 
     int16_t sample()
     {
         int16_t bit = 0;
         if (isWavetable) {
-            // TODO increment per pre-calculated steps
-            // then get rid of those sampleCounts
-            // int i = (FREQ_PI * (*_freq) * time) * audioFile.sampleCount;
-            // audioFile.seekToSample(i % audioFile.sampleCount);
-            sampleIndex += audioFile.sampleCount * frequency / SAMPLE_RATE;
-            while (sampleIndex >= audioFile.sampleCount) {
-                sampleIndex -= audioFile.sampleCount;
+            sampleIndex += sampleStep;
+            while (sampleIndex >= sampleCount) {
+                sampleIndex -= sampleCount;
             }
             audioFile.seekToSample((uint64_t)sampleIndex);
         }
         audioFile.read(&bit, sizeof(bit));
 
         return bit * amplitude / 100;
+    }
+
+    void frequencyUpdated() override
+    {
+        sampleStep = sampleCount * frequency / SAMPLE_RATE;
     }
 
     bool setSkipSample() override
@@ -48,6 +51,7 @@ public:
     {
         audioFile.open(filename);
         isWavetable = _isWavetable;
+        sampleCount = audioFile.sampleCount;
         setSkipSample();
     }
 
