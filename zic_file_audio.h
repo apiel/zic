@@ -20,6 +20,7 @@ public:
     uint64_t start = 0;
     uint64_t end = 0;
     uint64_t sampleCount = 0;
+    uint16_t wavetableCount= 1;
 
     Zic_File_Audio()
     {
@@ -60,12 +61,8 @@ public:
                     // return NULL; // we cann still continue
                 }
             } else if (chunkID == 1464027482) { // ZICW
-                Zic_File::read(&chunkSize, 4);
-                printf("ZICW Data: %d\n", chunkSize);
-                // printf("(%d) %c%c%c%c hex: x%X x%X x%X x%X\n", chunkSize,
-                //     (char)(chunkSize & 0xFF), (char)((chunkSize >> 8) & 0xFF), (char)((chunkSize >> 16) & 0xFF), (char)((chunkSize >> 24) & 0xFF),
-                //     (chunkSize & 0xFF), ((chunkSize >> 8) & 0xFF), ((chunkSize >> 16) & 0xFF), ((chunkSize >> 24) & 0xFF));
-                // printf("\n");
+                Zic_File::read(&wavetableCount, 4);
+                // printf("ZICW Data: %d\n", wavetableCount);
             }
             // } else if (chunkID == 1414349641) { // ICMT
             // #define AUDIO_FILE_DATA_SIZE 128
@@ -76,15 +73,10 @@ public:
             // }
         }
 
-        // printf("Last chunk(%d) %c%c%c%c\n", chunkID, (char)(chunkID & 0xFF), (char)((chunkID >> 8) & 0xFF), (char)((chunkID >> 16) & 0xFF), (char)((chunkID >> 24) & 0xFF));
-
         restart();
-        // this is false, it should be (end - start) / (header.BitsPerSample / 8)
+        // FIXME this is false, it should be (end - start) / (header.BitsPerSample / 8)
         // as 16 bits is made of 2 bytes (of 8 bits)
         sampleCount = (end - start) / (header.BitsPerSample); // * header.NumChannels
-
-        // printf("%s: %d channels, %d Hz, %d bits, chunksize %d Subchunk1Size %d DatachunkSize %d\n",
-        //     filename, header.NumChannels, header.SampleRate, header.BitsPerSample, header.chunkSize, header.Subchunk1Size, header.DatachunkSize);
 
         // printf("Audio file %d %d %d start %ld end %ld sampleCount %ld\n",
         //     header.BitsPerSample, header.AudioFormat, header.NumChannels, (long)start, (long)end, (long)sampleCount);
