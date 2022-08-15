@@ -79,6 +79,10 @@ public:
             // printf("Only 16 bit WAV files are supported\n");
             return NULL;
         }
+        // NOTE is it even necessary to get the sampleCount
+        // or at least to make the wavetable calculation using the sampleCount
+        // instead of the bitsCount? We could just use the bitsCount, and avoid
+        // to multiply by bytesPerSample
         sampleCount = bitsCount / bytesPerSample; // * header.NumChannels
 
         // printf("Audio file %s bitPerSample %d  format %d chan %d rate %d start %ld end %ld sampleCount %ld\n", filename,
