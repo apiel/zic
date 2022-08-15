@@ -10,6 +10,8 @@ protected:
     {
         int16_t bit = 0;
         if (isWavetable) {
+            // TODO increment per pre-calculated steps
+            // then get rid of those sampleCounts
             int i = (FREQ_PI * (*_freq) * time) * audioFile.sampleCount;
             audioFile.seekToSample(i % audioFile.sampleCount);
             audioFile.read(&bit, sizeof(bit));

@@ -3,8 +3,6 @@
 
 #include "zic_file.h"
 
-#define BUFF_SIZE 6720
-
 class Zic_File_Audio : public Zic_File {
 protected:
     typedef struct WavHeader {
@@ -41,8 +39,6 @@ public:
         bool dataAvailable = false;
         uint32_t chunkID;
         uint32_t chunkSize;
-        char data[512];
-        // while readfile
         while (Zic_File::read(&chunkID, 4)) {
             // printf("(%d) %c%c%c%c\n", chunkID, (char)(chunkID & 0xFF), (char)((chunkID >> 8) & 0xFF), (char)((chunkID >> 16) & 0xFF), (char)((chunkID >> 24) & 0xFF));
             // 1414744396 -> LIST
@@ -51,11 +47,7 @@ public:
             // 1163280727 -> WAVE
             // 544501094 -> fmt
             // Could check that first chunk is RIFF and 3th one is WAVE
-            if (chunkID == 1414349641) { // ICMT
-                Zic_File::read(&chunkSize, 4);
-                Zic_File::read(&data, chunkSize);
-                printf("ICMT Data: %s\n\n", data);
-            } else if (chunkID == 1635017060) { // data
+            if (chunkID == 1635017060) { // data
                 Zic_File::read(&chunkSize, 4);
                 start = tell();
                 end = start + chunkSize;
@@ -67,10 +59,28 @@ public:
                     // printf("Something went wrong reading the fmt chunk\n");
                     // return NULL; // we cann still continue
                 }
+            } else if (chunkID == 1464027482) { // ZICW
+                Zic_File::read(&chunkSize, 4);
+                printf("ZICW Data: %d\n", chunkSize);
+                // printf("(%d) %c%c%c%c hex: x%X x%X x%X x%X\n", chunkSize,
+                //     (char)(chunkSize & 0xFF), (char)((chunkSize >> 8) & 0xFF), (char)((chunkSize >> 16) & 0xFF), (char)((chunkSize >> 24) & 0xFF),
+                //     (chunkSize & 0xFF), ((chunkSize >> 8) & 0xFF), ((chunkSize >> 16) & 0xFF), ((chunkSize >> 24) & 0xFF));
+                // printf("\n");
             }
+            // } else if (chunkID == 1414349641) { // ICMT
+            // #define AUDIO_FILE_DATA_SIZE 128
+            //     char data[AUDIO_FILE_DATA_SIZE];
+            //     Zic_File::read(&chunkSize, 4);
+            //     Zic_File::read(&data, chunkSize > AUDIO_FILE_DATA_SIZE ? AUDIO_FILE_DATA_SIZE : chunkSize);
+            //     printf("ICMT Data: %s\n\n", data);
+            // }
         }
 
+        // printf("Last chunk(%d) %c%c%c%c\n", chunkID, (char)(chunkID & 0xFF), (char)((chunkID >> 8) & 0xFF), (char)((chunkID >> 16) & 0xFF), (char)((chunkID >> 24) & 0xFF));
+
         restart();
+        // this is false, it should be (end - start) / (header.BitsPerSample / 8)
+        // as 16 bits is made of 2 bytes (of 8 bits)
         sampleCount = (end - start) / (header.BitsPerSample); // * header.NumChannels
 
         // printf("%s: %d channels, %d Hz, %d bits, chunksize %d Subchunk1Size %d DatachunkSize %d\n",
