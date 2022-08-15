@@ -14,10 +14,9 @@ protected:
             // then get rid of those sampleCounts
             int i = (FREQ_PI * (*_freq) * time) * audioFile.sampleCount;
             audioFile.seekToSample(i % audioFile.sampleCount);
-            audioFile.read(&bit, sizeof(bit));
-        } else {
-            audioFile.read(&bit, sizeof(bit));
         }
+        audioFile.read(&bit, sizeof(bit));
+
         return bit * amplitude / 100;
     }
 
