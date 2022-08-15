@@ -19,6 +19,7 @@ protected:
 public:
     uint64_t start = 0;
     uint64_t end = 0;
+    uint64_t length = 0;
     uint64_t sampleCount = 0;
     uint16_t wavetableCount= 1;
 
@@ -37,7 +38,6 @@ public:
             return NULL;
         }
 
-        bool dataAvailable = false;
         uint32_t chunkID;
         uint32_t chunkSize;
         while (Zic_File::read(&chunkID, 4)) {
@@ -49,11 +49,10 @@ public:
             // 544501094 -> fmt
             // Could check that first chunk is RIFF and 3th one is WAVE
             if (chunkID == 1635017060) { // data
-                Zic_File::read(&chunkSize, 4);
+                Zic_File::read(&length, 4);
                 start = tell();
-                end = start + chunkSize;
-                seekFromCurrent(chunkSize);
-                dataAvailable = true;
+                end = start + length;
+                seekFromCurrent(length);
             } else if (chunkID == 544501094) { // fmt
                 Zic_File::read(&chunkSize, 4);
                 if (Zic_File::read((uint8_t*)&header, sizeof(WavHeader)) != chunkSize) {
@@ -81,7 +80,7 @@ public:
         // printf("Audio file %d %d %d start %ld end %ld sampleCount %ld\n",
         //     header.BitsPerSample, header.AudioFormat, header.NumChannels, (long)start, (long)end, (long)sampleCount);
 
-        return dataAvailable ? file : NULL;
+        return end ? file : NULL;
     }
 
     void seekToSample(uint64_t pos)

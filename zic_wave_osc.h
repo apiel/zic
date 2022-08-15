@@ -7,8 +7,16 @@
 #include "../fastTrigo.h"
 #include "zic_wave_base.h"
 
-enum
-{
+// To do use less floats, let round Freq to 100 up and then divide by 100 PI
+#ifndef FREQ_MULT
+#define FREQ_MULT 100
+#endif
+
+#ifndef FREQ_PI
+#define FREQ_PI M_PI / FREQ_MULT
+#endif
+
+enum {
     OSC_SINE,
     OSC_SQUARE,
     OSC_TRIANGLE,
@@ -17,10 +25,9 @@ enum
     OSC_COUNT
 };
 
-const char *getOscName(uint8_t _oscType)
+const char* getOscName(uint8_t _oscType)
 {
-    switch (_oscType)
-    {
+    switch (_oscType) {
     case OSC_SINE:
         return "Sine";
     case OSC_SQUARE:
@@ -41,70 +48,75 @@ const char *getOscName(uint8_t _oscType)
 
 // https://github.com/audiowaves/simpleWavesGenerator
 // https://olehc.medium.com/basic-sound-waves-with-c-and-juce-50ec9f0bfe5c
-class Zic_Wave_Osc: public Zic_Wave_Base
-{
+class Zic_Wave_Osc : public Zic_Wave_Base {
 protected:
-    double sine(float *freq)
-    {
-        // This use too much ressources
-        // return sin(M_PI_2 * (*freq) * time + phase);
+    uint32_t freq = frequency * FREQ_MULT;
 
-        return fastSine(M_PI_2 * (*freq) * time + phase);
+    void frequencyUpdated() override
+    {
+        freq = frequency * FREQ_MULT;
     }
 
-    double square(float *freq)
+    double sine()
     {
-        double fullPeriodTime = 1.0 / (*freq);
+        // This use too much ressources
+        // return sin(M_PI_2 * freq * time + phase);
+
+        return fastSine(M_PI_2 * freq * time + phase);
+    }
+
+    double square()
+    {
+        double fullPeriodTime = 1.0 / freq;
         double halfPeriodTime = fullPeriodTime * 0.5;
         double localTime = fmod(time, fullPeriodTime);
         return localTime < halfPeriodTime ? 1 : -1;
     }
 
-    double triangle(float *freq)
+    double triangle()
     {
-        double fullPeriodTime = 1.0 / (*freq);
+        double fullPeriodTime = 1.0 / freq;
         double localTime = fmod(time, fullPeriodTime);
 
         double value = localTime / fullPeriodTime;
 
-        if (value < 0.25)
-        {
+        if (value < 0.25) {
             return value * 4;
         }
-        if (value < 0.75)
-        {
+        if (value < 0.75) {
             return 2.0 - (value * 4.0);
         }
         return value * 4 - 4.0;
     }
 
-    double saw(float *freq)
+    double saw()
     {
-        double fullPeriodTime = 1.0 / (*freq);
+        double fullPeriodTime = 1.0 / freq;
         double localTime = fmod(time, fullPeriodTime);
 
         return ((localTime / fullPeriodTime) * 2 - 1.0);
     }
 
-    double noize(float *freq)
+    double noize()
     {
         return (rand() % 10000) * 0.00001;
     }
 
-    double sample(float *freq)
+    double sample()
     {
-        switch (oscType)
-        {
+        time += DELTA_TIME;
+
+        switch (oscType) {
         case OSC_SINE:
-            return sine(freq);
+            return sine();
         case OSC_SQUARE:
-            return square(freq);
+            return square();
         case OSC_TRIANGLE:
-            return triangle(freq);
+            return triangle();
         case OSC_SAW:
-            return saw(freq);
+            return saw();
         case OSC_NOIZE:
-            return noize(freq);
+            return noize();
         }
         return 0;
     }
@@ -112,6 +124,11 @@ protected:
 public:
     // uint8_t oscType = OSC_TRIANGLE;
     uint8_t oscType = OSC_SINE;
+
+    void reset()
+    {
+        time = 0.0;
+    }
 };
 
 #endif

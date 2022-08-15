@@ -6,27 +6,12 @@
 #include "zic_def.h"
 #include "zic_note.h"
 
-#ifndef FREQ_MULT
-#define FREQ_MULT 100
-#endif
-
-#ifndef FREQ_DIV
-#define FREQ_DIV 1.0f / FREQ_MULT
-#endif
-
-#ifndef FREQ_PI
-#define FREQ_PI M_PI / FREQ_MULT
-#endif
-
 class Zic_Wave_Base {
 protected:
     float time = 0.0;
 
-    virtual int16_t sample(uint32_t* freq) { return 0; }
-    uint32_t frequency = 103.82617439443122f * FREQ_MULT; // C3
-
-    // Pre-calculation
-    uint32_t freq = frequency; // * pitch;
+    virtual int16_t sample() { return 0; }
+    float frequency = 103.82617439443122f; // C3
 
     bool skipSample = false;
     bool mute = false;
@@ -37,17 +22,14 @@ protected:
 
     uint16_t phase = 0; // 0 to 360
 
-    // TODO
-    // see https://teropa.info/blog/2016/08/10/frequency-and-pitch.html
-    void updateFreq()
-    {
-        freq = frequency; // and do something with pitch
-    }
-
     virtual bool setSkipSample()
     {
         skipSample = mute || amplitude <= 0;
         return skipSample;
+    }
+
+    virtual void frequencyUpdated()
+    {
     }
 
     void setLevel(float _level = 1.0f)
@@ -57,15 +39,8 @@ protected:
     }
 
 public:
-    // TODO dont use float for that
-    // float pitchMod = 1.0f;
-
     int16_t next()
     {
-        time += DELTA_TIME;
-
-        // Should we reset time if it over a certain value?
-
         if (skipSample) {
             return 0;
         }
@@ -73,17 +48,7 @@ public:
         // use bitwise >> 8 to reduce amplitude (division by 256)
         // we could have a higher quality wavetable to int32 using a higher bitwise value
         // but is it really necessary? int16 make a gain on firmware size!
-        return (level * sample(&freq)) >> 8;
-    }
-
-    float getTime()
-    {
-        return time;
-    }
-
-    virtual void reset()
-    {
-        time = 0.0;
+        return (level * sample()) >> 8;
     }
 
     /**
@@ -171,8 +136,8 @@ public:
      */
     void setFrequency(float value)
     {
-        frequency = value * FREQ_MULT;
-        updateFreq();
+        frequency = value;
+        frequencyUpdated();
     }
 
     /**
@@ -182,29 +147,8 @@ public:
      */
     float getFrequency()
     {
-        return frequency * FREQ_DIV;
+        return frequency;
     }
-
-    // /**
-    //  * @brief Set the Pitch of the wave
-    //  *
-    //  * @param value
-    //  */
-    // void setPitch(float value)
-    // {
-    //     pitch = value;
-    //     updateFreq();
-    // }
-
-    // /**
-    //  * @brief Get the Pitch of the wave
-    //  *
-    //  * @return float
-    //  */
-    // float getPitch()
-    // {
-    //     return pitch;
-    // }
 };
 
 #endif
