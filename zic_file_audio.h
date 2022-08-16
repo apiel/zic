@@ -20,7 +20,7 @@ public:
     uint64_t audioDataStart = 0;
     uint64_t audioDataCount = 0;
     uint64_t sampleCount = 0;
-    uint16_t wavetableCount = 1;
+    uint32_t wavetableCount = 1;
     uint8_t bytesPerSample = sizeof(int16_t);
 
     Zic_File_Audio()
@@ -79,9 +79,9 @@ public:
         }
         sampleCount = audioDataCount / bytesPerSample; // * header.NumChannels
 
-        // printf("Audio file %s bitPerSample %d  format %d chan %d rate %d start %ld end %ld sampleCount %ld\n", filename,
+        // printf("Audio file %s bitPerSample %d  format %d chan %d rate %d start %ld sampleCount %ld\n", filename,
         //     header.BitsPerSample, header.AudioFormat, header.NumChannels, header.SampleRate,
-        //     (long)audioDataStart, (long)audioDataEnd, (long)sampleCount);
+        //     (long)audioDataStart, (long)sampleCount);
 
         return audioDataStart ? file : NULL;
     }
