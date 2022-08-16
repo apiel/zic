@@ -77,10 +77,6 @@ public:
             // printf("Only 16 bit WAV files are supported\n");
             return NULL;
         }
-        // NOTE is it even necessary to get the sampleCount
-        // or at least to make the wavetable calculation using the sampleCount
-        // instead of the audioDataCount? We could just use the audioDataCount, and avoid
-        // to multiply by bytesPerSample
         sampleCount = audioDataCount / bytesPerSample; // * header.NumChannels
 
         // printf("Audio file %s bitPerSample %d  format %d chan %d rate %d start %ld end %ld sampleCount %ld\n", filename,
@@ -101,21 +97,7 @@ public:
      */
     void seekToSample(uint64_t pos)
     {
-        seekToAudioData(pos * bytesPerSample);
-    }
-
-    /**
-     * @brief seek to audio data
-     *
-     * audio data is the raw data of the audio file, without the header
-     * if the wav file contains 256 samples, in 16bits per sample,
-     * there will be 512 bytes of audio data
-     *
-     * @param pos
-     */
-    void seekToAudioData(uint64_t pos)
-    {
-        seekFromStart(audioDataStart + pos);
+        seekFromStart(audioDataStart + (pos * bytesPerSample));
     }
 
     void restart()
