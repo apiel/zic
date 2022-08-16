@@ -50,10 +50,10 @@ public:
     {
         audioFile.open(filename);
         isWavetable = _isWavetable;
-        sampleCount = audioFile.sampleCount;
-        if (isWavetable && audioFile.wavetableCount > 1) {
-            sampleCount = (float)audioFile.sampleCount / (float)audioFile.wavetableCount;
-        }
+        sampleCount = isWavetable && audioFile.wavetableCount > 1
+            ? (float)audioFile.sampleCount / (float)audioFile.wavetableCount
+            : audioFile.sampleCount;
+
         setSkipSample();
     }
 
@@ -78,6 +78,13 @@ public:
         if (isWavetable) {
             setSampleParams((uint64_t)(value * sampleCount), sampleCount);
         }
+    }
+    float getMorph()
+    {
+        if (isWavetable) {
+            return (float)start / (float)sampleCount;
+        }
+        return 0.0f;
     }
 };
 
