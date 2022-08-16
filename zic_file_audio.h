@@ -17,9 +17,8 @@ protected:
     WavHeader header;
 
 public:
-    uint64_t start = 0;
-    uint64_t end = 0;
-    uint64_t bitsCount = 0;
+    uint64_t audioDataStart = 0;
+    uint64_t audioDataCount = 0;
     uint64_t sampleCount = 0;
     uint16_t wavetableCount = 1;
     uint8_t bytesPerSample = sizeof(int16_t);
@@ -50,10 +49,9 @@ public:
             // 544501094 -> fmt
             // Could check that first chunk is RIFF and 3th one is WAVE
             if (chunkID == 1635017060) { // data
-                Zic_File::read(&bitsCount, 4);
-                start = tell();
-                end = start + bitsCount;
-                seekFromCurrent(bitsCount);
+                Zic_File::read(&audioDataCount, 4);
+                audioDataStart = tell();
+                seekFromCurrent(audioDataCount);
             } else if (chunkID == 544501094) { // fmt
                 Zic_File::read(&chunkSize, 4);
                 if (Zic_File::read((uint8_t*)&header, sizeof(WavHeader)) != chunkSize) {
@@ -81,25 +79,48 @@ public:
         }
         // NOTE is it even necessary to get the sampleCount
         // or at least to make the wavetable calculation using the sampleCount
-        // instead of the bitsCount? We could just use the bitsCount, and avoid
+        // instead of the audioDataCount? We could just use the audioDataCount, and avoid
         // to multiply by bytesPerSample
-        sampleCount = bitsCount / bytesPerSample; // * header.NumChannels
+        sampleCount = audioDataCount / bytesPerSample; // * header.NumChannels
 
         // printf("Audio file %s bitPerSample %d  format %d chan %d rate %d start %ld end %ld sampleCount %ld\n", filename,
         //     header.BitsPerSample, header.AudioFormat, header.NumChannels, header.SampleRate,
-        //     (long)start, (long)end, (long)sampleCount);
+        //     (long)audioDataStart, (long)audioDataEnd, (long)sampleCount);
 
-        return end ? file : NULL;
+        return audioDataStart ? file : NULL;
     }
 
+    /**
+     * @brief seek to 16bits sample
+     *
+     * in 16bits per sample, 2 bytes are used to store 1 sample
+     * therefor we multiply the position by 2 (bytesPerSample)
+     * and seek from the start of the audio data
+     *
+     * @param pos
+     */
     void seekToSample(uint64_t pos)
     {
-        seekFromStart(start + (pos * bytesPerSample));
+        seekToAudioData(pos * bytesPerSample);
+    }
+
+    /**
+     * @brief seek to audio data
+     *
+     * audio data is the raw data of the audio file, without the header
+     * if the wav file contains 256 samples, in 16bits per sample,
+     * there will be 512 bytes of audio data
+     *
+     * @param pos
+     */
+    void seekToAudioData(uint64_t pos)
+    {
+        seekFromStart(audioDataStart + pos);
     }
 
     void restart()
     {
-        seekFromStart(start);
+        seekFromStart(audioDataStart);
     }
 };
 
