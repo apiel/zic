@@ -20,7 +20,7 @@ protected:
             while (sampleIndex >= sampleCount) {
                 sampleIndex -= sampleCount;
             }
-            audioFile.seekToSample((uint64_t)sampleIndex);
+            audioFile.seekToSample((uint64_t)sampleIndex + start);
         }
         audioFile.read(&bit, sizeof(bit));
 
@@ -61,6 +61,22 @@ public:
     {
         if (!isWavetable) {
             audioFile.restart();
+        }
+    }
+
+    void setSampleParams(uint64_t _start, uint64_t _sampleCount)
+    {
+        if (_start + _sampleCount <= audioFile.sampleCount) {
+            start = _start;
+            sampleCount = _sampleCount;
+        }
+    }
+
+    void morph(float value)
+    {
+        value = range(value, 0.0f, (float)audioFile.wavetableCount);
+        if (isWavetable) {
+            setSampleParams((uint64_t)(value * sampleCount), sampleCount);
         }
     }
 };
