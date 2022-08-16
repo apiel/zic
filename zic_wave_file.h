@@ -74,7 +74,7 @@ public:
 
     void morph(float value)
     {
-        value = range(value, 0.0f, (float)audioFile.wavetableCount);
+        value = range(value, 0.0f, (float)audioFile.wavetableCount - 1.0f);
         if (isWavetable) {
             setSampleParams((uint64_t)(value * sampleCount), sampleCount);
         }
