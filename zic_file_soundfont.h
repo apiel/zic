@@ -4,59 +4,53 @@
 #include "zic_file.h"
 
 typedef char tsf_fourcc[4];
-typedef signed char tsf_s8;
-typedef unsigned char tsf_u8;
-typedef unsigned short tsf_u16;
-typedef signed short tsf_s16;
-typedef unsigned int tsf_u32;
-typedef char tsf_char20[20];
 
 union tsf_hydra_genamount {
     struct {
-        tsf_u8 lo, hi;
+        uint8_t lo, hi;
     } range;
-    tsf_s16 shortAmount;
-    tsf_u16 wordAmount;
+    int16_t shortAmount;
+    uint16_t wordAmount;
 };
 struct tsf_hydra_phdr {
-    tsf_char20 presetName;
-    tsf_u16 preset, bank, presetBagNdx;
-    tsf_u32 library, genre, morphology;
+    char presetName[20];
+    uint16_t preset, bank, presetBagNdx;
+    uint32_t library, genre, morphology;
 };
 struct tsf_hydra_pbag {
-    tsf_u16 genNdx, modNdx;
+    uint16_t genNdx, modNdx;
 };
 struct tsf_hydra_pmod {
-    tsf_u16 modSrcOper, modDestOper;
-    tsf_s16 modAmount;
-    tsf_u16 modAmtSrcOper, modTransOper;
+    uint16_t modSrcOper, modDestOper;
+    int16_t modAmount;
+    uint16_t modAmtSrcOper, modTransOper;
 };
 struct tsf_hydra_pgen {
-    tsf_u16 genOper;
+    uint16_t genOper;
     union tsf_hydra_genamount genAmount;
 };
 struct tsf_hydra_inst {
-    tsf_char20 instName;
-    tsf_u16 instBagNdx;
+    char instName[20];
+    uint16_t instBagNdx;
 };
 struct tsf_hydra_ibag {
-    tsf_u16 instGenNdx, instModNdx;
+    uint16_t instGenNdx, instModNdx;
 };
 struct tsf_hydra_imod {
-    tsf_u16 modSrcOper, modDestOper;
-    tsf_s16 modAmount;
-    tsf_u16 modAmtSrcOper, modTransOper;
+    uint16_t modSrcOper, modDestOper;
+    int16_t modAmount;
+    uint16_t modAmtSrcOper, modTransOper;
 };
 struct tsf_hydra_igen {
-    tsf_u16 genOper;
+    uint16_t genOper;
     union tsf_hydra_genamount genAmount;
 };
 struct tsf_hydra_shdr {
-    tsf_char20 sampleName;
-    tsf_u32 start, end, startLoop, endLoop, sampleRate;
-    tsf_u8 originalPitch;
-    tsf_s8 pitchCorrection;
-    tsf_u16 sampleLink, sampleType;
+    char sampleName[20];
+    uint32_t start, end, startLoop, endLoop, sampleRate;
+    uint8_t originalPitch;
+    int8_t pitchCorrection;
+    uint16_t sampleLink, sampleType;
 };
 
 struct tsf_hydra {
@@ -74,7 +68,7 @@ struct tsf_hydra {
 
 struct tsf_riffchunk {
     tsf_fourcc id;
-    tsf_u32 size;
+    uint32_t size;
 };
 
 #define TSF_TRUE 1
@@ -86,16 +80,16 @@ struct tsf_riffchunk {
 static TSF_BOOL tsf_riffchunk_read(struct tsf_riffchunk* parent, struct tsf_riffchunk* chunk, Zic_File* file)
 {
     TSF_BOOL IsRiff, IsList;
-    if (parent && sizeof(tsf_fourcc) + sizeof(tsf_u32) > parent->size)
+    if (parent && sizeof(tsf_fourcc) + sizeof(uint32_t) > parent->size)
         return TSF_FALSE;
     if (!file->read(&chunk->id, sizeof(tsf_fourcc)) || *chunk->id <= ' ' || *chunk->id >= 'z')
         return TSF_FALSE;
-    if (!file->read(&chunk->size, sizeof(tsf_u32)))
+    if (!file->read(&chunk->size, sizeof(uint32_t)))
         return TSF_FALSE;
-    if (parent && sizeof(tsf_fourcc) + sizeof(tsf_u32) + chunk->size > parent->size)
+    if (parent && sizeof(tsf_fourcc) + sizeof(uint32_t) + chunk->size > parent->size)
         return TSF_FALSE;
     if (parent)
-        parent->size -= sizeof(tsf_fourcc) + sizeof(tsf_u32) + chunk->size;
+        parent->size -= sizeof(tsf_fourcc) + sizeof(uint32_t) + chunk->size;
     IsRiff = TSF_FourCCEquals(chunk->id, "RIFF"), IsList = TSF_FourCCEquals(chunk->id, "LIST");
     if (IsRiff && parent)
         return TSF_FALSE; // not allowed
@@ -130,29 +124,70 @@ static int tsf_load_samples(float** fontSamples, unsigned int* fontSampleCount, 
     return 1;
 }
 
-#define TSFR(FIELD) file->read(&i->FIELD, sizeof(i->FIELD));
 static void tsf_hydra_read_phdr(struct tsf_hydra_phdr* i, Zic_File* file)
 {
-    TSFR(presetName)
-    TSFR(preset) TSFR(bank) TSFR(presetBagNdx) TSFR(library) TSFR(genre) TSFR(morphology)
+    file->read(&i->presetName, sizeof(i->presetName));
+    file->read(&i->preset, sizeof(i->preset));
+    file->read(&i->bank, sizeof(i->bank));
+    file->read(&i->presetBagNdx, sizeof(i->presetBagNdx));
+    file->read(&i->library, sizeof(i->library));
+    file->read(&i->genre, sizeof(i->genre));
+    file->read(&i->morphology, sizeof(i->morphology));
 }
-static void tsf_hydra_read_pbag(struct tsf_hydra_pbag* i, Zic_File* file) { TSFR(genNdx)
-    TSFR(modNdx) }
-static void tsf_hydra_read_pmod(struct tsf_hydra_pmod* i, Zic_File* file) { TSFR(modSrcOper)
-    TSFR(modDestOper) TSFR(modAmount) TSFR(modAmtSrcOper) TSFR(modTransOper) }
-static void tsf_hydra_read_pgen(struct tsf_hydra_pgen* i, Zic_File* file) { TSFR(genOper)
-    TSFR(genAmount) }
-static void tsf_hydra_read_inst(struct tsf_hydra_inst* i, Zic_File* file) { TSFR(instName)
-    TSFR(instBagNdx) }
-static void tsf_hydra_read_ibag(struct tsf_hydra_ibag* i, Zic_File* file) { TSFR(instGenNdx)
-    TSFR(instModNdx) }
-static void tsf_hydra_read_imod(struct tsf_hydra_imod* i, Zic_File* file) { TSFR(modSrcOper)
-    TSFR(modDestOper) TSFR(modAmount) TSFR(modAmtSrcOper) TSFR(modTransOper) }
-static void tsf_hydra_read_igen(struct tsf_hydra_igen* i, Zic_File* file) { TSFR(genOper)
-    TSFR(genAmount) }
-static void tsf_hydra_read_shdr(struct tsf_hydra_shdr* i, Zic_File* file) { TSFR(sampleName)
-    TSFR(start) TSFR(end) TSFR(startLoop) TSFR(endLoop) TSFR(sampleRate) TSFR(originalPitch) TSFR(pitchCorrection) TSFR(sampleLink) TSFR(sampleType) }
-#undef TSFR
+static void tsf_hydra_read_pbag(struct tsf_hydra_pbag* i, Zic_File* file)
+{
+    file->read(&i->genNdx, sizeof(i->genNdx));
+    file->read(&i->modNdx, sizeof(i->modNdx));
+}
+static void tsf_hydra_read_pmod(struct tsf_hydra_pmod* i, Zic_File* file)
+{
+    file->read(&i->modSrcOper, sizeof(i->modSrcOper));
+    file->read(&i->modDestOper, sizeof(i->modDestOper));
+    file->read(&i->modAmount, sizeof(i->modAmount));
+    file->read(&i->modAmtSrcOper, sizeof(i->modAmtSrcOper));
+    file->read(&i->modTransOper, sizeof(i->modTransOper));
+}
+static void tsf_hydra_read_pgen(struct tsf_hydra_pgen* i, Zic_File* file)
+{
+    file->read(&i->genOper, sizeof(i->genOper));
+    file->read(&i->genAmount, sizeof(i->genAmount));
+}
+static void tsf_hydra_read_inst(struct tsf_hydra_inst* i, Zic_File* file)
+{
+    file->read(&i->instName, sizeof(i->instName));
+    file->read(&i->instBagNdx, sizeof(i->instBagNdx));
+}
+static void tsf_hydra_read_ibag(struct tsf_hydra_ibag* i, Zic_File* file)
+{
+    file->read(&i->instGenNdx, sizeof(i->instGenNdx));
+    file->read(&i->instModNdx, sizeof(i->instModNdx));
+}
+static void tsf_hydra_read_imod(struct tsf_hydra_imod* i, Zic_File* file)
+{
+    file->read(&i->modSrcOper, sizeof(i->modSrcOper));
+    file->read(&i->modDestOper, sizeof(i->modDestOper));
+    file->read(&i->modAmount, sizeof(i->modAmount));
+    file->read(&i->modAmtSrcOper, sizeof(i->modAmtSrcOper));
+    file->read(&i->modTransOper, sizeof(i->modTransOper));
+}
+static void tsf_hydra_read_igen(struct tsf_hydra_igen* i, Zic_File* file)
+{
+    file->read(&i->genOper, sizeof(i->genOper));
+    file->read(&i->genAmount, sizeof(i->genAmount));
+}
+static void tsf_hydra_read_shdr(struct tsf_hydra_shdr* i, Zic_File* file)
+{
+    file->read(&i->sampleName, sizeof(i->sampleName));
+    file->read(&i->start, sizeof(i->start));
+    file->read(&i->end, sizeof(i->end));
+    file->read(&i->startLoop, sizeof(i->startLoop));
+    file->read(&i->endLoop, sizeof(i->endLoop));
+    file->read(&i->sampleRate, sizeof(i->sampleRate));
+    file->read(&i->originalPitch, sizeof(i->originalPitch));
+    file->read(&i->pitchCorrection, sizeof(i->pitchCorrection));
+    file->read(&i->sampleLink, sizeof(i->sampleLink));
+    file->read(&i->sampleType, sizeof(i->sampleType));
+}
 
 void tsf_load(Zic_File* file)
 {
