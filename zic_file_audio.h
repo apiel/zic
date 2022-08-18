@@ -42,26 +42,21 @@ public:
         uint32_t chunkSize;
         while (Zic_File::read(&chunkID, 4)) {
             // printf("(%d) %c%c%c%c\n", chunkID, (char)(chunkID & 0xFF), (char)((chunkID >> 8) & 0xFF), (char)((chunkID >> 16) & 0xFF), (char)((chunkID >> 24) & 0xFF));
-            // 1414744396 -> LIST
-            // 70468681 -> ID3
-            // 1179011410 -> RIFF
-            // 1163280727 -> WAVE
-            // 544501094 -> fmt
             // Could check that first chunk is RIFF and 3th one is WAVE
             // convert "data" 4 char[] to uint32 in order to compare it to chunkID
-            if (chunkID == *(uint32_t*)"data") { // 1635017060) { // data
+            if (chunkID == *(uint32_t*)"data") {
                 Zic_File::read(&audioDataCount, 4);
                 audioDataStart = tell();
                 seekFromCurrent(audioDataCount);
-            } else if (chunkID == *(uint32_t*)"fmt ") { // 544501094) { // fmt
+            } else if (chunkID == *(uint32_t*)"fmt ") {
                 Zic_File::read(&chunkSize, 4);
                 if (Zic_File::read((uint8_t*)&header, sizeof(WavHeader)) != chunkSize) {
                     // printf("Something went wrong reading the fmt chunk\n");
                     // return NULL; // we cann still continue
                 }
-            } else if (chunkID == *(uint32_t*)"ZICW") { // 1464027482) { // ZICW
+            } else if (chunkID == *(uint32_t*)"ZICW") {
                 Zic_File::read(&wavetableCount, 4);
-                printf("ZICW Data: %d\n", wavetableCount);
+                // printf("ZICW Data: %d\n", wavetableCount);
             }
             // } else if (chunkID == 1414349641) { // ICMT
             // #define AUDIO_FILE_DATA_SIZE 128
