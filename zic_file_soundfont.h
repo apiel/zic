@@ -131,15 +131,27 @@ static int tsf_load_samples(float** fontSamples, unsigned int* fontSampleCount, 
 }
 
 #define TSFR(FIELD) file->read(&i->FIELD, sizeof(i->FIELD));
-static void tsf_hydra_read_phdr(struct tsf_hydra_phdr* i, Zic_File* file) { TSFR(presetName) TSFR(preset) TSFR(bank) TSFR(presetBagNdx) TSFR(library) TSFR(genre) TSFR(morphology) }
-static void tsf_hydra_read_pbag(struct tsf_hydra_pbag* i, Zic_File* file) { TSFR(genNdx) TSFR(modNdx) }
-static void tsf_hydra_read_pmod(struct tsf_hydra_pmod* i, Zic_File* file) { TSFR(modSrcOper) TSFR(modDestOper) TSFR(modAmount) TSFR(modAmtSrcOper) TSFR(modTransOper) }
-static void tsf_hydra_read_pgen(struct tsf_hydra_pgen* i, Zic_File* file) { TSFR(genOper) TSFR(genAmount) }
-static void tsf_hydra_read_inst(struct tsf_hydra_inst* i, Zic_File* file) { TSFR(instName) TSFR(instBagNdx) }
-static void tsf_hydra_read_ibag(struct tsf_hydra_ibag* i, Zic_File* file) { TSFR(instGenNdx) TSFR(instModNdx) }
-static void tsf_hydra_read_imod(struct tsf_hydra_imod* i, Zic_File* file) { TSFR(modSrcOper) TSFR(modDestOper) TSFR(modAmount) TSFR(modAmtSrcOper) TSFR(modTransOper) }
-static void tsf_hydra_read_igen(struct tsf_hydra_igen* i, Zic_File* file) { TSFR(genOper) TSFR(genAmount) }
-static void tsf_hydra_read_shdr(struct tsf_hydra_shdr* i, Zic_File* file) { TSFR(sampleName) TSFR(start) TSFR(end) TSFR(startLoop) TSFR(endLoop) TSFR(sampleRate) TSFR(originalPitch) TSFR(pitchCorrection) TSFR(sampleLink) TSFR(sampleType) }
+static void tsf_hydra_read_phdr(struct tsf_hydra_phdr* i, Zic_File* file)
+{
+    TSFR(presetName)
+    TSFR(preset) TSFR(bank) TSFR(presetBagNdx) TSFR(library) TSFR(genre) TSFR(morphology)
+}
+static void tsf_hydra_read_pbag(struct tsf_hydra_pbag* i, Zic_File* file) { TSFR(genNdx)
+    TSFR(modNdx) }
+static void tsf_hydra_read_pmod(struct tsf_hydra_pmod* i, Zic_File* file) { TSFR(modSrcOper)
+    TSFR(modDestOper) TSFR(modAmount) TSFR(modAmtSrcOper) TSFR(modTransOper) }
+static void tsf_hydra_read_pgen(struct tsf_hydra_pgen* i, Zic_File* file) { TSFR(genOper)
+    TSFR(genAmount) }
+static void tsf_hydra_read_inst(struct tsf_hydra_inst* i, Zic_File* file) { TSFR(instName)
+    TSFR(instBagNdx) }
+static void tsf_hydra_read_ibag(struct tsf_hydra_ibag* i, Zic_File* file) { TSFR(instGenNdx)
+    TSFR(instModNdx) }
+static void tsf_hydra_read_imod(struct tsf_hydra_imod* i, Zic_File* file) { TSFR(modSrcOper)
+    TSFR(modDestOper) TSFR(modAmount) TSFR(modAmtSrcOper) TSFR(modTransOper) }
+static void tsf_hydra_read_igen(struct tsf_hydra_igen* i, Zic_File* file) { TSFR(genOper)
+    TSFR(genAmount) }
+static void tsf_hydra_read_shdr(struct tsf_hydra_shdr* i, Zic_File* file) { TSFR(sampleName)
+    TSFR(start) TSFR(end) TSFR(startLoop) TSFR(endLoop) TSFR(sampleRate) TSFR(originalPitch) TSFR(pitchCorrection) TSFR(sampleLink) TSFR(sampleType) }
 #undef TSFR
 
 void tsf_load(Zic_File* file)
@@ -162,17 +174,17 @@ void tsf_load(Zic_File* file)
         if (TSF_FourCCEquals(chunkList.id, "pdta")) {
             while (tsf_riffchunk_read(&chunkList, &chunk, file)) {
 
-#define HandleChunk(chunkName)                                                                                      \
-    (TSF_FourCCEquals(chunk.id, #chunkName) && !(chunk.size % chunkName##SizeInFile))                               \
-    {                                                                                                               \
-        int num = chunk.size / chunkName##SizeInFile, i;                                                            \
-        hydra.chunkName##Num = num;                                                                                 \
+#define HandleChunk(chunkName)                                                                                  \
+    (TSF_FourCCEquals(chunk.id, #chunkName) && !(chunk.size % chunkName##SizeInFile))                           \
+    {                                                                                                           \
+        int num = chunk.size / chunkName##SizeInFile, i;                                                        \
+        hydra.chunkName##Num = num;                                                                             \
         hydra.chunkName##s = (struct tsf_hydra_##chunkName*)malloc(num * sizeof(struct tsf_hydra_##chunkName)); \
-        if (!hydra.chunkName##s)                                                                                    \
-            goto out_of_memory;                                                                                     \
-        for (i = 0; i < num; ++i)                                                                                   \
-            tsf_hydra_read_##chunkName(&hydra.chunkName##s[i], file);                                             \
-        printf("chunkName (%d)\n", num);                                                    \
+        if (!hydra.chunkName##s)                                                                                \
+            goto out_of_memory;                                                                                 \
+        for (i = 0; i < num; ++i)                                                                               \
+            tsf_hydra_read_##chunkName(&hydra.chunkName##s[i], file);                                           \
+        printf("chunkName (%d)\n", num);                                                                        \
     }
                 enum {
                     phdrSizeInFile = 38,
@@ -214,6 +226,9 @@ void tsf_load(Zic_File* file)
         // fontSamples = NULL; // don't free below
         // res->outSampleRate = 44100.0f;
         printf("should now load presets\n");
+        for (int i = 0; i < hydra.phdrNum; i++) {
+            printf("preset name %s\n", hydra.phdrs[i].presetName);
+        }
     }
     if (0) {
     out_of_memory:
