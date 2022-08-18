@@ -30,20 +30,21 @@ void debug_phdr(struct tsf_hydra_phdr* i)
 
 static void tsf_hydra_read_phdr(struct tsf_hydra_phdr* i, Zic_File* file)
 {
-    file->read(&i->presetName, sizeof(i->presetName));
-    file->read(&i->preset, sizeof(i->preset));
-    file->read(&i->bank, sizeof(i->bank));
-    file->read(&i->presetBagNdx, sizeof(i->presetBagNdx));
-    file->read(&i->library, sizeof(i->library));
-    file->read(&i->genre, sizeof(i->genre));
-    file->read(&i->morphology, sizeof(i->morphology));
+    // file->read(&i->presetName, sizeof(i->presetName));
+    // file->read(&i->preset, sizeof(i->preset));
+    // file->read(&i->bank, sizeof(i->bank));
+    // file->read(&i->presetBagNdx, sizeof(i->presetBagNdx));
+    // file->read(&i->library, sizeof(i->library));
+    // file->read(&i->genre, sizeof(i->genre));
+    // file->read(&i->morphology, sizeof(i->morphology));
 
-    // tsf_hydra_phdr phdr;
-    // file->read((uint8_t*)&phdr, sizeof(tsf_hydra_phdr));
-    // memcpy(i, &phdr, sizeof(tsf_hydra_phdr));
-    // debug_phdr(&phdr);
+    tsf_hydra_phdr phdr;
+    file->read((uint8_t*)&phdr, sizeof(tsf_hydra_phdr) - 2);
+    memcpy(i, &phdr, sizeof(tsf_hydra_phdr));
 
-    // file->read((uint8_t*)i, sizeof(tsf_hydra_phdr));
+    // file->read((uint8_t*)i, sizeof(tsf_hydra_phdr) - 2);
+
+    // debug_phdr(i);
 }
 
 struct tsf_hydra_pbag {
@@ -245,6 +246,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i) {
                         tsf_hydra_read_phdr(&hydra.phdrs[i], file);
+                        debug_phdr(&hydra.phdrs[i]);
                     }
                     printf("chunkName phdr (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"pbag" && !(chunk.size % pbagSizeInFile)) {
@@ -280,8 +282,10 @@ void tsf_load(Zic_File* file)
                     hydra.insts = (struct tsf_hydra_inst*)malloc(num * sizeof(struct tsf_hydra_inst));
                     if (!hydra.insts)
                         goto out_of_memory;
-                    for (i = 0; i < num; ++i)
+                    for (i = 0; i < num; ++i) {
                         tsf_hydra_read_inst(&hydra.insts[i], file);
+                        printf("chunkName inst (%d) %s\n", i, hydra.insts[i].instName);
+                    }
                     printf("chunkName inst (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"ibag" && !(chunk.size % ibagSizeInFile)) {
                     int num = chunk.size / ibagSizeInFile, i;
@@ -316,8 +320,10 @@ void tsf_load(Zic_File* file)
                     hydra.shdrs = (struct tsf_hydra_shdr*)malloc(num * sizeof(struct tsf_hydra_shdr));
                     if (!hydra.shdrs)
                         goto out_of_memory;
-                    for (i = 0; i < num; ++i)
+                    for (i = 0; i < num; ++i) {
                         tsf_hydra_read_shdr(&hydra.shdrs[i], file);
+                        printf("chunkName shdr (%d) %s\n", i, hydra.shdrs[i].sampleName);
+                    }
                     printf("chunkName shdr (%d)\n", num);
                 } else
                     file->seekFromCurrent(chunk.size);
@@ -348,10 +354,10 @@ void tsf_load(Zic_File* file)
         // fontSamples = NULL; // don't free below
         // res->outSampleRate = 44100.0f;
         printf("should now load presets\n");
-        for (int i = 0; i < hydra.phdrNum; i++) {
-            // printf("preset name %s\n", hydra.phdrs[i].presetName);
-            debug_phdr(&hydra.phdrs[i]);
-        }
+        // for (int i = 0; i < hydra.phdrNum; i++) {
+        //     // printf("preset name %s\n", hydra.phdrs[i].presetName);
+        //     debug_phdr(&hydra.phdrs[i]);
+        // }
     }
     if (0) {
     out_of_memory:
