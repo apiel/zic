@@ -101,32 +101,28 @@ struct tsf_riffchunk {
     uint32_t size;
 };
 
-#define TSF_TRUE 1
-#define TSF_FALSE 0
-#define TSF_BOOL char
-
-static TSF_BOOL tsf_riffchunk_read(struct tsf_riffchunk* parent, struct tsf_riffchunk* chunk, Zic_File* file)
+static bool tsf_riffchunk_read(struct tsf_riffchunk* parent, struct tsf_riffchunk* chunk, Zic_File* file)
 {
-    TSF_BOOL IsRiff, IsList;
+    bool IsRiff, IsList;
     if (parent && sizeof(uint32_t) + sizeof(uint32_t) > parent->size)
-        return TSF_FALSE;
+        return false;
     if (!file->read(&chunk->id, sizeof(uint32_t)) || (char)(chunk->id & 0xFF) <= ' ' || (char)(chunk->id & 0xFF) >= 'z')
-        return TSF_FALSE;
+        return false;
     if (!file->read(&chunk->size, sizeof(uint32_t)))
-        return TSF_FALSE;
+        return false;
     if (parent && sizeof(uint32_t) + sizeof(uint32_t) + chunk->size > parent->size)
-        return TSF_FALSE;
+        return false;
     if (parent)
         parent->size -= sizeof(uint32_t) + sizeof(uint32_t) + chunk->size;
     IsRiff = chunk->id == *(uint32_t*)"RIFF", IsList = chunk->id == *(uint32_t*)"LIST";
     if (IsRiff && parent)
-        return TSF_FALSE; // not allowed
+        return false; // not allowed
     if (!IsRiff && !IsList)
-        return TSF_TRUE; // custom type without sub type
+        return true; // custom type without sub type
     if (!file->read(&chunk->id, sizeof(uint32_t)) || (char)(chunk->id & 0xFF) <= ' ' || (char)(chunk->id & 0xFF) >= 'z')
-        return TSF_FALSE;
+        return false;
     chunk->size -= sizeof(uint32_t);
-    return TSF_TRUE;
+    return true;
 }
 
 static int tsf_load_samples(float** fontSamples, unsigned int* fontSampleCount, struct tsf_riffchunk* chunkSmpl, Zic_File* file)
@@ -284,7 +280,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i) {
                         tsf_hydra_read_inst(&hydra.insts[i], file);
-                        printf("chunkName inst (%d) %s\n", i, hydra.insts[i].instName);
+                        printf("inst (%d) %s\n", i, hydra.insts[i].instName);
                     }
                     printf("chunkName inst (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"ibag" && !(chunk.size % ibagSizeInFile)) {
@@ -322,7 +318,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i) {
                         tsf_hydra_read_shdr(&hydra.shdrs[i], file);
-                        printf("chunkName shdr (%d) %s\n", i, hydra.shdrs[i].sampleName);
+                        printf("shdr (%d) %s\n", i, hydra.shdrs[i].sampleName);
                     }
                     printf("chunkName shdr (%d)\n", num);
                 } else
