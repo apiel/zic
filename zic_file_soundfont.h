@@ -172,6 +172,7 @@ void tsf_load(Zic_File* file)
             goto out_of_memory;                                                                                     \
         for (i = 0; i < num; ++i)                                                                                   \
             tsf_hydra_read_##chunkName(&hydra.chunkName##s[i], file);                                             \
+        printf("chunkName (%d): %s\n", num, hydra.chunkName##s);                                                    \
     }
                 enum {
                     phdrSizeInFile = 38,
