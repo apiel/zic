@@ -243,9 +243,10 @@ void tsf_load(Zic_File* file)
                     hydra.phdrs = (struct tsf_hydra_phdr*)malloc(num * sizeof(struct tsf_hydra_phdr));
                     if (!hydra.phdrs)
                         goto out_of_memory;
-                    for (i = 0; i < num; ++i)
+                    for (i = 0; i < num; ++i) {
                         tsf_hydra_read_phdr(&hydra.phdrs[i], file);
-                    printf("chunkName (%d)\n", num);
+                    }
+                    printf("chunkName phdr (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"pbag" && !(chunk.size % pbagSizeInFile)) {
                     int num = chunk.size / pbagSizeInFile, i;
                     hydra.pbagNum = num;
@@ -254,7 +255,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i)
                         tsf_hydra_read_pbag(&hydra.pbags[i], file);
-                    printf("chunkName (%d)\n", num);
+                    printf("chunkName pbag (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"pmod" && !(chunk.size % pmodSizeInFile)) {
                     int num = chunk.size / pmodSizeInFile, i;
                     hydra.pmodNum = num;
@@ -263,7 +264,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i)
                         tsf_hydra_read_pmod(&hydra.pmods[i], file);
-                    printf("chunkName (%d)\n", num);
+                    printf("chunkName pmod (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"pgen" && !(chunk.size % pgenSizeInFile)) {
                     int num = chunk.size / pgenSizeInFile, i;
                     hydra.pgenNum = num;
@@ -272,7 +273,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i)
                         tsf_hydra_read_pgen(&hydra.pgens[i], file);
-                    printf("chunkName (%d)\n", num);
+                    printf("chunkName pgen (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"inst" && !(chunk.size % instSizeInFile)) {
                     int num = chunk.size / instSizeInFile, i;
                     hydra.instNum = num;
@@ -281,7 +282,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i)
                         tsf_hydra_read_inst(&hydra.insts[i], file);
-                    printf("chunkName (%d)\n", num);
+                    printf("chunkName inst (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"ibag" && !(chunk.size % ibagSizeInFile)) {
                     int num = chunk.size / ibagSizeInFile, i;
                     hydra.ibagNum = num;
@@ -290,7 +291,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i)
                         tsf_hydra_read_ibag(&hydra.ibags[i], file);
-                    printf("chunkName (%d)\n", num);
+                    printf("chunkName ibag (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"imod" && !(chunk.size % imodSizeInFile)) {
                     int num = chunk.size / imodSizeInFile, i;
                     hydra.imodNum = num;
@@ -299,7 +300,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i)
                         tsf_hydra_read_imod(&hydra.imods[i], file);
-                    printf("chunkName (%d)\n", num);
+                    printf("chunkName imod (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"igen" && !(chunk.size % igenSizeInFile)) {
                     int num = chunk.size / igenSizeInFile, i;
                     hydra.igenNum = num;
@@ -308,7 +309,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i)
                         tsf_hydra_read_igen(&hydra.igens[i], file);
-                    printf("chunkName (%d)\n", num);
+                    printf("chunkName igen (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"shdr" && !(chunk.size % shdrSizeInFile)) {
                     int num = chunk.size / shdrSizeInFile, i;
                     hydra.shdrNum = num;
@@ -317,7 +318,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i)
                         tsf_hydra_read_shdr(&hydra.shdrs[i], file);
-                    printf("chunkName (%d)\n", num);
+                    printf("chunkName shdr (%d)\n", num);
                 } else
                     file->seekFromCurrent(chunk.size);
             }
