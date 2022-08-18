@@ -172,7 +172,7 @@ void tsf_load(Zic_File* file)
             goto out_of_memory;                                                                                     \
         for (i = 0; i < num; ++i)                                                                                   \
             tsf_hydra_read_##chunkName(&hydra.chunkName##s[i], file);                                             \
-        printf("chunkName (%d): %s\n", num, hydra.chunkName##s);                                                    \
+        printf("chunkName (%d)\n", num);                                                    \
     }
                 enum {
                     phdrSizeInFile = 38,
@@ -192,6 +192,7 @@ void tsf_load(Zic_File* file)
         } else if (TSF_FourCCEquals(chunkList.id, "sdta")) {
             while (tsf_riffchunk_read(&chunkList, &chunk, file)) {
                 if (TSF_FourCCEquals(chunk.id, "smpl") && !fontSamples && chunk.size >= sizeof(short)) {
+                    printf("smpl: %d\n", chunk.size);
                     if (!tsf_load_samples(&fontSamples, &fontSampleCount, &chunk, file))
                         goto out_of_memory;
                 } else
@@ -202,19 +203,21 @@ void tsf_load(Zic_File* file)
     }
     if (!hydra.phdrs || !hydra.pbags || !hydra.pmods || !hydra.pgens || !hydra.insts || !hydra.ibags || !hydra.imods || !hydra.igens || !hydra.shdrs) {
         // if (e) *e = TSF_INVALID_INCOMPLETE;
+        printf("TSF_INVALID_INCOMPLETE\n");
     } else if (fontSamples == NULL) {
         // if (e) *e = TSF_INVALID_NOSAMPLEDATA;
+        printf("TSF_INVALID_NOSAMPLEDATA\n");
     } else {
         // if (!tsf_load_presets(res, &hydra, fontSampleCount))
         //     goto out_of_memory;
         // res->fontSamples = fontSamples;
         // fontSamples = NULL; // don't free below
         // res->outSampleRate = 44100.0f;
-        printf("should now load presets");
+        printf("should now load presets\n");
     }
     if (0) {
     out_of_memory:
-        printf("out of memory");
+        printf("out of memory\n");
         return;
     }
     free(hydra.phdrs);
