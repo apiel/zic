@@ -42,7 +42,7 @@ static void tsf_hydra_read_phdr(struct tsf_hydra_phdr* i, Zic_File* file)
     file->read((uint8_t*)&phdr, sizeof(tsf_hydra_phdr) - 2);
     memcpy(i, &phdr, sizeof(tsf_hydra_phdr));
 
-    // file->read((uint8_t*)i, sizeof(tsf_hydra_phdr) - 2);
+    // file->read((uint8_t*)i, 38);
 
     // debug_phdr(i);
 }
@@ -150,6 +150,7 @@ static int tsf_load_samples(float** fontSamples, unsigned int* fontSampleCount, 
 
 static void tsf_hydra_read_pbag(struct tsf_hydra_pbag* i, Zic_File* file)
 {
+    // printf("pbag size %d\n", sizeof(struct tsf_hydra_pbag));
     file->read(&i->genNdx, sizeof(i->genNdx));
     file->read(&i->modNdx, sizeof(i->modNdx));
 }
@@ -377,6 +378,7 @@ protected:
     // https://mrtenz.github.io/soundfont2/getting-started/soundfont2-structure.html
     // https://github.com/gagern/soundfontutils/blob/master/YamlFormat.md
     // https://github.com/Mrtenz/soundfont2.git
+    // http://www.synthfont.com/Tutorial6.html
 
 public:
     Zic_File_Soundfont()
