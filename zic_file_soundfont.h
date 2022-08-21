@@ -243,7 +243,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i) {
                         tsf_hydra_read_phdr(&hydra.phdrs[i], file);
-                        debug_phdr(&hydra.phdrs[i]);
+                        // debug_phdr(&hydra.phdrs[i]);
                     }
                     printf("chunkName phdr (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"pbag" && !(chunk.size % pbagSizeInFile)) {
@@ -281,10 +281,11 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i) {
                         tsf_hydra_read_inst(&hydra.insts[i], file);
-                        printf("inst (%d) %s\n", i, hydra.insts[i].instName);
+                        // printf("inst (%d) %s\n", i, hydra.insts[i].instName);
                     }
                     printf("chunkName inst (%d)\n", num);
                 } else if (chunk.id == *(uint32_t*)"ibag" && !(chunk.size % ibagSizeInFile)) {
+                    printf("ibag start %ld\n", file->tell());
                     int num = chunk.size / ibagSizeInFile, i;
                     hydra.ibagNum = num;
                     hydra.ibags = (struct tsf_hydra_ibag*)malloc(num * sizeof(struct tsf_hydra_ibag));
@@ -319,7 +320,7 @@ void tsf_load(Zic_File* file)
                         goto out_of_memory;
                     for (i = 0; i < num; ++i) {
                         tsf_hydra_read_shdr(&hydra.shdrs[i], file);
-                        printf("shdr (%d) %s\n", i, hydra.shdrs[i].sampleName);
+                        // printf("shdr (%d) %s\n", i, hydra.shdrs[i].sampleName);
                     }
                     printf("chunkName shdr (%d)\n", num);
                 } else
@@ -354,6 +355,40 @@ void tsf_load(Zic_File* file)
         // for (int i = 0; i < hydra.phdrNum; i++) {
         //     // printf("preset name %s\n", hydra.phdrs[i].presetName);
         //     debug_phdr(&hydra.phdrs[i]);
+        // }
+        printf("num presets %d pbagNum %d\n", hydra.phdrNum, hydra.pbagNum);
+
+        for (int i = 0; i < hydra.instNum; i++) {
+            printf("----\ninstrument name %s (ibag %d)\n", hydra.insts[i].instName, hydra.insts[i].instBagNdx);
+
+            if (hydra.insts[i].instName[0] == 'E' && hydra.insts[i].instName[1] == 'O'
+                && hydra.insts[i].instName[2] == 'I' && hydra.insts[i].instName[3] == '\0') {
+                printf("EOI\n");
+            } else {
+                printf("start %d end %d\n", hydra.insts[i].instBagNdx, hydra.insts[i + 1].instBagNdx);
+                for (int j = hydra.insts[i].instBagNdx; j < hydra.insts[i + 1].instBagNdx; j++) {
+                    printf("ibag (%d) %d \n", j, hydra.ibags[j].instGenNdx);
+
+                    for (int g = hydra.ibags[j].instGenNdx; g < hydra.igenNum && g < hydra.ibags[j + 1].instGenNdx; g++) {
+                        if (hydra.igens[g].genOper == 43 || hydra.igens[g].genOper == 53) {
+                            printf("> igen (%d) %d hi %d low %d\tshortAmount %d wordAmount %d\n", g,
+                                hydra.igens[g].genOper,
+                                hydra.igens[g].genAmount.range.hi,
+                                hydra.igens[g].genAmount.range.lo,
+                                hydra.igens[g].genAmount.shortAmount,
+                                hydra.igens[g].genAmount.wordAmount);
+                        }
+                        if (hydra.igens[g].genOper == 53) {
+                            printf("sample name %s\n", hydra.shdrs[hydra.igens[g].genAmount.range.lo].sampleName);
+                        }
+                    }
+                }
+            }
+        }
+
+        // printf("\n\n sample:\n");
+        // for(int i = 0; i < hydra.shdrNum; i++) {
+        //     printf("(%d) sample name %s\n", i, hydra.shdrs[i].sampleName);
         // }
     }
     if (0) {
