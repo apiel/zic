@@ -52,18 +52,6 @@ struct sf2_hydra_shdr {
     uint16_t sampleLink, sampleType;
 };
 
-struct sf2_hydra {
-    struct sf2_hydra_phdr* phdrs;
-    struct sf2_hydra_pbag* pbags;
-    struct sf2_hydra_pmod* pmods;
-    struct sf2_hydra_pgen* pgens;
-    struct sf2_hydra_inst* insts;
-    struct sf2_hydra_ibag* ibags;
-    struct sf2_hydra_imod* imods;
-    struct sf2_hydra_igen* igens;
-    struct sf2_hydra_shdr* shdrs;
-};
-
 struct sf2_riffchunk {
     uint32_t id;
     uint32_t size;
@@ -221,7 +209,6 @@ void sf2_load(Zic_File* file)
 {
     struct sf2_riffchunk chunkHead;
     struct sf2_riffchunk chunkList;
-    struct sf2_hydra hydra;
     float* fontSamples = NULL;
     unsigned int fontSampleCount = 0;
 
@@ -230,8 +217,6 @@ void sf2_load(Zic_File* file)
         return;
     }
 
-    // Read hydra and locate sample data.
-    memset(&hydra, 0, sizeof(hydra));
     while (sf2_riffchunk_read(&chunkHead, &chunkList, file)) {
         struct sf2_riffchunk chunk;
         if (chunkList.id == *(uint32_t*)"pdta") {
@@ -248,14 +233,17 @@ void sf2_load(Zic_File* file)
             while (sf2_riffchunk_read(&chunkList, &chunk, file)) {
                 if (chunk.id == *(uint32_t*)"smpl" && !fontSamples && chunk.size >= sizeof(short)) {
                     printf("smpl: %d\n", chunk.size);
-                    if (!sf2_load_samples(&fontSamples, &fontSampleCount, &chunk, file))
-                        goto out_of_memory;
+                    if (!sf2_load_samples(&fontSamples, &fontSampleCount, &chunk, file)) {
+                        printf("out of memory\n");
+                        return;
+                    }
                 } else
                     file->seekFromCurrent(chunk.size);
             }
         } else
             file->seekFromCurrent(chunkList.size);
     }
+    // here we could check that each offset are set...
     // if (!hydra.phdrs || !hydra.pbags || !hydra.pmods || !hydra.pgens || !hydra.insts || !hydra.ibags || !hydra.imods || !hydra.igens || !hydra.shdrs) {
     //     // if (e) *e = sf2_INVALID_INCOMPLETE;
     //     printf("sf2_INVALID_INCOMPLETE\n");
@@ -264,16 +252,6 @@ void sf2_load(Zic_File* file)
         // if (e) *e = sf2_INVALID_NOSAMPLEDATA;
         printf("sf2_INVALID_NOSAMPLEDATA\n");
     } else {
-        // if (!sf2_load_presets(res, &hydra, fontSampleCount))
-        //     goto out_of_memory;
-        // res->fontSamples = fontSamples;
-        // fontSamples = NULL; // don't free below
-        // res->outSampleRate = 44100.0f;
-        printf("should now load presets\n");
-        // for (int i = 0; i < hydra.phdrNum; i++) {
-        //     // printf("preset name %s\n", hydra.phdrs[i].presetName);
-        //     debug_phdr(&hydra.phdrs[i]);
-        // }
         printf("num presets %d pbagNum %d\n", sf2Num[phdrIdx], sf2Num[pbagIdx]);
 
         for (uint32_t i = 0; i < sf2Num[instIdx]; i++) {
@@ -289,21 +267,6 @@ void sf2_load(Zic_File* file)
         //     printf("(%d) sample name %s\n", i, hydra.shdrs[i].sampleName);
         // }
     }
-    if (0) {
-    out_of_memory:
-        printf("out of memory\n");
-        return;
-    }
-    free(hydra.phdrs);
-    free(hydra.pbags);
-    free(hydra.pmods);
-    free(hydra.pgens);
-    free(hydra.insts);
-    free(hydra.ibags);
-    free(hydra.imods);
-    free(hydra.igens);
-    free(hydra.shdrs);
-    free(fontSamples);
 }
 
 class Zic_File_Soundfont : public Zic_File {
