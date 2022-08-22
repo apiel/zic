@@ -215,17 +215,16 @@ void printPreset(Zic_File* file, uint8_t index)
                 sf2_hydra_pgen pgen;
                 file->read((uint8_t*)&pgen, sf2Size[pgenIdx]);
 
-                // if (pgen.genOper == 43 || pgen.genOper == 53) {
-                //     printf("> igen (%d) %d hi %d low %d\tshortAmount %d wordAmount %d\n", g,
-                //         igen.genOper,
-                //         igen.genAmount.range.hi,
-                //         igen.genAmount.range.lo,
-                //         igen.genAmount.shortAmount,
-                //         igen.genAmount.wordAmount);
-                // }
-                // // if 43 we should assign the key range
                 if (pgen.genOper == 41) {
                     printInstrument(file, pgen.genAmount.range.lo);
+                } else if (pgen.genOper == 43) {
+                    // see line 745
+                    printf("######### pgen (%d) %d hi %d low %d\tshortAmount %d wordAmount %d\n", g,
+                        pgen.genOper,
+                        pgen.genAmount.range.hi,
+                        pgen.genAmount.range.lo,
+                        pgen.genAmount.shortAmount,
+                        pgen.genAmount.wordAmount);
                 }
             }
         }
@@ -280,20 +279,18 @@ void sf2_load(Zic_File* file)
         } else
             file->seekFromCurrent(chunkList.size);
     }
-    // here we could check that each offset are set...
-    // if (!hydra.phdrs || !hydra.pbags || !hydra.pmods || !hydra.pgens || !hydra.insts || !hydra.ibags || !hydra.imods || !hydra.igens || !hydra.shdrs) {
-    //     // if (e) *e = sf2_INVALID_INCOMPLETE;
-    //     printf("sf2_INVALID_INCOMPLETE\n");
-    // } else
-    if (fontSamples == NULL) {
+    if (!sf2Offset[phdrIdx] || !sf2Offset[pbagIdx] || !sf2Offset[pmodIdx] || !sf2Offset[pgenIdx] || !sf2Offset[instIdx] || !sf2Offset[ibagIdx] || !sf2Offset[imodIdx] || !sf2Offset[igenIdx] || !sf2Offset[shdrIdx]) {
+        // if (e) *e = sf2_INVALID_INCOMPLETE;
+        printf("sf2_INVALID_INCOMPLETE\n");
+    } else if (fontSamples == NULL) {
         // if (e) *e = sf2_INVALID_NOSAMPLEDATA;
         printf("sf2_INVALID_NOSAMPLEDATA\n");
     } else {
         printf("num presets %d pbagNum %d\n", sf2Num[phdrIdx], sf2Num[pbagIdx]);
 
-        for (uint32_t i = 0; i < sf2Num[instIdx]; i++) {
-            printInstrument(file, i);
-        }
+        // for (uint32_t i = 0; i < sf2Num[instIdx]; i++) {
+        //     printInstrument(file, i);
+        // }
 
         for (uint32_t i = 0; i < sf2Num[phdrIdx]; i++) {
             printPreset(file, i);
@@ -330,43 +327,6 @@ public:
         }
 
         sf2_load(this);
-
-        // uint32_t chunkID;
-        // uint32_t chunkSize;
-        // while (Zic_File::read(&chunkID, 4)) {
-        //     // printf("(%d) %c%c%c%c\n", chunkID, (char)(chunkID & 0xFF), (char)((chunkID >> 8) & 0xFF), (char)((chunkID >> 16) & 0xFF), (char)((chunkID >> 24) & 0xFF));
-        //     if (chunkID == *(uint32_t*)"pdta") {
-        //         printf("Found pdta\n");
-        //         // Zic_File::read(&chunkSize, 4);
-        //         // printf("pdta Data: %d\n", chunkSize);
-        //         // seekFromCurrent(chunkSize);
-        //     } else if (chunkID == *(uint32_t*)"sdta") {
-        //         printf("Found sdta\n");
-        //     } else if (chunkID == *(uint32_t*)"smpl") {
-        //         printf("Found smpl\n");
-        //     } else if (chunkID == *(uint32_t*)"sm24") {
-        //         printf("Found sm24\n");
-        //     } else if (chunkID == *(uint32_t*)"RIFF") {
-        //         printf("Found RIFF\n");
-        //     } else if (chunkID == *(uint32_t*)"LIST") {
-        //         printf("Found LIST\n");
-        //     } else if (chunkID == *(uint32_t*)"sfbk") {
-        //         printf("Found sfbk\n");
-        //     } else if (chunkID == *(uint32_t*)"INFO") {
-        //         printf("Found INFO\n");
-        //     } else if (chunkID == *(uint32_t*)"INAM") {
-        //         printf("Found INAM\n");
-        //     } else if (chunkID == *(uint32_t*)"shdr") {
-        //         printf("Found shdr\n");
-        //     } else if (chunkID == *(uint32_t*)"pbag") {
-        //         printf("Found pbag\n");
-        //     } else {
-        //         // char * chunkName = (char*)&chunkID;
-        //         // if (*chunkName > ' ' && *chunkName < 'z') {
-        //         //     printf("Found something %c%c%c%c\n", *chunkName, *(chunkName + 1), *(chunkName + 2), *(chunkName + 3));
-        //         // }
-        //     }
-        // }
 
         return file;
     }
