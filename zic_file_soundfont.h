@@ -171,11 +171,6 @@ static void sf2_hydra_read_inst(struct sf2_hydra_inst* i, Zic_File* file)
     file->read(&i->instName, sizeof(i->instName));
     file->read(&i->instBagNdx, sizeof(i->instBagNdx));
 }
-static void sf2_hydra_read_ibag(struct sf2_hydra_ibag* i, Zic_File* file)
-{
-    file->read(&i->instGenNdx, sizeof(i->instGenNdx));
-    file->read(&i->instModNdx, sizeof(i->instModNdx));
-}
 static void sf2_hydra_read_imod(struct sf2_hydra_imod* i, Zic_File* file)
 {
     file->read(&i->modSrcOper, sizeof(i->modSrcOper));
@@ -287,16 +282,9 @@ void sf2_load(Zic_File* file)
                     }
                     printf("chunkName inst (%d)\n", sf2Num[instIdx]);
                 } else if (chunk.id == *(uint32_t*)"ibag" && !(chunk.size % sf2Size[ibagIdx])) {
-                    printf("ibag start %ld\n", file->tell());
                     sf2Offset[ibagIdx] = file->tell();
                     sf2Num[ibagIdx] = chunk.size / sf2Size[ibagIdx];
-                    
-                    hydra.ibags = (struct sf2_hydra_ibag*)malloc(sf2Num[ibagIdx] * sizeof(struct sf2_hydra_ibag));
-                    if (!hydra.ibags)
-                        goto out_of_memory;
-                    for (uint32_t i = 0; i < sf2Num[ibagIdx]; ++i)
-                        sf2_hydra_read_ibag(&hydra.ibags[i], file);
-                    printf("chunkName ibag (%d)\n", sf2Num[ibagIdx]);
+                    file->seekFromCurrent(chunk.size);
                 } else if (chunk.id == *(uint32_t*)"imod" && !(chunk.size % sf2Size[imodIdx])) {
                     sf2Offset[imodIdx] = file->tell();
                     sf2Num[imodIdx] = chunk.size / sf2Size[imodIdx];
@@ -360,11 +348,11 @@ void sf2_load(Zic_File* file)
             } else {
                 printf("start %d end %d\n", hydra.insts[i].instBagNdx, hydra.insts[i + 1].instBagNdx);
                 for (int j = hydra.insts[i].instBagNdx; j < hydra.insts[i + 1].instBagNdx; j++) {
-                    printf("ibag (%d) %d \n", j, hydra.ibags[j].instGenNdx);
+                    // printf("ibag (%d) %d \n", j, hydra.ibags[j].instGenNdx);
 
                     uint16_t g = getInstGenNdx(file, j);
                     file->seekFromStart(sf2Offset[igenIdx] + g * sf2Size[igenIdx]);
-                    for (; g < sf2Num[igenIdx] && g < hydra.ibags[j + 1].instGenNdx; g++) {
+                    for (; g < sf2Num[igenIdx]; g++) {
                         sf2_hydra_igen igen;
                         file->read((uint8_t*)&igen, sf2Size[igenIdx]);
 
