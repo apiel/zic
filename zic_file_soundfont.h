@@ -213,6 +213,46 @@ uint16_t getInstGenNdx(Zic_File* file, uint16_t instBagNdx)
     return ibag.instGenNdx;
 }
 
+void printInstrument(Zic_File* file, uint8_t index)
+{
+    sf2_hydra_inst inst;
+    file->seekFromStart(sf2Offset[instIdx] + index * sf2Size[instIdx]);
+    file->read((uint8_t*)&inst, sf2Size[instIdx]);
+    printf("----\ninstrument name %s (ibag %d)\n", inst.instName, inst.instBagNdx);
+
+    if (inst.instName[0] == 'E' && inst.instName[1] == 'O'
+        && inst.instName[2] == 'I' && inst.instName[3] == '\0') {
+        printf("EOI\n");
+    } else {
+        sf2_hydra_inst instNext;
+        file->read((uint8_t*)&instNext, sf2Size[instIdx]);
+        printf("start %d end %d\n", inst.instBagNdx, instNext.instBagNdx);
+        for (int j = inst.instBagNdx; j < instNext.instBagNdx; j++) {
+
+            uint16_t g = getInstGenNdx(file, j);
+            file->seekFromStart(sf2Offset[igenIdx] + g * sf2Size[igenIdx]);
+            for (; g < sf2Num[igenIdx]; g++) {
+                sf2_hydra_igen igen;
+                file->read((uint8_t*)&igen, sf2Size[igenIdx]);
+
+                if (igen.genOper == 43 || igen.genOper == 53) {
+                    printf("> igen (%d) %d hi %d low %d\tshortAmount %d wordAmount %d\n", g,
+                        igen.genOper,
+                        igen.genAmount.range.hi,
+                        igen.genAmount.range.lo,
+                        igen.genAmount.shortAmount,
+                        igen.genAmount.wordAmount);
+                }
+                // if 43 we should assign the key range
+                if (igen.genOper == 53) {
+                    // here we should assign sample value
+                    printSample(file, igen.genAmount.range.lo);
+                }
+            }
+        }
+    }
+}
+
 void sf2_load(Zic_File* file)
 {
     struct sf2_riffchunk chunkHead;
@@ -340,38 +380,7 @@ void sf2_load(Zic_File* file)
         printf("num presets %d pbagNum %d\n", sf2Num[phdrIdx], sf2Num[pbagIdx]);
 
         for (uint32_t i = 0; i < sf2Num[instIdx]; i++) {
-            printf("----\ninstrument name %s (ibag %d)\n", hydra.insts[i].instName, hydra.insts[i].instBagNdx);
-
-            if (hydra.insts[i].instName[0] == 'E' && hydra.insts[i].instName[1] == 'O'
-                && hydra.insts[i].instName[2] == 'I' && hydra.insts[i].instName[3] == '\0') {
-                printf("EOI\n");
-            } else {
-                printf("start %d end %d\n", hydra.insts[i].instBagNdx, hydra.insts[i + 1].instBagNdx);
-                for (int j = hydra.insts[i].instBagNdx; j < hydra.insts[i + 1].instBagNdx; j++) {
-                    // printf("ibag (%d) %d \n", j, hydra.ibags[j].instGenNdx);
-
-                    uint16_t g = getInstGenNdx(file, j);
-                    file->seekFromStart(sf2Offset[igenIdx] + g * sf2Size[igenIdx]);
-                    for (; g < sf2Num[igenIdx]; g++) {
-                        sf2_hydra_igen igen;
-                        file->read((uint8_t*)&igen, sf2Size[igenIdx]);
-
-                        if (igen.genOper == 43 || igen.genOper == 53) {
-                            printf("> igen (%d) %d hi %d low %d\tshortAmount %d wordAmount %d\n", g,
-                                igen.genOper,
-                                igen.genAmount.range.hi,
-                                igen.genAmount.range.lo,
-                                igen.genAmount.shortAmount,
-                                igen.genAmount.wordAmount);
-                        }
-                        // if 43 we should assign the key range
-                        if (igen.genOper == 53) {
-                            // here we should assign sample value
-                            printSample(file, igen.genAmount.range.lo);
-                        }
-                    }
-                }
-            }
+            printInstrument(file, i);
         }
 
         // printf("\n\n sample:\n");
