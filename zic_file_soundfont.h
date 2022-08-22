@@ -57,6 +57,7 @@ struct sf2_riffchunk {
     uint32_t size;
 };
 
+// see if there is a way to simplify this
 static bool sf2_riffchunk_read(struct sf2_riffchunk* parent, struct sf2_riffchunk* chunk, Zic_File* file)
 {
     bool IsRiff, IsList;
@@ -148,6 +149,14 @@ uint16_t getInstGenNdx(Zic_File* file, uint16_t instBagNdx)
     return ibag.instGenNdx;
 }
 
+uint16_t getPresetGenNdx(Zic_File* file, uint16_t presetBagNdx)
+{
+    sf2_hydra_pbag pbag;
+    file->seekFromStart(sf2Offset[pbagIdx] + presetBagNdx * sf2Size[pbagIdx]);
+    file->read((uint8_t*)&pbag, sf2Size[pbagIdx]);
+    return pbag.genNdx;
+}
+
 void printInstrument(Zic_File* file, uint8_t index)
 {
     sf2_hydra_inst inst;
@@ -155,8 +164,7 @@ void printInstrument(Zic_File* file, uint8_t index)
     file->read((uint8_t*)&inst, sf2Size[instIdx]);
     printf("----\ninstrument name %s (ibag %d)\n", inst.instName, inst.instBagNdx);
 
-    // maybe there is a better way to do this? with uint32?
-    if (inst.instName[0] == 'E' && inst.instName[1] == 'O' && inst.instName[2] == 'I' && inst.instName[3] == '\0') {
+    if (*(uint32_t*)inst.instName == *(uint32_t*)"EOI\0") {
         printf("EOI\n");
     } else {
         sf2_hydra_inst instNext;
@@ -192,7 +200,36 @@ void printPreset(Zic_File* file, uint8_t index)
     sf2_hydra_phdr phdr;
     file->seekFromStart(sf2Offset[phdrIdx] + index * sf2Size[phdrIdx]);
     file->read((uint8_t*)&phdr, sf2Size[phdrIdx]);
-    printf("preset name %s (pbag %d)\n", phdr.presetName, phdr.presetBagNdx);
+    printf("+++++++++++\npreset name %s (pbag %d)\n", phdr.presetName, phdr.presetBagNdx);
+
+    if (*(uint32_t*)phdr.presetName == *(uint32_t*)"EOP\0") {
+        printf("EOP\n");
+    } else {
+        sf2_hydra_phdr phdrNext;
+        file->read((uint8_t*)&phdrNext, sf2Size[phdrIdx]);
+        printf("preset start %d end %d\n", phdr.presetBagNdx, phdrNext.presetBagNdx);
+        for (int j = phdr.presetBagNdx; j < phdrNext.presetBagNdx; j++) {
+            uint16_t g = getPresetGenNdx(file, j);
+            file->seekFromStart(sf2Offset[pgenIdx] + g * sf2Size[pgenIdx]);
+            for (; g < sf2Num[pgenIdx]; g++) {
+                sf2_hydra_pgen pgen;
+                file->read((uint8_t*)&pgen, sf2Size[pgenIdx]);
+
+                // if (pgen.genOper == 43 || pgen.genOper == 53) {
+                //     printf("> igen (%d) %d hi %d low %d\tshortAmount %d wordAmount %d\n", g,
+                //         igen.genOper,
+                //         igen.genAmount.range.hi,
+                //         igen.genAmount.range.lo,
+                //         igen.genAmount.shortAmount,
+                //         igen.genAmount.wordAmount);
+                // }
+                // // if 43 we should assign the key range
+                if (pgen.genOper == 41) {
+                    printInstrument(file, pgen.genAmount.range.lo);
+                }
+            }
+        }
+    }
 }
 
 int8_t getChunkIdIndex(uint32_t chunkId)
