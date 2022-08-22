@@ -16,37 +16,6 @@ struct sf2_hydra_phdr {
     uint32_t library, genre, morphology;
 };
 
-void debug_phdr(struct sf2_hydra_phdr* i)
-{
-    printf("\ndebug_phdr ----------\n");
-    printf("presetName: %s\n", i->presetName);
-    printf("preset: %d\n", i->preset);
-    printf("bank: %d\n", i->bank);
-    printf("presetBagNdx: %d\n", i->presetBagNdx);
-    printf("library: %d\n", i->library);
-    printf("genre: %d\n", i->genre);
-    printf("morphology: %d\n", i->morphology);
-}
-
-static void sf2_hydra_read_phdr(struct sf2_hydra_phdr* i, Zic_File* file)
-{
-    // file->read(&i->presetName, sizeof(i->presetName));
-    // file->read(&i->preset, sizeof(i->preset));
-    // file->read(&i->bank, sizeof(i->bank));
-    // file->read(&i->presetBagNdx, sizeof(i->presetBagNdx));
-    // file->read(&i->library, sizeof(i->library));
-    // file->read(&i->genre, sizeof(i->genre));
-    // file->read(&i->morphology, sizeof(i->morphology));
-
-    sf2_hydra_phdr phdr;
-    file->read((uint8_t*)&phdr, sizeof(sf2_hydra_phdr) - 2);
-    memcpy(i, &phdr, sizeof(sf2_hydra_phdr));
-
-    // file->read((uint8_t*)i, 38);
-
-    // debug_phdr(i);
-}
-
 struct sf2_hydra_pbag {
     uint16_t genNdx, modNdx;
 };
@@ -147,26 +116,6 @@ static int sf2_load_samples(float** fontSamples, unsigned int* fontSampleCount, 
     return 1;
 }
 
-static void sf2_hydra_read_pbag(struct sf2_hydra_pbag* i, Zic_File* file)
-{
-    // printf("pbag size %d\n", sizeof(struct sf2_hydra_pbag));
-    file->read(&i->genNdx, sizeof(i->genNdx));
-    file->read(&i->modNdx, sizeof(i->modNdx));
-}
-static void sf2_hydra_read_pmod(struct sf2_hydra_pmod* i, Zic_File* file)
-{
-    file->read(&i->modSrcOper, sizeof(i->modSrcOper));
-    file->read(&i->modDestOper, sizeof(i->modDestOper));
-    file->read(&i->modAmount, sizeof(i->modAmount));
-    file->read(&i->modAmtSrcOper, sizeof(i->modAmtSrcOper));
-    file->read(&i->modTransOper, sizeof(i->modTransOper));
-}
-static void sf2_hydra_read_pgen(struct sf2_hydra_pgen* i, Zic_File* file)
-{
-    file->read(&i->genOper, sizeof(i->genOper));
-    file->read(&i->genAmount, sizeof(i->genAmount));
-}
-
 enum {
     phdrIdx = 0,
     pbagIdx,
@@ -250,6 +199,14 @@ void printInstrument(Zic_File* file, uint8_t index)
     }
 }
 
+void printPreset(Zic_File* file, uint8_t index)
+{
+    sf2_hydra_phdr phdr;
+    file->seekFromStart(sf2Offset[phdrIdx] + index * sf2Size[phdrIdx]);
+    file->read((uint8_t*)&phdr, sf2Size[phdrIdx]);
+    printf("preset name %s (pbag %d)\n", phdr.presetName, phdr.presetBagNdx);
+}
+
 int8_t getChunkIdIndex(uint32_t chunkId)
 {
     for (uint8_t i = 0; i < sf2IdxCount; i++) {
@@ -279,54 +236,14 @@ void sf2_load(Zic_File* file)
         struct sf2_riffchunk chunk;
         if (chunkList.id == *(uint32_t*)"pdta") {
             while (sf2_riffchunk_read(&chunkList, &chunk, file)) {
-                if (chunk.id == *(uint32_t*)"phdr" && !(chunk.size % sf2Size[phdrIdx])) {
-                    sf2Offset[phdrIdx] = file->tell();
-                    sf2Num[phdrIdx] = chunk.size / sf2Size[phdrIdx];
-                    hydra.phdrs = (struct sf2_hydra_phdr*)malloc(sf2Num[phdrIdx] * sizeof(struct sf2_hydra_phdr));
-                    if (!hydra.phdrs)
-                        goto out_of_memory;
-                    for (uint32_t i = 0; i < sf2Num[phdrIdx]; ++i) {
-                        sf2_hydra_read_phdr(&hydra.phdrs[i], file);
-                        // debug_phdr(&hydra.phdrs[i]);
-                    }
-                    printf("chunkName phdr (%d)\n", sf2Num[phdrIdx]);
-                } else if (chunk.id == *(uint32_t*)"pbag" && !(chunk.size % sf2Size[pbagIdx])) {
-                    sf2Offset[pbagIdx] = file->tell();
-                    sf2Num[pbagIdx] = chunk.size / sf2Size[pbagIdx];
-                    hydra.pbags = (struct sf2_hydra_pbag*)malloc(sf2Num[pbagIdx] * sizeof(struct sf2_hydra_pbag));
-                    if (!hydra.pbags)
-                        goto out_of_memory;
-                    for (uint32_t i = 0; i < sf2Num[pbagIdx]; ++i)
-                        sf2_hydra_read_pbag(&hydra.pbags[i], file);
-                    printf("chunkName pbag (%d)\n", sf2Num[pbagIdx]);
-                } else if (chunk.id == *(uint32_t*)"pmod" && !(chunk.size % sf2Size[pmodIdx])) {
-                    sf2Offset[pmodIdx] = file->tell();
-                    sf2Num[pmodIdx] = chunk.size / sf2Size[pmodIdx];
-                    hydra.pmods = (struct sf2_hydra_pmod*)malloc(sf2Num[pmodIdx] * sizeof(struct sf2_hydra_pmod));
-                    if (!hydra.pmods)
-                        goto out_of_memory;
-                    for (uint32_t i = 0; i < sf2Num[pmodIdx]; ++i)
-                        sf2_hydra_read_pmod(&hydra.pmods[i], file);
-                    printf("chunkName pmod (%d)\n", sf2Num[pmodIdx]);
-                } else if (chunk.id == *(uint32_t*)"pgen" && !(chunk.size % sf2Size[pgenIdx])) {
-                    sf2Offset[pgenIdx] = file->tell();
-                    sf2Num[pgenIdx] = chunk.size / sf2Size[pgenIdx];
-                    hydra.pgens = (struct sf2_hydra_pgen*)malloc(sf2Num[pgenIdx] * sizeof(struct sf2_hydra_pgen));
-                    if (!hydra.pgens)
-                        goto out_of_memory;
-                    for (uint32_t i = 0; i < sf2Num[pgenIdx]; ++i)
-                        sf2_hydra_read_pgen(&hydra.pgens[i], file);
-                    printf("chunkName pgen (%d)\n", sf2Num[pgenIdx]);
-                } else {
-                    uint8_t index = getChunkIdIndex(chunk.id);
-                    if (index != -1) {
-                        sf2Offset[index] = file->tell();
-                        sf2Num[index] = chunk.size / sf2Size[index];
-                    }
-                    file->seekFromCurrent(chunk.size);
-                }
-            }
 
+                uint8_t index = getChunkIdIndex(chunk.id);
+                if (index != -1) {
+                    sf2Offset[index] = file->tell();
+                    sf2Num[index] = chunk.size / sf2Size[index];
+                }
+                file->seekFromCurrent(chunk.size);
+            }
         } else if (chunkList.id == *(uint32_t*)"sdta") {
             while (sf2_riffchunk_read(&chunkList, &chunk, file)) {
                 if (chunk.id == *(uint32_t*)"smpl" && !fontSamples && chunk.size >= sizeof(short)) {
@@ -361,6 +278,10 @@ void sf2_load(Zic_File* file)
 
         for (uint32_t i = 0; i < sf2Num[instIdx]; i++) {
             printInstrument(file, i);
+        }
+
+        for (uint32_t i = 0; i < sf2Num[phdrIdx]; i++) {
+            printPreset(file, i);
         }
 
         // printf("\n\n sample:\n");
