@@ -167,15 +167,6 @@ static void sf2_hydra_read_pgen(struct sf2_hydra_pgen* i, Zic_File* file)
     file->read(&i->genAmount, sizeof(i->genAmount));
 }
 
-static void sf2_hydra_read_imod(struct sf2_hydra_imod* i, Zic_File* file)
-{
-    file->read(&i->modSrcOper, sizeof(i->modSrcOper));
-    file->read(&i->modDestOper, sizeof(i->modDestOper));
-    file->read(&i->modAmount, sizeof(i->modAmount));
-    file->read(&i->modAmtSrcOper, sizeof(i->modAmtSrcOper));
-    file->read(&i->modTransOper, sizeof(i->modTransOper));
-}
-
 enum {
     phdrIdx = 0,
     pbagIdx,
@@ -189,6 +180,17 @@ enum {
     sf2IdxCount,
 };
 
+uint32_t sf2Id[sf2IdxCount] = {
+    *(uint32_t*)"phdr",
+    *(uint32_t*)"pbag",
+    *(uint32_t*)"pmod",
+    *(uint32_t*)"pgen",
+    *(uint32_t*)"inst",
+    *(uint32_t*)"ibag",
+    *(uint32_t*)"imod",
+    *(uint32_t*)"igen",
+    *(uint32_t*)"shdr",
+};
 uint32_t sf2Size[sf2IdxCount] = { 38, 4, 10, 4, 22, 4, 10, 4, 46 }; // cannot use sizeof struct because of memory padding https://www.javatpoint.com/structure-padding-in-c
 uint32_t sf2Num[sf2IdxCount];
 uint64_t sf2Offset[sf2IdxCount];
@@ -248,6 +250,16 @@ void printInstrument(Zic_File* file, uint8_t index)
     }
 }
 
+int8_t getChunkIdIndex(uint32_t chunkId)
+{
+    for (uint8_t i = 0; i < sf2IdxCount; i++) {
+        if (chunkId == sf2Id[i]) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void sf2_load(Zic_File* file)
 {
     struct sf2_riffchunk chunkHead;
@@ -305,32 +317,12 @@ void sf2_load(Zic_File* file)
                     for (uint32_t i = 0; i < sf2Num[pgenIdx]; ++i)
                         sf2_hydra_read_pgen(&hydra.pgens[i], file);
                     printf("chunkName pgen (%d)\n", sf2Num[pgenIdx]);
-                } else if (chunk.id == *(uint32_t*)"inst" && !(chunk.size % sf2Size[instIdx])) {
-                    sf2Offset[instIdx] = file->tell();
-                    sf2Num[instIdx] = chunk.size / sf2Size[instIdx];
-                    file->seekFromCurrent(chunk.size);
-                } else if (chunk.id == *(uint32_t*)"ibag" && !(chunk.size % sf2Size[ibagIdx])) {
-                    sf2Offset[ibagIdx] = file->tell();
-                    sf2Num[ibagIdx] = chunk.size / sf2Size[ibagIdx];
-                    file->seekFromCurrent(chunk.size);
-                } else if (chunk.id == *(uint32_t*)"imod" && !(chunk.size % sf2Size[imodIdx])) {
-                    sf2Offset[imodIdx] = file->tell();
-                    sf2Num[imodIdx] = chunk.size / sf2Size[imodIdx];
-                    hydra.imods = (struct sf2_hydra_imod*)malloc(sf2Num[imodIdx] * sizeof(struct sf2_hydra_imod));
-                    if (!hydra.imods)
-                        goto out_of_memory;
-                    for (uint32_t i = 0; i < sf2Num[imodIdx]; ++i)
-                        sf2_hydra_read_imod(&hydra.imods[i], file);
-                    printf("chunkName imod (%d)\n", sf2Num[imodIdx]);
-                } else if (chunk.id == *(uint32_t*)"igen" && !(chunk.size % sf2Size[igenIdx])) {
-                    sf2Offset[igenIdx] = file->tell();
-                    sf2Num[igenIdx] = chunk.size / sf2Size[igenIdx];
-                    file->seekFromCurrent(chunk.size);
-                } else if (chunk.id == *(uint32_t*)"shdr" && !(chunk.size % sf2Size[shdrIdx])) {
-                    sf2Offset[shdrIdx] = file->tell();
-                    sf2Num[shdrIdx] = chunk.size / sf2Size[shdrIdx];
-                    file->seekFromCurrent(chunk.size);
                 } else {
+                    uint8_t index = getChunkIdIndex(chunk.id);
+                    if (index != -1) {
+                        sf2Offset[index] = file->tell();
+                        sf2Num[index] = chunk.size / sf2Size[index];
+                    }
                     file->seekFromCurrent(chunk.size);
                 }
             }
