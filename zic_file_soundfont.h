@@ -220,6 +220,14 @@ uint32_t sf2Size[sf2IdxCount] = { 38, 4, 10, 4, 22, 4, 10, 4, 46 }; // cannot us
 uint32_t sf2Num[sf2IdxCount];
 uint64_t sf2Offset[sf2IdxCount];
 
+void printSample(Zic_File* file, uint8_t index)
+{
+    tsf_hydra_shdr shdr;
+    file->seekFromStart(sf2Offset[shdrIdx] + index * sf2Size[shdrIdx]);
+    file->read((uint8_t*)&shdr, sf2Size[shdrIdx]);
+    printf("sample name %s\n", shdr.sampleName);
+}
+
 void tsf_load(Zic_File* file)
 {
     struct tsf_riffchunk chunkHead;
@@ -240,6 +248,7 @@ void tsf_load(Zic_File* file)
         if (chunkList.id == *(uint32_t*)"pdta") {
             while (tsf_riffchunk_read(&chunkList, &chunk, file)) {
                 if (chunk.id == *(uint32_t*)"phdr" && !(chunk.size % sf2Size[phdrIdx])) {
+                    sf2Offset[phdrIdx] = file->tell();
                     sf2Num[phdrIdx] = chunk.size / sf2Size[phdrIdx];
                     hydra.phdrs = (struct tsf_hydra_phdr*)malloc(sf2Num[phdrIdx] * sizeof(struct tsf_hydra_phdr));
                     if (!hydra.phdrs)
@@ -250,6 +259,7 @@ void tsf_load(Zic_File* file)
                     }
                     printf("chunkName phdr (%d)\n", sf2Num[phdrIdx]);
                 } else if (chunk.id == *(uint32_t*)"pbag" && !(chunk.size % sf2Size[pbagIdx])) {
+                    sf2Offset[pbagIdx] = file->tell();
                     sf2Num[pbagIdx] = chunk.size / sf2Size[pbagIdx];
                     hydra.pbags = (struct tsf_hydra_pbag*)malloc(sf2Num[pbagIdx] * sizeof(struct tsf_hydra_pbag));
                     if (!hydra.pbags)
@@ -258,6 +268,7 @@ void tsf_load(Zic_File* file)
                         tsf_hydra_read_pbag(&hydra.pbags[i], file);
                     printf("chunkName pbag (%d)\n", sf2Num[pbagIdx]);
                 } else if (chunk.id == *(uint32_t*)"pmod" && !(chunk.size % sf2Size[pmodIdx])) {
+                    sf2Offset[pmodIdx] = file->tell();
                     sf2Num[pmodIdx] = chunk.size / sf2Size[pmodIdx];
                     hydra.pmods = (struct tsf_hydra_pmod*)malloc(sf2Num[pmodIdx] * sizeof(struct tsf_hydra_pmod));
                     if (!hydra.pmods)
@@ -266,6 +277,7 @@ void tsf_load(Zic_File* file)
                         tsf_hydra_read_pmod(&hydra.pmods[i], file);
                     printf("chunkName pmod (%d)\n", sf2Num[pmodIdx]);
                 } else if (chunk.id == *(uint32_t*)"pgen" && !(chunk.size % sf2Size[pgenIdx])) {
+                    sf2Offset[pgenIdx] = file->tell();
                     sf2Num[pgenIdx] = chunk.size / sf2Size[pgenIdx];
                     hydra.pgens = (struct tsf_hydra_pgen*)malloc(sf2Num[pgenIdx] * sizeof(struct tsf_hydra_pgen));
                     if (!hydra.pgens)
@@ -274,6 +286,7 @@ void tsf_load(Zic_File* file)
                         tsf_hydra_read_pgen(&hydra.pgens[i], file);
                     printf("chunkName pgen (%d)\n", sf2Num[pgenIdx]);
                 } else if (chunk.id == *(uint32_t*)"inst" && !(chunk.size % sf2Size[instIdx])) {
+                    sf2Offset[instIdx] = file->tell();
                     sf2Num[instIdx] = chunk.size / sf2Size[instIdx];
                     hydra.insts = (struct tsf_hydra_inst*)malloc(sf2Num[instIdx] * sizeof(struct tsf_hydra_inst));
                     if (!hydra.insts)
@@ -285,6 +298,7 @@ void tsf_load(Zic_File* file)
                     printf("chunkName inst (%d)\n", sf2Num[instIdx]);
                 } else if (chunk.id == *(uint32_t*)"ibag" && !(chunk.size % sf2Size[ibagIdx])) {
                     printf("ibag start %ld\n", file->tell());
+                    sf2Offset[ibagIdx] = file->tell();
                     sf2Num[ibagIdx] = chunk.size / sf2Size[ibagIdx];
                     hydra.ibags = (struct tsf_hydra_ibag*)malloc(sf2Num[ibagIdx] * sizeof(struct tsf_hydra_ibag));
                     if (!hydra.ibags)
@@ -293,6 +307,7 @@ void tsf_load(Zic_File* file)
                         tsf_hydra_read_ibag(&hydra.ibags[i], file);
                     printf("chunkName ibag (%d)\n", sf2Num[ibagIdx]);
                 } else if (chunk.id == *(uint32_t*)"imod" && !(chunk.size % sf2Size[imodIdx])) {
+                    sf2Offset[imodIdx] = file->tell();
                     sf2Num[imodIdx] = chunk.size / sf2Size[imodIdx];
                     hydra.imods = (struct tsf_hydra_imod*)malloc(sf2Num[imodIdx] * sizeof(struct tsf_hydra_imod));
                     if (!hydra.imods)
@@ -301,6 +316,7 @@ void tsf_load(Zic_File* file)
                         tsf_hydra_read_imod(&hydra.imods[i], file);
                     printf("chunkName imod (%d)\n", sf2Num[imodIdx]);
                 } else if (chunk.id == *(uint32_t*)"igen" && !(chunk.size % sf2Size[igenIdx])) {
+                    sf2Offset[igenIdx] = file->tell();
                     sf2Num[igenIdx] = chunk.size / sf2Size[igenIdx];
                     hydra.igens = (struct tsf_hydra_igen*)malloc(sf2Num[igenIdx] * sizeof(struct tsf_hydra_igen));
                     if (!hydra.igens)
@@ -309,6 +325,7 @@ void tsf_load(Zic_File* file)
                         tsf_hydra_read_igen(&hydra.igens[i], file);
                     printf("chunkName igen (%d)\n", sf2Num[igenIdx]);
                 } else if (chunk.id == *(uint32_t*)"shdr" && !(chunk.size % sf2Size[shdrIdx])) {
+                    sf2Offset[shdrIdx] = file->tell();
                     sf2Num[shdrIdx] = chunk.size / sf2Size[shdrIdx];
                     hydra.shdrs = (struct tsf_hydra_shdr*)malloc(sf2Num[shdrIdx] * sizeof(struct tsf_hydra_shdr));
                     if (!hydra.shdrs)
@@ -374,7 +391,8 @@ void tsf_load(Zic_File* file)
                                 hydra.igens[g].genAmount.wordAmount);
                         }
                         if (hydra.igens[g].genOper == 53) {
-                            printf("sample name %s\n", hydra.shdrs[hydra.igens[g].genAmount.range.lo].sampleName);
+                            // printf("sample name %s\n", hydra.shdrs[hydra.igens[g].genAmount.range.lo].sampleName);
+                            printSample(file, hydra.igens[g].genAmount.range.lo);
                         }
                     }
                 }
