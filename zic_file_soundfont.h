@@ -210,6 +210,14 @@ void printSample(Zic_File* file, uint8_t index)
     printf("sample name %s\n", shdr.sampleName);
 }
 
+uint16_t getInstGenNdx(Zic_File* file, uint16_t instBagNdx)
+{
+    sf2_hydra_ibag ibag;
+    file->seekFromStart(sf2Offset[ibagIdx] + instBagNdx * sf2Size[ibagIdx]);
+    file->read((uint8_t*)&ibag, sf2Size[ibagIdx]);
+    return ibag.instGenNdx;
+}
+
 void sf2_load(Zic_File* file)
 {
     struct sf2_riffchunk chunkHead;
@@ -282,6 +290,7 @@ void sf2_load(Zic_File* file)
                     printf("ibag start %ld\n", file->tell());
                     sf2Offset[ibagIdx] = file->tell();
                     sf2Num[ibagIdx] = chunk.size / sf2Size[ibagIdx];
+                    
                     hydra.ibags = (struct sf2_hydra_ibag*)malloc(sf2Num[ibagIdx] * sizeof(struct sf2_hydra_ibag));
                     if (!hydra.ibags)
                         goto out_of_memory;
@@ -353,9 +362,10 @@ void sf2_load(Zic_File* file)
                 for (int j = hydra.insts[i].instBagNdx; j < hydra.insts[i + 1].instBagNdx; j++) {
                     printf("ibag (%d) %d \n", j, hydra.ibags[j].instGenNdx);
 
-                    for (uint32_t g = hydra.ibags[j].instGenNdx; g < sf2Num[igenIdx] && g < hydra.ibags[j + 1].instGenNdx; g++) {
+                    uint16_t g = getInstGenNdx(file, j);
+                    file->seekFromStart(sf2Offset[igenIdx] + g * sf2Size[igenIdx]);
+                    for (; g < sf2Num[igenIdx] && g < hydra.ibags[j + 1].instGenNdx; g++) {
                         sf2_hydra_igen igen;
-                        file->seekFromStart(sf2Offset[igenIdx] + g * sf2Size[igenIdx]);
                         file->read((uint8_t*)&igen, sf2Size[igenIdx]);
 
                         if (igen.genOper == 43 || igen.genOper == 53) {
@@ -366,22 +376,11 @@ void sf2_load(Zic_File* file)
                                 igen.genAmount.shortAmount,
                                 igen.genAmount.wordAmount);
                         }
+                        // if 43 we should assign the key range
                         if (igen.genOper == 53) {
+                            // here we should assign sample value
                             printSample(file, igen.genAmount.range.lo);
                         }
-
-                        // if (hydra.igens[g].genOper == 43 || hydra.igens[g].genOper == 53) {
-                        //     printf("> igen (%d) %d hi %d low %d\tshortAmount %d wordAmount %d\n", g,
-                        //         hydra.igens[g].genOper,
-                        //         hydra.igens[g].genAmount.range.hi,
-                        //         hydra.igens[g].genAmount.range.lo,
-                        //         hydra.igens[g].genAmount.shortAmount,
-                        //         hydra.igens[g].genAmount.wordAmount);
-                        // }
-                        // if (hydra.igens[g].genOper == 53) {
-                        //     // printf("sample name %s\n", hydra.shdrs[hydra.igens[g].genAmount.range.lo].sampleName);
-                        //     printSample(file, hydra.igens[g].genAmount.range.lo);
-                        // }
                     }
                 }
             }
