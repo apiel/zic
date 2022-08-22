@@ -166,11 +166,7 @@ static void sf2_hydra_read_pgen(struct sf2_hydra_pgen* i, Zic_File* file)
     file->read(&i->genOper, sizeof(i->genOper));
     file->read(&i->genAmount, sizeof(i->genAmount));
 }
-static void sf2_hydra_read_inst(struct sf2_hydra_inst* i, Zic_File* file)
-{
-    file->read(&i->instName, sizeof(i->instName));
-    file->read(&i->instBagNdx, sizeof(i->instBagNdx));
-}
+
 static void sf2_hydra_read_imod(struct sf2_hydra_imod* i, Zic_File* file)
 {
     file->read(&i->modSrcOper, sizeof(i->modSrcOper));
@@ -220,15 +216,14 @@ void printInstrument(Zic_File* file, uint8_t index)
     file->read((uint8_t*)&inst, sf2Size[instIdx]);
     printf("----\ninstrument name %s (ibag %d)\n", inst.instName, inst.instBagNdx);
 
-    if (inst.instName[0] == 'E' && inst.instName[1] == 'O'
-        && inst.instName[2] == 'I' && inst.instName[3] == '\0') {
+    // maybe there is a better way to do this? with uint32?
+    if (inst.instName[0] == 'E' && inst.instName[1] == 'O' && inst.instName[2] == 'I' && inst.instName[3] == '\0') {
         printf("EOI\n");
     } else {
         sf2_hydra_inst instNext;
         file->read((uint8_t*)&instNext, sf2Size[instIdx]);
         printf("start %d end %d\n", inst.instBagNdx, instNext.instBagNdx);
         for (int j = inst.instBagNdx; j < instNext.instBagNdx; j++) {
-
             uint16_t g = getInstGenNdx(file, j);
             file->seekFromStart(sf2Offset[igenIdx] + g * sf2Size[igenIdx]);
             for (; g < sf2Num[igenIdx]; g++) {
@@ -313,14 +308,7 @@ void sf2_load(Zic_File* file)
                 } else if (chunk.id == *(uint32_t*)"inst" && !(chunk.size % sf2Size[instIdx])) {
                     sf2Offset[instIdx] = file->tell();
                     sf2Num[instIdx] = chunk.size / sf2Size[instIdx];
-                    hydra.insts = (struct sf2_hydra_inst*)malloc(sf2Num[instIdx] * sizeof(struct sf2_hydra_inst));
-                    if (!hydra.insts)
-                        goto out_of_memory;
-                    for (uint32_t i = 0; i < sf2Num[instIdx]; ++i) {
-                        sf2_hydra_read_inst(&hydra.insts[i], file);
-                        // printf("inst (%d) %s\n", i, hydra.insts[i].instName);
-                    }
-                    printf("chunkName inst (%d)\n", sf2Num[instIdx]);
+                    file->seekFromCurrent(chunk.size);
                 } else if (chunk.id == *(uint32_t*)"ibag" && !(chunk.size % sf2Size[ibagIdx])) {
                     sf2Offset[ibagIdx] = file->tell();
                     sf2Num[ibagIdx] = chunk.size / sf2Size[ibagIdx];
