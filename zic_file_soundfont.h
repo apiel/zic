@@ -136,14 +136,6 @@ protected:
         return 1;
     }
 
-    void printSample(uint8_t index)
-    {
-        sf2_shdr shdr;
-        seekFromStart(sf2Offset[shdrIdx] + index * sf2Size[shdrIdx]);
-        read((uint8_t*)&shdr, sf2Size[shdrIdx]);
-        printf("sample name %s\n", shdr.sampleName);
-    }
-
     uint16_t getInstGenNdx(uint16_t instBagNdx)
     {
         sf2_ibag ibag;
@@ -160,38 +152,45 @@ protected:
         return pbag.genNdx;
     }
 
-    void printInstrument(uint8_t index)
+    void getSample(uint8_t index, sf2_shdr* shdr)
+    {
+        seekFromStart(sf2Offset[shdrIdx] + index * sf2Size[shdrIdx]);
+        read((uint8_t*)shdr, sf2Size[shdrIdx]);
+    }
+
+    void assignInstrument(uint8_t index)
     {
         sf2_inst inst;
         seekFromStart(sf2Offset[instIdx] + index * sf2Size[instIdx]);
         read((uint8_t*)&inst, sf2Size[instIdx]);
-        printf("----\ninstrument name %s (ibag %d)\n", inst.instName, inst.instBagNdx);
+        // printf("----\ninstrument name %s (ibag %d)\n", inst.instName, inst.instBagNdx);
 
-        if (*(uint32_t*)inst.instName == *(uint32_t*)"EOI\0") {
-            printf("EOI\n");
-        } else {
+        if (*(uint32_t*)inst.instName != *(uint32_t*)"EOI\0") {
             sf2_inst instNext;
             read((uint8_t*)&instNext, sf2Size[instIdx]);
-            printf("start %d end %d\n", inst.instBagNdx, instNext.instBagNdx);
+            // printf("start %d end %d\n", inst.instBagNdx, instNext.instBagNdx);
             for (int j = inst.instBagNdx; j < instNext.instBagNdx; j++) {
                 uint16_t g = getInstGenNdx(j);
                 seekFromStart(sf2Offset[igenIdx] + g * sf2Size[igenIdx]);
+                sf2_shdr shdr;
+                bool sampleFound = false;
+                uint8_t lowKey = 0, highKey = 127;
                 for (; g < sf2Num[igenIdx]; g++) {
                     sf2_igen igen;
                     read((uint8_t*)&igen, sf2Size[igenIdx]);
-
-                    if (igen.genOper == 43 || igen.genOper == 53) {
-                        printf("> igen (%d) %d hi %d low %d\tshortAmount %d wordAmount %d\n", g,
-                            igen.genOper,
-                            igen.genAmount.range.hi,
-                            igen.genAmount.range.lo,
-                            igen.genAmount.shortAmount,
-                            igen.genAmount.wordAmount);
+                    if (igen.genOper == 43) {
+                        lowKey = igen.genAmount.range.lo;
+                        highKey = igen.genAmount.range.hi;
+                    } else if (igen.genOper == 53) {
+                        getSample(igen.genAmount.range.lo, &shdr);
+                        // printf("sample name %s\n", shdr.sampleName);
+                        sampleFound = true;
                     }
-                    // if 43 we should assign the key range
-                    if (igen.genOper == 53) {
-                        // here we should assign sample value
-                        printSample(igen.genAmount.range.lo);
+                }
+
+                if (sampleFound) {
+                    for (uint8_t key = lowKey; key <= highKey; key++) {
+                        memcpy(&preset.keys[key].sample, &shdr, sizeof(sf2_shdr));
                     }
                 }
             }
@@ -259,7 +258,15 @@ protected:
             // }
 
             for (uint32_t i = 0; i < sf2Num[phdrIdx]; i++) {
-                getPreset(i);
+                sf2_preset* p = getPreset(i);
+                if (p) {
+                    printf("+++++++++++\npreset name %s\n", p->phdr.presetName);
+                    // for (uint8_t key = 0; key < 128; key++) {
+                    //     if (p->keys[key].sample.sampleRate != 0) {
+                    //         printf("(%d) sample %s\n", key, p->keys[key].sample.sampleName);
+                    //     }
+                    // }
+                }
             }
 
             // printf("\n\n sample:\n");
@@ -308,12 +315,12 @@ public:
     {
         seekFromStart(sf2Offset[phdrIdx] + index * sf2Size[phdrIdx]);
         read((uint8_t*)&preset.phdr, sf2Size[phdrIdx]);
-        printf("+++++++++++\npreset name %s (pbag %d)\n", preset.phdr.presetName, preset.phdr.presetBagNdx);
+        // printf("+++++++++++\npreset name %s (pbag %d)\n", preset.phdr.presetName, preset.phdr.presetBagNdx);
 
         if (*(uint32_t*)preset.phdr.presetName != *(uint32_t*)"EOP\0") {
             sf2_phdr phdrNext;
             read((uint8_t*)&phdrNext, sf2Size[phdrIdx]);
-            printf("preset start %d end %d\n", preset.phdr.presetBagNdx, phdrNext.presetBagNdx);
+            // printf("preset start %d end %d\n", preset.phdr.presetBagNdx, phdrNext.presetBagNdx);
             for (int j = preset.phdr.presetBagNdx; j < phdrNext.presetBagNdx; j++) {
                 uint16_t g = getPresetGenNdx(j);
                 seekFromStart(sf2Offset[pgenIdx] + g * sf2Size[pgenIdx]);
@@ -322,21 +329,21 @@ public:
                     read((uint8_t*)&pgen, sf2Size[pgenIdx]);
 
                     if (pgen.genOper == 41) {
-                        printInstrument(pgen.genAmount.range.lo);
+                        assignInstrument(pgen.genAmount.range.lo);
                     } else if (pgen.genOper == 43) {
-                        // see line 745
-                        printf("######### pgen (%d) %d hi %d low %d\tshortAmount %d wordAmount %d\n", g,
-                            pgen.genOper,
-                            pgen.genAmount.range.hi,
-                            pgen.genAmount.range.lo,
-                            pgen.genAmount.shortAmount,
-                            pgen.genAmount.wordAmount);
+                        // see line 745 of tsf.h in TinySoundFont
+                        // printf("######### pgen (%d) %d hi %d low %d\tshortAmount %d wordAmount %d\n", g,
+                        //     pgen.genOper,
+                        //     pgen.genAmount.range.hi,
+                        //     pgen.genAmount.range.lo,
+                        //     pgen.genAmount.shortAmount,
+                        //     pgen.genAmount.wordAmount);
                     }
                 }
             }
+            return &preset;
         }
-
-        return &preset;
+        return NULL;
     }
 };
 
