@@ -91,7 +91,7 @@ protected:
     };
 
     // see if there is a way to simplify this
-    bool sf2_riffchunk_read(struct sf2_riffchunk* parent, struct sf2_riffchunk* chunk)
+    bool sf2RiffchunkRead(struct sf2_riffchunk* parent, struct sf2_riffchunk* chunk)
     {
         bool IsRiff, IsList;
         if (parent && sizeof(uint32_t) + sizeof(uint32_t) > parent->size)
@@ -115,7 +115,7 @@ protected:
         return true;
     }
 
-    uint16_t getInstGenNdx(uint16_t instBagNdx)
+    uint16_t getSf2InstGenNdx(uint16_t instBagNdx)
     {
         sf2_ibag ibag;
         seekFromStart(sf2Offset[ibagIdx] + instBagNdx * sf2Size[ibagIdx]);
@@ -123,7 +123,7 @@ protected:
         return ibag.instGenNdx;
     }
 
-    uint16_t getPresetGenNdx(uint16_t presetBagNdx)
+    uint16_t getSf2PresetGenNdx(uint16_t presetBagNdx)
     {
         sf2_pbag pbag;
         seekFromStart(sf2Offset[pbagIdx] + presetBagNdx * sf2Size[pbagIdx]);
@@ -131,13 +131,13 @@ protected:
         return pbag.genNdx;
     }
 
-    void getSample(uint8_t index, sf2_shdr* shdr)
+    void getSf2Sample(uint8_t index, sf2_shdr* shdr)
     {
         seekFromStart(sf2Offset[shdrIdx] + index * sf2Size[shdrIdx]);
         read((uint8_t*)shdr, sf2Size[shdrIdx]);
     }
 
-    void assignInstrument(uint8_t index)
+    void assignSf2Instrument(uint8_t index)
     {
         sf2_inst inst;
         seekFromStart(sf2Offset[instIdx] + index * sf2Size[instIdx]);
@@ -149,7 +149,7 @@ protected:
             read((uint8_t*)&instNext, sf2Size[instIdx]);
             // printf("start %d end %d\n", inst.instBagNdx, instNext.instBagNdx);
             for (int j = inst.instBagNdx; j < instNext.instBagNdx; j++) {
-                uint16_t g = getInstGenNdx(j);
+                uint16_t g = getSf2InstGenNdx(j);
                 seekFromStart(sf2Offset[igenIdx] + g * sf2Size[igenIdx]);
                 sf2_shdr shdr;
                 bool sampleFound = false;
@@ -161,7 +161,7 @@ protected:
                         lowKey = igen.genAmount.range.lo;
                         highKey = igen.genAmount.range.hi;
                     } else if (igen.genOper == 53) {
-                        getSample(igen.genAmount.range.lo, &shdr);
+                        getSf2Sample(igen.genAmount.range.lo, &shdr);
                         // printf("sample name %s\n", shdr.sampleName);
                         sampleFound = true;
                     }
@@ -176,7 +176,7 @@ protected:
         }
     }
 
-    int8_t getChunkIdIndex(uint32_t chunkId)
+    int8_t getSf2ChunkIdIndex(uint32_t chunkId)
     {
         for (uint8_t i = 0; i < sf2IdxCount; i++) {
             if (chunkId == sf2Id[i]) {
@@ -186,21 +186,21 @@ protected:
         return -1;
     }
 
-    void sf2_load()
+    void sf2Load()
     {
         struct sf2_riffchunk chunkHead;
         struct sf2_riffchunk chunkList;
 
-        if (!sf2_riffchunk_read(NULL, &chunkHead) || chunkHead.id != *(uint32_t*)"sfbk") {
+        if (!sf2RiffchunkRead(NULL, &chunkHead) || chunkHead.id != *(uint32_t*)"sfbk") {
             return;
         }
 
-        while (sf2_riffchunk_read(&chunkHead, &chunkList)) {
+        while (sf2RiffchunkRead(&chunkHead, &chunkList)) {
             struct sf2_riffchunk chunk;
             if (chunkList.id == *(uint32_t*)"pdta") {
-                while (sf2_riffchunk_read(&chunkList, &chunk)) {
+                while (sf2RiffchunkRead(&chunkList, &chunk)) {
 
-                    uint8_t index = getChunkIdIndex(chunk.id);
+                    uint8_t index = getSf2ChunkIdIndex(chunk.id);
                     if (index != -1) {
                         sf2Offset[index] = tell();
                         sf2Num[index] = chunk.size / sf2Size[index];
@@ -208,7 +208,7 @@ protected:
                     seekFromCurrent(chunk.size);
                 }
             } else if (chunkList.id == *(uint32_t*)"sdta") {
-                while (sf2_riffchunk_read(&chunkList, &chunk)) {
+                while (sf2RiffchunkRead(&chunkList, &chunk)) {
                     if (chunk.id == *(uint32_t*)"smpl" && chunk.size >= sizeof(short)) {
                         sf2SampleStart = tell();
                     }
@@ -259,17 +259,17 @@ public:
             return NULL;
         }
 
-        sf2_load();
+        sf2Load();
 
         return file;
     }
 
-    uint32_t getPresetCount()
+    uint32_t getSf2PresetCount()
     {
         return sf2Num[phdrIdx];
     }
 
-    sf2_preset* getPreset(uint8_t index)
+    sf2_preset* getSf2Preset(uint8_t index)
     {
         seekFromStart(sf2Offset[phdrIdx] + index * sf2Size[phdrIdx]);
         read((uint8_t*)&preset.phdr, sf2Size[phdrIdx]);
@@ -280,14 +280,14 @@ public:
             read((uint8_t*)&phdrNext, sf2Size[phdrIdx]);
             // printf("preset start %d end %d\n", preset.phdr.presetBagNdx, phdrNext.presetBagNdx);
             for (int j = preset.phdr.presetBagNdx; j < phdrNext.presetBagNdx; j++) {
-                uint16_t g = getPresetGenNdx(j);
+                uint16_t g = getSf2PresetGenNdx(j);
                 seekFromStart(sf2Offset[pgenIdx] + g * sf2Size[pgenIdx]);
                 for (; g < sf2Num[pgenIdx]; g++) {
                     sf2_pgen pgen;
                     read((uint8_t*)&pgen, sf2Size[pgenIdx]);
 
                     if (pgen.genOper == 41) {
-                        assignInstrument(pgen.genAmount.range.lo);
+                        assignSf2Instrument(pgen.genAmount.range.lo);
                     } else if (pgen.genOper == 43) {
                         // see line 745 of tsf.h in TinySoundFont
                     }
