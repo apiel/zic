@@ -32,6 +32,8 @@ protected:
     uint32_t sf2Size[sf2IdxCount] = { 38, 4, 10, 4, 22, 4, 10, 4, 46 }; // cannot use sizeof struct because of memory padding https://www.javatpoint.com/structure-padding-in-c
     uint32_t sf2Num[sf2IdxCount];
     uint64_t sf2Offset[sf2IdxCount];
+    uint64_t sf2SampleStart = 0;
+    bool sf2Loaded = false;
 
     // see https://github.com/schellingb/TinySoundFont
     union sf2_genamount {
@@ -113,29 +115,6 @@ protected:
         return true;
     }
 
-    int sf2_load_samples(float** fontSamples, unsigned int* fontSampleCount, struct sf2_riffchunk* chunkSmpl)
-    {
-        // Read sample data into float format buffer.
-        float* out;
-        unsigned int samplesLeft, samplesToRead, samplesToConvert;
-        samplesLeft = *fontSampleCount = chunkSmpl->size / sizeof(short);
-        out = *fontSamples = (float*)malloc(samplesLeft * sizeof(float));
-        if (!out)
-            return 0;
-        for (; samplesLeft; samplesLeft -= samplesToRead) {
-            short sampleBuffer[1024], *in = sampleBuffer;
-            ;
-            samplesToRead = (samplesLeft > 1024 ? 1024 : samplesLeft);
-            read(sampleBuffer, samplesToRead * sizeof(short));
-
-            // Convert from signed 16-bit to float.
-            for (samplesToConvert = samplesToRead; samplesToConvert > 0; --samplesToConvert)
-                // If we ever need to compile for big-endian platforms, we'll need to byte-swap here.
-                *out++ = (float)(*in++ / 32767.0);
-        }
-        return 1;
-    }
-
     uint16_t getInstGenNdx(uint16_t instBagNdx)
     {
         sf2_ibag ibag;
@@ -211,8 +190,6 @@ protected:
     {
         struct sf2_riffchunk chunkHead;
         struct sf2_riffchunk chunkList;
-        float* fontSamples = NULL;
-        unsigned int fontSampleCount = 0;
 
         if (!sf2_riffchunk_read(NULL, &chunkHead) || chunkHead.id != *(uint32_t*)"sfbk") {
             return;
@@ -232,48 +209,29 @@ protected:
                 }
             } else if (chunkList.id == *(uint32_t*)"sdta") {
                 while (sf2_riffchunk_read(&chunkList, &chunk)) {
-                    if (chunk.id == *(uint32_t*)"smpl" && !fontSamples && chunk.size >= sizeof(short)) {
-                        printf("smpl: %d\n", chunk.size);
-                        if (!sf2_load_samples(&fontSamples, &fontSampleCount, &chunk)) {
-                            printf("out of memory\n");
-                            return;
-                        }
-                    } else
-                        seekFromCurrent(chunk.size);
+                    if (chunk.id == *(uint32_t*)"smpl" && chunk.size >= sizeof(short)) {
+                        sf2SampleStart = tell();
+                    }
+                    seekFromCurrent(chunk.size);
                 }
-            } else
+            } else {
                 seekFromCurrent(chunkList.size);
-        }
-        if (!sf2Offset[phdrIdx] || !sf2Offset[pbagIdx] || !sf2Offset[pmodIdx] || !sf2Offset[pgenIdx] || !sf2Offset[instIdx] || !sf2Offset[ibagIdx] || !sf2Offset[imodIdx] || !sf2Offset[igenIdx] || !sf2Offset[shdrIdx]) {
-            // if (e) *e = sf2_INVALID_INCOMPLETE;
-            printf("sf2_INVALID_INCOMPLETE\n");
-        } else if (fontSamples == NULL) {
-            // if (e) *e = sf2_INVALID_NOSAMPLEDATA;
-            printf("sf2_INVALID_NOSAMPLEDATA\n");
-        } else {
-            printf("num presets %d pbagNum %d\n", sf2Num[phdrIdx], sf2Num[pbagIdx]);
-
-            // for (uint32_t i = 0; i < sf2Num[instIdx]; i++) {
-            //     printInstrument(file, i);
-            // }
-
-            for (uint32_t i = 0; i < sf2Num[phdrIdx]; i++) {
-                sf2_preset* p = getPreset(i);
-                if (p) {
-                    printf("+++++++++++\npreset name %s\n", p->phdr.presetName);
-                    // for (uint8_t key = 0; key < 128; key++) {
-                    //     if (p->keys[key].sample.sampleRate != 0) {
-                    //         printf("(%d) sample %s\n", key, p->keys[key].sample.sampleName);
-                    //     }
-                    // }
-                }
             }
-
-            // printf("\n\n sample:\n");
-            // for(int i = 0; i < hydra.shdrNum; i++) {
-            //     printf("(%d) sample name %s\n", i, hydra.shdrs[i].sampleName);
-            // }
         }
+        sf2Loaded = sf2Offset[phdrIdx] && sf2Offset[pbagIdx] && sf2Offset[pmodIdx] && sf2Offset[pgenIdx]
+            && sf2Offset[instIdx] && sf2Offset[ibagIdx] && sf2Offset[imodIdx] && sf2Offset[igenIdx] && sf2Offset[shdrIdx];
+        // if (!sf2Loaded) {
+        //     printf("sf2_INVALID_INCOMPLETE\n");
+        // } else {
+        //     for (uint32_t i = 0; i < sf2Num[phdrIdx]; i++) {
+        //         sf2_preset* p = getPreset(i);
+        //         if (p) {
+        //             printf("preset name %s\n", p->phdr.presetName);
+        //             printf("sample rate %d start %d end %d\n",
+        //                 p->keys[0].sample.sampleRate, p->keys[0].sample.start, p->keys[0].sample.end);
+        //         }
+        //     }
+        // }
     }
 
 public:
@@ -332,12 +290,6 @@ public:
                         assignInstrument(pgen.genAmount.range.lo);
                     } else if (pgen.genOper == 43) {
                         // see line 745 of tsf.h in TinySoundFont
-                        // printf("######### pgen (%d) %d hi %d low %d\tshortAmount %d wordAmount %d\n", g,
-                        //     pgen.genOper,
-                        //     pgen.genAmount.range.hi,
-                        //     pgen.genAmount.range.lo,
-                        //     pgen.genAmount.shortAmount,
-                        //     pgen.genAmount.wordAmount);
                     }
                 }
             }
