@@ -3,6 +3,17 @@
 
 #include "zic_file.h"
 
+/**
+ * Still have to get it working within zic_file_audio and zic_wave_file.
+ * Even if we are able (and might still buggy) to load the sf2 file, with
+ * the positions of the samples for the given preset, we still need to pich 
+ * the samples depending on the pitch of the note...
+ * Should picthing the note be done on the fly, or should it be done while
+ * loading the preset (in memory or in a temp file)?
+ * If using the idea of a temp file, we could think about a new file format
+ * containing one sample per key!
+ */
+
 class Zic_File_Soundfont : public Zic_File {
 protected:
     enum {
