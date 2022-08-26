@@ -19,6 +19,11 @@ public:
         set(80);
     }
 
+    Zic_Seq_Tempo(uint16_t _bpm)
+    {
+        set(_bpm);
+    }
+
     /**
      * @brief Set tempo in beat per minutes (BPM)
      *
@@ -27,7 +32,8 @@ public:
     void set(uint16_t _bpm)
     {
         bpm = range(_bpm, 10, 250);
-        tempo = 60000 / (bpm * STEP_PER_BEAT);
+        tempo = 60000.0f / (float)(bpm * STEP_PER_BEAT);
+        // printf("Tempo (%d): %d\n", bpm, tempo);
     }
 
     /**
