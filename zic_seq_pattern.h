@@ -84,27 +84,6 @@ public:
             steps[pos].set(_steps[pos][0], _steps[pos][1] == 1);
         }
     }
-
-    // for testing
-    void print()
-    {
-        // TODO add generic print
-        // for (uint8_t x = 0; x < stepCount; x++)
-        // {
-        //     Serial.print("[");
-        //     Serial.print(x);
-        //     Serial.print(", ");
-        //     Serial.print(steps[x].note);
-        //     Serial.print(", ");
-        //     Serial.print(steps[x].slide);
-        //     Serial.print("],");
-        //     if (x % 8 == 7)
-        //     {
-        //         Serial.println("");
-        //     }
-        // }
-        // Serial.println("\n");
-    }
 };
 
 #endif
