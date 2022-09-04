@@ -44,6 +44,18 @@ public:
     {
         condition = (_condition + SEQ_CONDITIONS_COUNT) % SEQ_CONDITIONS_COUNT;
     }
+
+    void setCondition(char* _condition)
+    {
+        for (uint8_t i = 0; i < SEQ_CONDITIONS_COUNT; i++) {
+            // if (strncmp(_condition, SEQ_CONDITIONS_NAMES[i], 2) == 0) {
+            if (_condition[0] == SEQ_CONDITIONS_NAMES[i][0] && _condition[1] == SEQ_CONDITIONS_NAMES[i][1]) {
+                condition = i;
+                return;
+            }
+        }
+        condition = 0;
+    }
 };
 
 class Zic_Seq_LoopMaster : public Zic_Seq_Loop {
