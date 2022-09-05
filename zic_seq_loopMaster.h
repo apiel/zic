@@ -14,7 +14,6 @@ enum {
     SEQ_CONDITION_X5,
     SEQ_CONDITION_STOP,
     SEQ_CONDITION_RESTART,
-    SEQ_CONDITION_MUTE,
     SEQ_CONDITIONS_COUNT,
 };
 
@@ -27,7 +26,6 @@ const char* SEQ_CONDITIONS_NAMES[SEQ_CONDITIONS_COUNT] = {
     "x5",
     "! ",
     "<<",
-    "--",
 };
 
 class Zic_Seq_PatternComponent : public Zic_Seq_LoopState {
@@ -113,7 +111,6 @@ public:
 
     void setNextState() override
     {
-        mute = false;
         Zic_Seq_PatternComponent* component = &components[currentComponent];
         switch (component->condition) {
         case SEQ_CONDITION_X0:
@@ -138,9 +135,6 @@ public:
             return;
         case SEQ_CONDITION_RESTART:
             backToFirstComponent();
-            break;
-        case SEQ_CONDITION_MUTE:
-            mute = true;
             break;
         }
         state.set(&components[currentComponent]);

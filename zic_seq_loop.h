@@ -73,7 +73,6 @@ public:
     uint8_t currentStep = 0;
     Zic_Seq_LoopState state;
     Zic_Seq_LoopState nextState;
-    bool mute = false;
 
     Zic_Seq_Loop() { }
     Zic_Seq_Loop(Zic_Seq_Pattern* _pattern)
@@ -117,9 +116,7 @@ public:
         stepOff.set(&stepOn);
         if (state.pattern && state.playing) {
             stepOn.set(&state.pattern->steps[currentStep]);
-            if (mute) {
-                stepOn.note = 0;
-            } else if (stepOn.note) {
+            if (stepOn.note) {
                 stepOn.note += state.detune;
             }
             setNextStep();
