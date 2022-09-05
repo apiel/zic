@@ -113,6 +113,10 @@ public:
 
     virtual void next()
     {
+        if (currentStep == 0) {
+            setNextState();
+        }
+
         stepOff.set(&stepOn);
         if (state.pattern && state.playing) {
             stepOn.set(&state.pattern->steps[currentStep]);
@@ -120,10 +124,6 @@ public:
                 stepOn.note += state.detune;
             }
             setNextStep();
-        }
-
-        if (currentStep == 0) {
-            setNextState();
         }
     }
 };

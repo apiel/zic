@@ -61,7 +61,7 @@ protected:
     uint8_t componentCount;
     Zic_Seq_PatternComponent* components;
     uint8_t currentComponent = 0;
-    uint8_t loopInComponent = 0;
+    int8_t loopInComponent = -1;
     bool playing = false;
 
     void setNextComponent()
@@ -78,9 +78,8 @@ protected:
 
     void setLoopInComponent(uint8_t count)
     {
-        if (loopInComponent < count) {
+        if (loopInComponent < count - 1) {
             loopInComponent++;
-            nextState.set(&components[currentComponent]);
         } else {
             setNextComponent();
         }
@@ -93,9 +92,6 @@ public:
     {
         if (count > 0) {
             state.set(&components[0]);
-
-            // to be removed
-            nextState.set(&components[0]);
         }
     }
 
@@ -111,12 +107,18 @@ public:
 
     void setNextState() override
     {
+        if (!playing) {
+            state.stop();
+            return;
+        }
+
         Zic_Seq_PatternComponent* component = &components[currentComponent];
         switch (component->condition) {
         case SEQ_CONDITION_X0:
             break;
         case SEQ_CONDITION_X1:
-            setNextComponent();
+            // setNextComponent(); // do not use else first step might be skipped on start
+            setLoopInComponent(1);
             break;
         case SEQ_CONDITION_X2:
             setLoopInComponent(2);
