@@ -49,9 +49,6 @@ public:
 
 class Zic_Seq_Loop {
 protected:
-    Zic_Seq_Step stepOn;
-    Zic_Seq_Step stepOff;
-
     virtual void setNextState()
     {
         if (state.playing || nextState.playing) {
@@ -73,6 +70,8 @@ public:
     uint8_t currentStep = 0;
     Zic_Seq_LoopState state;
     Zic_Seq_LoopState nextState;
+    uint8_t stepOn = 255;
+    uint8_t stepOff = 255;
 
     Zic_Seq_Loop() { }
     Zic_Seq_Loop(Zic_Seq_Pattern* _pattern)
@@ -81,34 +80,9 @@ public:
         nextState.setPattern(_pattern);
     }
 
-    Zic_Seq_Step* getNoteOn()
-    {
-        if (state.playing && stepOn.note > 0) {
-            return &stepOn;
-        }
-        return NULL;
-    }
-
-    Zic_Seq_Step* getNoteOff()
-    {
-        if (stepOff.slide && getNoteOn()) {
-            return NULL;
-        }
-
-        // TODO bad idea, instead use something like `step.isOn` or `step.playing`
-        // // To avoid to trigger off again set slide to true
-        // stepOff.slide = true;
-        return &stepOff;
-    }
-
     uint8_t getStepsLeft()
     {
         return state.pattern->stepCount - (currentStep + 1);
-    }
-
-    bool wasSlide()
-    {
-        return stepOff.slide;
     }
 
     virtual void next()
@@ -117,12 +91,9 @@ public:
             setNextState();
         }
 
-        stepOff.set(&stepOn);
+        stepOff = stepOn;
         if (state.pattern && state.playing) {
-            stepOn.set(&state.pattern->steps[currentStep]);
-            if (stepOn.note) {
-                stepOn.note += state.detune;
-            }
+            stepOn = currentStep;
             setNextStep();
         }
     }
