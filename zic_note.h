@@ -154,6 +154,16 @@ const char* getNoteDash(uint8_t initialNote)
     uint8_t idx = (initialNote % 12);
     return noteNames[idx];
 }
+
+const char* getNoteUnderscore(uint8_t initialNote)
+{
+    const char* noteNames[] = { "C_", "C#", "D_", "D#", "E_", "F_",
+        "F#", "G_", "G#", "A_", "A#", "B_" };
+
+    uint8_t idx = (initialNote % 12);
+    return noteNames[idx];
+}
+
 const char* getNoteStr(uint8_t initialNote)
 {
     const char* noteNames[] = { "C", "C#", "D", "D#", "E", "F",

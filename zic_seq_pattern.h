@@ -20,6 +20,7 @@ public:
     uint8_t instrument = 0;
     uint8_t note = 0;
     uint8_t velocity = 127;
+    uint8_t condition = 1; // 1 every step, 2 every 2nd step, 3 every 3rd step, 4 every 4th step... '!' could be only once
     bool slide = false;
 
     Zic_Seq_Step() { }
