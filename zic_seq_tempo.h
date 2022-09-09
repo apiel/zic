@@ -3,7 +3,7 @@
 
 #include "zic_def.h"
 
-// 4 ♬ ♬ step per beat
+// 4 𝆺𝅥𝅯𝆺𝅥𝅯𝆺𝅥𝅯𝆺𝅥𝅯 step per beat
 template <uint8_t STEP_PER_BEAT = 4>
 class Zic_Seq_Tempo {
 protected:
