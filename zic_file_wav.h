@@ -38,6 +38,19 @@ protected:
                 Zic_File::read(&wavetableCount, 4);
                 // printf("ZICW Data: %d\n", wavetableCount);
             }
+            // See https://github.com/mtytel/vital/blob/main/src/interface/editor_sections/wavetable_edit_section.cpp#L611
+            // meta_data.set("clm ", "<!>2048 20000000 wavetable (vital.audio)");
+            // vital synth set the chunkID to "clm " and the chunkSize to 2048
+            else if (chunkID == *(uint32_t*)"clm ") {
+                Zic_File::read(&chunkSize, 4);
+                // we could check that string start by "<!>2048"
+                // in vital there 256 wavetable of 2048 samples
+                wavetableCount = 256;
+                // There might be a problem as sample rate is not 44100 but 88200
+                // however so far the result is not good
+                seekFromCurrent(chunkSize);
+            }
+
             // } else if (chunkID == 1414349641) { // ICMT
             // #define AUDIO_FILE_DATA_SIZE 128
             //     char data[AUDIO_FILE_DATA_SIZE];
