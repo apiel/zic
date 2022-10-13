@@ -1,6 +1,8 @@
 #ifndef ZIC_MOD_FILTER_H_
 #define ZIC_MOD_FILTER_H_
 
+#include "./zic_def.h"
+
 // http://www.martin-finke.de/blog/articles/audio-plugins-013-filter/
 
 // TODO rename this to Zic_Effect_Filter
