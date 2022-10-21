@@ -136,7 +136,7 @@ public:
      */
     void setFrequency(float value)
     {
-        frequency = value;
+        frequency = range(value, 0.01f, 80000.0f);
         frequencyUpdated();
     }
 
