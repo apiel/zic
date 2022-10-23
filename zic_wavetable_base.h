@@ -1,6 +1,11 @@
 #ifndef ZIC_WAVETABLE_BASE_H_
 #define ZIC_WAVETABLE_BASE_H_
 
+#include <stdint.h>
+
+/**
+ * @brief Base class for hardcoded wavetable data in .h files
+ */
 class Zic_Wavetable_Base
 {
 public:

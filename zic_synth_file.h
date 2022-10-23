@@ -16,8 +16,6 @@ class Zic_Synth_File
 public:
     Zic_Wave_File wave;
     Zic_Mod_Asr asr;
-    // Zic_Mod_AsrFast asr;
-    // Zic_Mod_AsrFastQ asr;
     Zic_Effect_Filter filter;
 
     // Zic_Synth_File()
