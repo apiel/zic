@@ -1,7 +1,8 @@
 #ifndef ZIC_MOD_ASR_H_
 #define ZIC_MOD_ASR_H_
 
-#include "zic_wave_base.h"
+#include "zic_def.h"
+#include <stdint.h>
 
 // FIXME still make a cutting noise
 
@@ -31,8 +32,7 @@ public:
         ATTACK_PHASE,
         SUSTAIN_PHASE,
         RELEASE_PHASE,
-        END_PHASE,
-        PHASE_COUNT
+        END_PHASE
     };
 
     /**

@@ -1,22 +1,34 @@
-#ifndef ZIC_MOD_ASR_BASE_H_
-#define ZIC_MOD_ASR_BASE_H_
+#ifndef ZIC_MOD_ADSR_H_
+#define ZIC_MOD_ADSR_H_
 
-#include "zic_wave_base.h"
+#include <stdint.h>
 
-template <typename T, typename TData = int16_t>
-class Zic_Mod_AsrBase {
+#include "zic_def.h"
+class Zic_Mod_Adsr {
 protected:
+    enum {
+        ATTACK_PHASE,
+        DECAY_PHASE,
+        SUSTAIN_PHASE,
+        RELEASE_PHASE,
+        END_PHASE
+    };
+
+    enum {
+        ATTACK_MS,
+        DECAY_MS,
+        RELEASE_MS,
+        COUNT_MS,
+    };
+
     uint8_t phase = END_PHASE;
     uint8_t nextPhase = END_PHASE;
-    uint16_t attackMs = 10;
-    uint16_t releaseMs = 500;
+    uint16_t ms[COUNT_MS] = { 10, 100, 500 };
+    float steps[COUNT_MS] = { 0.0f, 0.0f, 0.0f };
 
-    T stepTarget = 1.0f;
-    T attackStep;
-    T releaseStep;
-    T value = 0;
-
-    uint8_t note = 0;
+    float sustainTarget = 0.5f;
+    float stepTarget = 1.0f;
+    float value = 0;
 
     virtual int16_t getData(int16_t data)
     {
@@ -24,24 +36,17 @@ protected:
     }
 
 public:
-    enum {
-        ATTACK_PHASE,
-        SUSTAIN_PHASE,
-        RELEASE_PHASE,
-        END_PHASE,
-        PHASE_COUNT
-    };
-
     /**
      * @brief set to true to skip substain phase
      */
     bool noSustain = false;
 
-    Zic_Mod_AsrBase(bool _noSustain = false)
+    Zic_Mod_Adsr(bool _noSustain = false)
     {
         noSustain = _noSustain;
-        setAttack(attackMs);
-        setRelease(releaseMs);
+        setAttack(getAttack());
+        setDecay(getDecay());
+        setRelease(getRelease());
     }
 
     /**
@@ -56,14 +61,32 @@ public:
     }
 
     /**
+     * @brief Set the Susatin target level
+     */
+    virtual void setSusatin(float target)
+    {
+        sustainTarget = target;
+    }
+
+    /**
+     * @brief Get the Sustain level
+     *
+     * @return float
+     */
+    float getSustain()
+    {
+        return sustainTarget;
+    }
+
+    /**
      * @brief Set the Attack in millisecond.
      *
      * @param ms
      */
-    virtual void setAttack(uint16_t ms)
+    virtual void setAttack(uint16_t _ms)
     {
-        attackMs = ms;
-        attackStep = stepTarget / ((float)ms * SAMPLE_PER_MS);
+        ms[ATTACK_MS] = _ms;
+        steps[ATTACK_MS] = stepTarget / ((float)_ms * SAMPLE_PER_MS);
     }
 
     /**
@@ -73,7 +96,28 @@ public:
      */
     uint16_t getAttack()
     {
-        return attackMs;
+        return ms[ATTACK_MS];
+    }
+
+    /**
+     * @brief Set the Decay in millisecond.
+     *
+     * @param ms
+     */
+    virtual void setDecay(uint16_t _ms)
+    {
+        ms[DECAY_MS] = _ms;
+        steps[DECAY_MS] = stepTarget / ((float)_ms * SAMPLE_PER_MS);
+    }
+
+    /**
+     * @brief Return the Decay in millisecond.
+     *
+     * @return uint16_t
+     */
+    uint16_t getDecay()
+    {
+        return ms[DECAY_MS];
     }
 
     /**
@@ -81,10 +125,10 @@ public:
      *
      * @param ms
      */
-    virtual void setRelease(uint16_t ms)
+    virtual void setRelease(uint16_t _ms)
     {
-        releaseMs = ms;
-        releaseStep = stepTarget / ((float)ms * SAMPLE_PER_MS);
+        ms[RELEASE_MS] = _ms;
+        steps[RELEASE_MS] = stepTarget / ((float)_ms * SAMPLE_PER_MS);
     }
 
     /**
@@ -94,18 +138,7 @@ public:
      */
     uint16_t getRelease()
     {
-        return releaseMs;
-    }
-
-    virtual void debug()
-    {
-        // TODO add generic print
-        // Serial.print("stepTarget ");
-        // Serial.println(stepTarget);
-        // Serial.printf("attack %d step ", attackMs);
-        // Serial.println(attackStep);
-        // Serial.printf("release %d step ", releaseMs);
-        // Serial.println(releaseStep);
+        return ms[RELEASE_MS];
     }
 
     /**
@@ -116,28 +149,34 @@ public:
      * @param data
      * @return int16_t
      */
-    TData next(TData data = 100)
+    int16_t next(int16_t data = 100)
     {
         switch (phase) {
         case ATTACK_PHASE:
             if (value < stepTarget) {
-                value += attackStep;
+                value += steps[ATTACK_MS];
             } else {
-                // Serial.println("end ATTACK_PHASE");
                 value = stepTarget;
-                phase = nextPhase;
-                nextPhase = END_PHASE;
+                phase = DECAY_PHASE;
+                stepTarget = sustainTarget;
+            }
+            break;
+        case DECAY_PHASE:
+            if (value > stepTarget) {
+                value += steps[DECAY_MS];
+            } else {
+                value = stepTarget;
+                phase = noSustain ? RELEASE_PHASE : SUSTAIN_PHASE;
+                stepTarget = 0.0f;
             }
             break;
         case SUSTAIN_PHASE:
-            value = stepTarget;
             break;
         case RELEASE_PHASE:
-            if (value > releaseStep) {
-                value -= releaseStep;
+            if (value > stepTarget) {
+                value -= steps[RELEASE_MS];
             } else {
-                // Serial.println("end RELEASE_PHASE");
-                value = 0;
+                value = 0.0f;
                 phase = END_PHASE;
             }
             break;
@@ -150,57 +189,22 @@ public:
 
     /**
      * @brief Start to play the envelop
-     *
-     * @param _note
      */
-    void on(uint8_t _phase = ATTACK_PHASE, uint8_t _note = 0)
+    void on()
     {
-        // Serial.println("start ATTACK_PHASE");
-        note = _note;
         value = 0;
-        nextPhase = noSustain ? RELEASE_PHASE : SUSTAIN_PHASE;
-        phase = _phase;
-    }
-
-    /**
-     * @brief Skip attack phase and go directly to sustain phase
-     *
-     * @param _note
-     */
-    void slide(uint8_t _note = 0)
-    {
-        on(SUSTAIN_PHASE, _note);
+        phase = ATTACK_PHASE;
+        stepTarget = 1.0f;
     }
 
     /**
      * @brief Stop to play the envelop
-     *
-     * @param _note
      */
-    void off(uint8_t _note = 0)
+    void off()
     {
-        if (_note && _note != note) {
-            return;
-        }
-
-        phase = RELEASE_PHASE;
-    }
-
-    /**
-     * @brief Stop to play the envelop but ensure that attack phase complete before to start release phase.
-     *
-     * @param _note
-     */
-    void nextOff(uint8_t _note = 0)
-    {
-        if (_note && _note != note) {
-            return;
-        }
-
-        if (nextPhase != END_PHASE) {
-            nextPhase = RELEASE_PHASE;
-        } else {
-            off(_note);
+        if (phase != END_PHASE) {
+            phase = RELEASE_PHASE;
+            stepTarget = 0.0f;
         }
     }
 };
