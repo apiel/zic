@@ -1,5 +1,5 @@
-#ifndef ZIC_MOD_FILTER_H_
-#define ZIC_MOD_FILTER_H_
+#ifndef ZIC_EFFECT_FILTER_H_
+#define ZIC_EFFECT_FILTER_H_
 
 #include "./zic_def.h"
 
@@ -7,7 +7,7 @@
 
 // TODO rename this to Zic_Effect_Filter
 
-class Zic_Mod_Filter
+class Zic_Effect_Filter
 {
 protected:
     int16_t buf0 = 0.0;
@@ -40,7 +40,7 @@ public:
     float resonance = 0.0;
     FilterMode mode = FILTER_MODE_LOWPASS;
 
-    Zic_Mod_Filter()
+    Zic_Effect_Filter()
     {
         calculateVar();
     };
