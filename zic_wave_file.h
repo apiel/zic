@@ -23,6 +23,7 @@ protected:
             audioFile.seekToSample((uint64_t)sampleIndex + start);
         }
         audioFile.read(&bit, sizeof(bit));
+        // printf("sampleIndex: %f, sampleStep: %f, sampleCount: %ld, bit: %d\n", sampleIndex, sampleStep, sampleCount, bit);
 
         return bit * amplitude / 100;
     }
@@ -58,7 +59,7 @@ public:
         setSkipSample();
         setFrequency(frequency);
 
-        printf("open file %s sample count %ld sample step %f\n", filename, sampleCount, sampleStep);
+        printf("open file %s (%p) sample count %ld sample step %f skipSample %d\n", filename, audioFile.file, sampleCount, sampleStep, skipSample);
     }
 
     void reset()
