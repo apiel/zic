@@ -61,11 +61,11 @@ public:
     }
 
     /**
-     * @brief Set the Susatin target level
+     * @brief Set the Sustain target level
      */
-    virtual void setSusatin(float target)
+    virtual void setSustain(float target)
     {
-        sustainTarget = target;
+        sustainTarget = range(target, 0.0f, 1.0f);
     }
 
     /**
@@ -83,9 +83,9 @@ public:
      *
      * @param ms
      */
-    virtual void setAttack(uint16_t _ms)
+    virtual void setAttack(int16_t _ms)
     {
-        ms[ATTACK_MS] = _ms;
+        ms[ATTACK_MS] = range(_ms, 0, 9900);
         steps[ATTACK_MS] = stepTarget / ((float)_ms * SAMPLE_PER_MS);
     }
 
@@ -104,9 +104,9 @@ public:
      *
      * @param ms
      */
-    virtual void setDecay(uint16_t _ms)
+    virtual void setDecay(int16_t _ms)
     {
-        ms[DECAY_MS] = _ms;
+        ms[DECAY_MS] = range(_ms, 0, 9900);
         steps[DECAY_MS] = stepTarget / ((float)_ms * SAMPLE_PER_MS);
     }
 
@@ -125,9 +125,9 @@ public:
      *
      * @param ms
      */
-    virtual void setRelease(uint16_t _ms)
+    virtual void setRelease(int16_t _ms)
     {
-        ms[RELEASE_MS] = _ms;
+        ms[RELEASE_MS] = range(_ms, 0, 9900);
         steps[RELEASE_MS] = stepTarget / ((float)_ms * SAMPLE_PER_MS);
     }
 
@@ -163,10 +163,10 @@ public:
             break;
         case DECAY_PHASE:
             if (value > stepTarget) {
-                value += steps[DECAY_MS];
+                value -= steps[DECAY_MS];
             } else {
-                value = stepTarget;
                 phase = noSustain ? RELEASE_PHASE : SUSTAIN_PHASE;
+                value = stepTarget;
                 stepTarget = 0.0f;
             }
             break;

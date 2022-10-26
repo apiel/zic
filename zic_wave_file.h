@@ -30,7 +30,6 @@ protected:
 
     void frequencyUpdated() override
     {
-        printf("frequencyUpdated %ld * %f / %d\n", sampleCount, frequency, SAMPLE_RATE);
         // could even cache frequency / SAMPLE_RATE or even the whole calc for each frequency
         // however, this happen only once every noteOn, it is not that much that it would require
         // to cache it
@@ -59,7 +58,7 @@ public:
         setSkipSample();
         setFrequency(frequency);
 
-        printf("open file %s (%p) sample count %ld sample step %f skipSample %d\n", filename, audioFile.file, sampleCount, sampleStep, skipSample);
+        // printf("open file %s (%p) sample count %ld sample step %f skipSample %d\n", filename, audioFile.file, sampleCount, sampleStep, skipSample);
     }
 
     void reset()
