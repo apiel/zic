@@ -192,9 +192,11 @@ public:
      */
     void on()
     {
-        value = 0;
-        phase = ATTACK_PHASE;
-        stepTarget = 1.0f;
+        if (!isOn()) {
+            value = 0;
+            phase = ATTACK_PHASE;
+            stepTarget = 1.0f;
+        }
     }
 
     /**
