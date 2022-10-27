@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "zic_def.h"
+
 class Zic_Mod_Adsr {
 protected:
     enum {
@@ -61,24 +62,6 @@ public:
     }
 
     /**
-     * @brief Set the Sustain target level
-     */
-    virtual void setSustain(float target)
-    {
-        sustainTarget = range(target, 0.0f, 1.0f);
-    }
-
-    /**
-     * @brief Get the Sustain level
-     *
-     * @return float
-     */
-    float getSustain()
-    {
-        return sustainTarget;
-    }
-
-    /**
      * @brief Set the Attack in millisecond.
      *
      * @param ms
@@ -86,7 +69,7 @@ public:
     virtual void setAttack(int16_t _ms)
     {
         ms[ATTACK_MS] = range(_ms, 0, 9900);
-        steps[ATTACK_MS] = stepTarget / ((float)_ms * SAMPLE_PER_MS);
+        steps[ATTACK_MS] = 1.0f / ((float)_ms * SAMPLE_PER_MS);
     }
 
     /**
@@ -107,7 +90,8 @@ public:
     virtual void setDecay(int16_t _ms)
     {
         ms[DECAY_MS] = range(_ms, 0, 9900);
-        steps[DECAY_MS] = stepTarget / ((float)_ms * SAMPLE_PER_MS);
+        steps[DECAY_MS] = (1.0f - sustainTarget) / ((float)_ms * SAMPLE_PER_MS);
+        // steps[DECAY_MS] = 1.0f / ((float)_ms * SAMPLE_PER_MS);
     }
 
     /**
@@ -128,7 +112,8 @@ public:
     virtual void setRelease(int16_t _ms)
     {
         ms[RELEASE_MS] = range(_ms, 0, 9900);
-        steps[RELEASE_MS] = stepTarget / ((float)_ms * SAMPLE_PER_MS);
+        steps[RELEASE_MS] = sustainTarget / ((float)_ms * SAMPLE_PER_MS);
+        // steps[RELEASE_MS] = 1.0f / ((float)_ms * SAMPLE_PER_MS);
     }
 
     /**
@@ -139,6 +124,26 @@ public:
     uint16_t getRelease()
     {
         return ms[RELEASE_MS];
+    }
+
+        /**
+     * @brief Set the Sustain target level
+     */
+    virtual void setSustain(float target)
+    {
+        sustainTarget = range(target, 0.0f, 1.0f);
+        setDecay(getDecay());
+        setRelease(getRelease());
+    }
+
+    /**
+     * @brief Get the Sustain level
+     *
+     * @return float
+     */
+    float getSustain()
+    {
+        return sustainTarget;
     }
 
     /**
