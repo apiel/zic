@@ -69,10 +69,14 @@ public:
     {
         frequency = range(freq, 0, 8000);
         cutoff = 2.0 * sin(M_PI * frequency / SAMPLE_RATE);
-        printf("cutoff %.2f\n", cutoff);
+        // printf("cutoff %.2f\n", cutoff);
         set(cutoff, resonance);
     }
 
+    // could set cutoff for modulation
+    // but maybe it would just be better to precalculate all the possible value for the frequency...
+    //
+    // or use 0 to .99 to set the value and use the getFrequencyFromCutoff ???
     void setCutoff(float _cutoff)
     {
         set(_cutoff, resonance);
