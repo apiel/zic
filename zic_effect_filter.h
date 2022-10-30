@@ -36,7 +36,7 @@ public:
     uint16_t frequency = 8000;
     float cutoff = 0.99;
     float resonance = 0.0;
-    FilterMode mode = FILTER_MODE_LOWPASS;
+    uint8_t mode = FILTER_MODE_LOWPASS;
 
     Zic_Effect_Filter()
     {
@@ -96,14 +96,9 @@ public:
         calculateVar();
     }
 
-    void setFilterMode(FilterMode value)
+    void setFilterMode(int8_t value)
     {
-        mode = value;
-    }
-
-    void setFilterMode(uint8_t value)
-    {
-        mode = (FilterMode)(value % FILTER_MODE_COUNT);
+        mode = value % FILTER_MODE_COUNT;
     }
 
     const char* getName()
