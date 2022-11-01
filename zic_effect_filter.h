@@ -26,9 +26,12 @@ protected:
 public:
     enum FilterMode {
         FILTER_MODE_OFF,
-        FILTER_MODE_LOWPASS,
-        FILTER_MODE_HIGHPASS,
-        FILTER_MODE_BANDPASS,
+        FILTER_MODE_LOWPASS_12,
+        FILTER_MODE_LOWPASS_24,
+        FILTER_MODE_HIGHPASS_12,
+        FILTER_MODE_HIGHPASS_24,
+        FILTER_MODE_BANDPASS_12,
+        FILTER_MODE_BANDPASS_24,
         FILTER_MODE_COUNT,
     };
 
@@ -36,7 +39,7 @@ public:
     uint16_t frequency = 8000;
     float cutoff = 0.99;
     float resonance = 0.0;
-    uint8_t mode = FILTER_MODE_LOWPASS;
+    uint8_t mode = FILTER_MODE_LOWPASS_24;
 
     Zic_Effect_Filter()
     {
@@ -54,11 +57,17 @@ public:
         buf2 += cutoff * (buf1 - buf2);
         buf3 += cutoff * (buf2 - buf3);
         switch (mode) {
-        case FILTER_MODE_LOWPASS:
+        case FILTER_MODE_LOWPASS_12:
+            return buf1;
+        case FILTER_MODE_LOWPASS_24:
             return buf3;
-        case FILTER_MODE_HIGHPASS:
+        case FILTER_MODE_HIGHPASS_12:
+            return inputValue - buf0;
+        case FILTER_MODE_HIGHPASS_24:
             return inputValue - buf3;
-        case FILTER_MODE_BANDPASS:
+        case FILTER_MODE_BANDPASS_12:
+            return buf0 - buf1;
+        case FILTER_MODE_BANDPASS_24:
             return buf0 - buf3;
         default:
             return 0.0;
@@ -108,12 +117,18 @@ public:
     const char* getName()
     {
         switch (mode) {
-        case FILTER_MODE_LOWPASS:
-            return "LPF";
-        case FILTER_MODE_HIGHPASS:
-            return "HPF";
-        case FILTER_MODE_BANDPASS:
-            return "BPF";
+        case FILTER_MODE_LOWPASS_12:
+            return "LPF 12dB";
+        case FILTER_MODE_LOWPASS_24:
+            return "LPF 24dB";
+        case FILTER_MODE_HIGHPASS_12:
+            return "HPF 12dB";
+        case FILTER_MODE_HIGHPASS_24:
+            return "HPF 24dB";
+        case FILTER_MODE_BANDPASS_12:
+            return "BPF 12dB";
+        case FILTER_MODE_BANDPASS_24:
+            return "BPF 24dB";
         default:
             return "OFF";
         }
