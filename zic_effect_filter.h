@@ -117,7 +117,7 @@ public:
         return nextResonantFilter(inputValue);
     }
 
-    void setFrequency(uint16_t freq)
+    Zic_Effect_Filter* setFrequency(uint16_t freq)
     {
         // Human can hear frequency between 20Hz and 20kHz. While 20 to 20,000Hz forms the absolute borders
         // of the human hearing range, our hearing is most sensitive in the 2000 - 5000 Hz frequency range.
@@ -128,6 +128,8 @@ public:
         cutoff = 2.0 * sin(M_PI * frequency / SAMPLE_RATE);
         // printf("cutoff %.2f\n", cutoff);
         setCutoff(cutoff);
+
+        return this;
     }
 
     // could set cutoff for modulation
@@ -136,11 +138,13 @@ public:
     // or use 0 to .99 to set the value and use the getFrequencyFromCutoff ???
     //
     // look up table is most likely the best option!
-    void setCutoff(float _cutoff)
+    Zic_Effect_Filter* setCutoff(float _cutoff)
     {
         // cutoff cannot be 1.0 else div by zero
         cutoff = range(_cutoff, 0.01, 0.99);
         calculateVar();
+
+        return this;
     };
 
     float getFrequencyFromCutoff()
@@ -148,15 +152,19 @@ public:
         return SAMPLE_RATE * asin(cutoff / 2.0) / M_PI;
     }
 
-    void setResonance(float _res)
+    Zic_Effect_Filter* setResonance(float _res)
     {
         resonance = range(_res, 0.00, 0.99);
         calculateVar();
+
+        return this;
     };
 
-    void setFilterMode(int8_t value)
+    Zic_Effect_Filter* setFilterMode(int8_t value)
     {
         mode = value % FILTER_MODE_COUNT;
+
+        return this;
     }
 
     const char* getName()
