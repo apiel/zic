@@ -76,7 +76,12 @@ public:
 
     void setFrequency(uint16_t freq)
     {
-        frequency = range(freq, 0, 8000);
+        // Human can hear frequency between 20Hz and 20kHz. While 20 to 20,000Hz forms the absolute borders 
+        // of the human hearing range, our hearing is most sensitive in the 2000 - 5000 Hz frequency range.
+        // But establishing the effect of sounds with frequencies under about 250 Hz has been harder. Even 
+        // though they're above the lower limit of 20 Hz, these low-frequency sounds tend to be either 
+        // inaudible or barely audible.
+        frequency = range(freq, 200, 8000);
         cutoff = 2.0 * sin(M_PI * frequency / SAMPLE_RATE);
         // printf("cutoff %.2f\n", cutoff);
         set(cutoff, resonance);
@@ -86,6 +91,8 @@ public:
     // but maybe it would just be better to precalculate all the possible value for the frequency...
     //
     // or use 0 to .99 to set the value and use the getFrequencyFromCutoff ???
+    //
+    // look up table is most likely the best option!
     void setCutoff(float _cutoff)
     {
         set(_cutoff, resonance);
