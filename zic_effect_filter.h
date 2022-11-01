@@ -25,6 +25,57 @@ protected:
         Q1 = 1 / (resonance * resonance * 1000 + 0.7); // 1000 value set randomly, might need to find better value?!
     }
 
+    int16_t nextResonantFilter(int16_t inputValue)
+    {
+        // https://www.musicdsp.org/en/latest/Filters/29-resonant-filter.html
+        // https://www.martin-finke.de/articles/audio-plugins-013-filter/
+        buf0 += cutoff * (inputValue - buf0 + feedback * (buf0 - buf1));
+        buf1 += cutoff * (buf0 - buf1);
+        buf2 += cutoff * (buf1 - buf2);
+        buf3 += cutoff * (buf2 - buf3);
+        switch (mode) {
+        case FILTER_MODE_LOWPASS_12:
+            return buf1;
+        case FILTER_MODE_LOWPASS_24:
+            return buf3;
+        case FILTER_MODE_HIGHPASS_12:
+            return inputValue - buf0;
+        case FILTER_MODE_HIGHPASS_24:
+            return inputValue - buf3;
+        case FILTER_MODE_BANDPASS_12:
+            return buf0 - buf1;
+        case FILTER_MODE_BANDPASS_24:
+            return buf0 - buf3;
+        default:
+            return 0;
+        }
+    }
+
+    int16_t nextStateVariableFilter(int16_t inputValue)
+    {
+        // https://www.musicdsp.org/en/latest/Filters/142-state-variable-filter-chamberlin-version.html
+        int16_t lowpass = buf1 + cutoff * buf0;
+        int16_t highpass = inputValue - lowpass - Q1 * buf0;
+        int16_t bandpass = cutoff * highpass + buf0;
+        int16_t notch = highpass + lowpass;
+
+        buf0 = bandpass;
+        buf1 = lowpass;
+
+        switch (mode) {
+        case FILTER_MODE_LOWPASS_STATE_VARIABLE:
+            return lowpass;
+        case FILTER_MODE_HIGHPASS_STATE_VARIABLE:
+            return highpass;
+        case FILTER_MODE_BANDPASS_STATE_VARIABLE:
+            return bandpass;
+        case FILTER_MODE_NOTCH_STATE_VARIABLE:
+            return notch;
+        default:
+            return 0;
+        }
+    }
+
 public:
     enum FilterMode {
         FILTER_MODE_OFF,
@@ -60,51 +111,10 @@ public:
         }
 
         if (mode >= FILTER_MODE_LOWPASS_STATE_VARIABLE) {
-            // https://www.musicdsp.org/en/latest/Filters/142-state-variable-filter-chamberlin-version.html
-            int16_t lowpass = buf1 + cutoff * buf0;
-            int16_t highpass = inputValue - lowpass - Q1 * buf0;
-            int16_t bandpass = cutoff * highpass + buf0;
-            int16_t notch = highpass + lowpass;
-
-            buf0 = bandpass;
-            buf1 = lowpass;
-
-            switch (mode) {
-            case FILTER_MODE_LOWPASS_STATE_VARIABLE:
-                return lowpass;
-            case FILTER_MODE_HIGHPASS_STATE_VARIABLE:
-                return highpass;
-            case FILTER_MODE_BANDPASS_STATE_VARIABLE:
-                return bandpass;
-            case FILTER_MODE_NOTCH_STATE_VARIABLE:
-                return notch;
-            default:
-                return 0;
-            }
+            return nextStateVariableFilter(inputValue);
         }
 
-        // https://www.musicdsp.org/en/latest/Filters/29-resonant-filter.html
-        // https://www.martin-finke.de/articles/audio-plugins-013-filter/
-        buf0 += cutoff * (inputValue - buf0 + feedback * (buf0 - buf1));
-        buf1 += cutoff * (buf0 - buf1);
-        buf2 += cutoff * (buf1 - buf2);
-        buf3 += cutoff * (buf2 - buf3);
-        switch (mode) {
-        case FILTER_MODE_LOWPASS_12:
-            return buf1;
-        case FILTER_MODE_LOWPASS_24:
-            return buf3;
-        case FILTER_MODE_HIGHPASS_12:
-            return inputValue - buf0;
-        case FILTER_MODE_HIGHPASS_24:
-            return inputValue - buf3;
-        case FILTER_MODE_BANDPASS_12:
-            return buf0 - buf1;
-        case FILTER_MODE_BANDPASS_24:
-            return buf0 - buf3;
-        default:
-            return 0;
-        }
+        return nextResonantFilter(inputValue);
     }
 
     void setFrequency(uint16_t freq)
