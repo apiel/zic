@@ -19,7 +19,11 @@ protected:
     float feedback;
     void calculateVar()
     {
-        feedback = resonance + resonance / (1.0 - cutoff);
+        if (cutoff == 1.0) {
+            feedback = resonance + resonance;
+        } else {
+            feedback = resonance + resonance / (1.0 - cutoff);
+        }
 
         // Q1 is for the second filtering method
         Q1 = 1 / (resonance * resonance * 1000 + 0.7); // 1000 value set randomly, might need to find better value?!
@@ -92,7 +96,7 @@ public:
         FILTER_MODE_COUNT,
     };
 
-    // uint16_t frequency = (uint16_t)(SAMPLE_RATE / 2.0);
+    // uint16_t frequency = (uint16_t)(SAMPLE_RATE / 2.0); // Nyquist
     uint16_t frequency = 8000;
     float cutoff = 0.99;
     float resonance = 0.0;
@@ -126,8 +130,7 @@ public:
         // inaudible or barely audible.
         frequency = range(freq, 200, 8000);
         cutoff = 2.0 * sin(M_PI * frequency / SAMPLE_RATE);
-        // printf("cutoff %.2f\n", cutoff);
-        setCutoff(cutoff);
+        calculateVar();
 
         return this;
     }
@@ -141,7 +144,9 @@ public:
     Zic_Effect_Filter* setCutoff(float _cutoff)
     {
         // cutoff cannot be 1.0 else div by zero
-        cutoff = range(_cutoff, 0.01, 0.99);
+        // cutoff = range(_cutoff, 0.01, 0.99);
+
+        cutoff = _cutoff;
         calculateVar();
 
         return this;
@@ -154,7 +159,8 @@ public:
 
     Zic_Effect_Filter* setResonance(float _res)
     {
-        resonance = range(_res, 0.00, 0.99);
+        // resonance = range(_res, 0.00, 0.99); ??
+        resonance = range(_res, 0.00, 1.00);
         calculateVar();
 
         return this;
