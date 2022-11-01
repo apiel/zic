@@ -127,7 +127,7 @@ public:
         frequency = range(freq, 200, 8000);
         cutoff = 2.0 * sin(M_PI * frequency / SAMPLE_RATE);
         // printf("cutoff %.2f\n", cutoff);
-        set(cutoff, resonance);
+        setCutoff(cutoff);
     }
 
     // could set cutoff for modulation
@@ -138,7 +138,9 @@ public:
     // look up table is most likely the best option!
     void setCutoff(float _cutoff)
     {
-        set(_cutoff, resonance);
+        // cutoff cannot be 1.0 else div by zero
+        cutoff = range(_cutoff, 0.01, 0.99);
+        calculateVar();
     };
 
     float getFrequencyFromCutoff()
@@ -148,16 +150,9 @@ public:
 
     void setResonance(float _res)
     {
-        set(cutoff, _res);
-    };
-
-    void set(float _cutoff, float _res)
-    {
-        // cutoff cannot be 1.0 else div by zero
-        cutoff = range(_cutoff, 0.01, 0.99);
         resonance = range(_res, 0.00, 0.99);
         calculateVar();
-    }
+    };
 
     void setFilterMode(int8_t value)
     {
