@@ -31,11 +31,6 @@ protected:
     float stepTarget = 1.0f;
     float value = 0;
 
-    virtual int16_t getData(int16_t data)
-    {
-        return value * data;
-    }
-
 public:
     /**
      * @brief set to true to skip substain phase
@@ -126,7 +121,7 @@ public:
         return ms[RELEASE_MS];
     }
 
-        /**
+    /**
      * @brief Set the Sustain target level
      */
     virtual void setSustain(float target)
@@ -147,14 +142,18 @@ public:
     }
 
     /**
-     * @brief To be call on each sample to update the phase. If a data value is passed as param,
-     * it will be returned with the envelop level applied to it. Else it return a value between
-     * 0 and 100.
+     * @brief To be call on each sample to update the phase. Data value is passed as param,
+     * it will be returned with the envelop level applied to it.
      *
      * @param data
      * @return int16_t
      */
-    int16_t next(int16_t data = 100)
+    virtual int16_t next(int16_t data)
+    {
+        return next() * data;
+    }
+
+    float next()
     {
         switch (phase) {
         case ATTACK_PHASE:
@@ -189,7 +188,7 @@ public:
             break;
         }
 
-        return getData(data);
+        return value;
     }
 
     /**
