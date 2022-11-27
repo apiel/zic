@@ -70,8 +70,8 @@ public:
      */
     bool next()
     {
-        sampleCount += APP_AUDIO_CHUNK / APP_CHANNELS;
-        // sampleCount += 2;
+        sampleCount += APP_CHANNELS;
+        // sampleCount ++;
         if (sampleCount > SAMPLE_PER_MS) {
             sampleCount = 0;
             time++;
