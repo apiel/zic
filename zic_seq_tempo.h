@@ -33,7 +33,7 @@ public:
     {
         bpm = range(_bpm, 10, 250);
         tempo = 60000.0f / (float)(bpm * STEP_PER_BEAT);
-        // printf("Tempo (%d): %d\n", bpm, tempo);
+        printf("Tempo (%d -> %d): %d\n", _bpm, bpm, tempo);
     }
 
     /**
@@ -70,11 +70,10 @@ public:
      */
     bool next()
     {
-        sampleCount += APP_CHANNELS;
-        // sampleCount ++;
+        sampleCount += APP_AUDIO_CHUNK / APP_CHANNELS;
         if (sampleCount > SAMPLE_PER_MS) {
+            time += sampleCount / (SAMPLE_PER_MS);
             sampleCount = 0;
-            time++;
             return next(time);
         }
         return false;
