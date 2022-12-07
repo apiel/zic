@@ -28,6 +28,17 @@ const char* SEQ_CONDITIONS_NAMES[SEQ_CONDITIONS_COUNT] = {
     "<<",
 };
 
+const char* SEQ_CONDITIONS_FULLNAMES[SEQ_CONDITIONS_COUNT] = {
+    "play in loop",
+    "play once",
+    "play twice",
+    "play 3 times",
+    "play 4 times",
+    "play 5 times",
+    "play & stop",
+    "play & restart",
+};
+
 class Zic_Seq_PatternComponent : public Zic_Seq_LoopState {
 public:
     uint8_t condition = 0;
@@ -93,6 +104,11 @@ public:
         if (count > 0) {
             state.set(&components[0]);
         }
+    }
+
+    uint8_t getCurrentComponent()
+    {
+        return currentComponent;
     }
 
     bool isCurrentComponent(uint8_t index)
