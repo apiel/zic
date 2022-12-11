@@ -9,11 +9,12 @@ class Zic_Seq_Tempo {
 protected:
     unsigned long previous = 0;
     uint16_t tempo;
-    uint16_t bpm;
     uint16_t sampleCount = 0;
     unsigned long time;
 
 public:
+    uint16_t bpm;
+
     Zic_Seq_Tempo()
     {
         set(80);
