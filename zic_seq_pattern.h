@@ -1,6 +1,10 @@
 #ifndef ZIC_SEQ_PATTERN_H_
 #define ZIC_SEQ_PATTERN_H_
 
+#include "./zic_def.h"
+
+#include <stdio.h>
+
 #ifndef MAX_STEPS_IN_PATTERN
 #define MAX_STEPS_IN_PATTERN 64
 #endif
@@ -15,12 +19,19 @@
 
 typedef uint8_t Pat[MAX_INSTRUMENTS_IN_PATTERN][MAX_STEPS_IN_PATTERN][2];
 
+#define STEP_CONDITION_MAX 107
+
 class Zic_Seq_Step {
 public:
     uint8_t instrument = 0;
     uint8_t note = 0;
     uint8_t velocity = 127;
-    uint8_t condition = 1; // 1 every step, 2 every 2nd step, 3 every 3rd step, 4 every 4th step... '!' could be only once
+    // TODO to be implemented in looper
+    // -- , 01-99 , /2, /3, /4, /5, /6, /7, /8 
+    // 1 every step, 2 every 2nd step, 3 every 3rd step, 4 every 4th step... '!' could be only once
+    // NEED probability
+    // need also condition to play only the first time or the 2 first times '!' '!2'
+    uint8_t condition = 0;
     bool slide = false;
 
     Zic_Seq_Step() { }
@@ -69,6 +80,26 @@ public:
     {
         velocity = _velocity;
         set(_instrument, _note, _slide);
+    }
+
+    void setCondition(uint8_t _condition)
+    {
+        condition = range(_condition, 0, STEP_CONDITION_MAX);
+    }
+
+    // must be char[3]
+    void getConditionName(char * name)
+    {
+        if (condition == 0) {
+            name[0] = '-';
+            name[1] = '-';
+        } else if (condition < 100) {
+            sprintf(name, "%02d", condition);
+        } else {
+            name[0] = '/';
+            name[1] = '2' + condition - 100;
+        }
+        name[2] = '\0';
     }
 };
 
