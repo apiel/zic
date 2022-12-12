@@ -82,7 +82,7 @@ public:
         set(_instrument, _note, _slide);
     }
 
-    void setCondition(uint8_t _condition)
+    void setCondition(int8_t _condition)
     {
         condition = range(_condition, 0, STEP_CONDITION_MAX);
     }
