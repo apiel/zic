@@ -101,6 +101,18 @@ public:
         }
         name[2] = '\0';
     }
+
+    // must be char[22]
+    void getConditionFullname(char * name)
+    {
+        if (condition == 0) {
+            sprintf(name, "none");
+        } else if (condition < 100) {
+            sprintf(name, "mute probability %02d%%", condition);
+        } else {
+            sprintf(name, "play ever %d time", condition - 100 + 2);
+        }
+    }
 };
 
 class Zic_Seq_Pattern {
