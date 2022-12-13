@@ -170,7 +170,7 @@ public:
      *
      * @param _note
      */
-    void slide(uint8_t _note = 0)
+    void tie(uint8_t _note = 0)
     {
         on(SUSTAIN_PHASE, _note);
     }

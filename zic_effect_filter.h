@@ -238,8 +238,8 @@ int16_t next(int16_t inputValue)
 
 Another: LPF seem very similar to upper one
 https://www.musicdsp.org/en/latest/Filters/259-simple-biquad-filter-from-apple-com.html
-//cutoff_slider range 20-20000hz
-//res_slider range -25/25db
+//cutoff_tier range 20-20000hz
+//res_tier range -25/25db
 //srate - sample rate
 
 //init
@@ -250,11 +250,11 @@ mY2 = 0;
 pi = 22/7;
 
 //coefficients
-cutoff = cutoff_slider;
-res = res_slider;
+cutoff = cutoff_tier;
+res = res_tier;
 
-cutoff = 2 * cutoff_slider / srate;
-res = pow(10, 0.05 * -res_slider);
+cutoff = 2 * cutoff_tier / srate;
+res = pow(10, 0.05 * -res_tier);
 k = 0.5 * res * sin(pi * cutoff);
 c1 = 0.5 * (1 - k) / (1 + k);
 c2 = (0.5 + c1) * cos(pi * cutoff);

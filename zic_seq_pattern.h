@@ -14,7 +14,6 @@
 #endif
 
 #define PATTERN_NAME_SIZE 15
-#define SLIDE 1
 #define END 1
 
 typedef uint8_t Pat[MAX_VOICES_IN_PATTERN][MAX_STEPS_IN_PATTERN][2];
@@ -32,18 +31,18 @@ public:
     // NEED probability
     // need also condition to play only the first time or the 2 first times '!' '!2'
     uint8_t condition = 0;
-    bool slide = false;
+    bool tie = false;
 
     Zic_Seq_Step() { }
 
-    Zic_Seq_Step(uint8_t _note, bool _slide)
+    Zic_Seq_Step(uint8_t _note, bool _tie)
     {
-        set(_note, _slide);
+        set(_note, _tie);
     }
 
-    Zic_Seq_Step(uint8_t _instrument, uint8_t _note, bool _slide)
+    Zic_Seq_Step(uint8_t _instrument, uint8_t _note, bool _tie)
     {
-        set(_instrument, _note, _slide);
+        set(_instrument, _note, _tie);
     }
 
     void reset()
@@ -51,12 +50,12 @@ public:
         instrument = 0;
         note = 0;
         velocity = 127;
-        slide = false;
+        tie = false;
     }
 
     void set(Zic_Seq_Step* step)
     {
-        set(step->instrument, step->note, step->velocity, step->slide);
+        set(step->instrument, step->note, step->velocity, step->tie);
     }
 
     void set(uint8_t _note)
@@ -64,22 +63,22 @@ public:
         note = _note;
     }
 
-    void set(uint8_t _note, bool _slide)
+    void set(uint8_t _note, bool _tie)
     {
-        slide = _slide;
+        tie = _tie;
         set(_note);
     }
 
-    void set(uint8_t _instrument, uint8_t _note, bool _slide)
+    void set(uint8_t _instrument, uint8_t _note, bool _tie)
     {
         instrument = _instrument;
-        set(_note, _slide);
+        set(_note, _tie);
     }
 
-    void set(uint8_t _instrument, uint8_t _note, uint8_t _velocity, bool _slide)
+    void set(uint8_t _instrument, uint8_t _note, uint8_t _velocity, bool _tie)
     {
         velocity = _velocity;
-        set(_instrument, _note, _slide);
+        set(_instrument, _note, _tie);
     }
 
     void setCondition(int8_t _condition)
