@@ -87,6 +87,17 @@ public:
         condition = range(_condition, 0, STEP_CONDITION_MAX);
     }
 
+    void setCondition(char * _cond)
+    {
+        if (_cond[0] == '-') {
+            condition = 0;
+        } else if (_cond[0] == '/') {
+            condition = _cond[1] - '2' + 100;
+        } else {
+            condition = atoi(_cond);
+        }
+    }
+
     // must be char[3]
     void getConditionName(char * name)
     {
