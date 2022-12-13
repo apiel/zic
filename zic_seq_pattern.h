@@ -9,15 +9,15 @@
 #define MAX_STEPS_IN_PATTERN 64
 #endif
 
-#ifndef MAX_INSTRUMENTS_IN_PATTERN
-#define MAX_INSTRUMENTS_IN_PATTERN 4
+#ifndef MAX_VOICES_IN_PATTERN
+#define MAX_VOICES_IN_PATTERN 4
 #endif
 
 #define PATTERN_NAME_SIZE 15
 #define SLIDE 1
 #define END 1
 
-typedef uint8_t Pat[MAX_INSTRUMENTS_IN_PATTERN][MAX_STEPS_IN_PATTERN][2];
+typedef uint8_t Pat[MAX_VOICES_IN_PATTERN][MAX_STEPS_IN_PATTERN][2];
 
 #define STEP_CONDITION_MAX 107
 
@@ -119,7 +119,7 @@ class Zic_Seq_Pattern {
 public:
     uint16_t id = 0;
     uint8_t stepCount = MAX_STEPS_IN_PATTERN;
-    Zic_Seq_Step steps[MAX_INSTRUMENTS_IN_PATTERN][MAX_STEPS_IN_PATTERN];
+    Zic_Seq_Step steps[MAX_VOICES_IN_PATTERN][MAX_STEPS_IN_PATTERN];
 
     Zic_Seq_Pattern()
     {
@@ -127,7 +127,7 @@ public:
 
     Zic_Seq_Pattern(Pat _steps)
     {
-        for (uint8_t inst = 0; inst < MAX_INSTRUMENTS_IN_PATTERN; inst++) {
+        for (uint8_t inst = 0; inst < MAX_VOICES_IN_PATTERN; inst++) {
             for (uint8_t pos = 0; pos < MAX_STEPS_IN_PATTERN; pos++) {
                 if (_steps[inst][pos][0] == END) {
                     stepCount = pos;
