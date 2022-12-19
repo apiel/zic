@@ -5,10 +5,9 @@
 #include <string.h>
 
 class Zic_File_Audio {
-protected:
+public:
     SF_INFO sfinfo;
 
-public:
     uint64_t sampleCount = 256;
     uint32_t wavetableCount = 64;
     uint8_t bytesPerSample = sizeof(float);
@@ -21,6 +20,11 @@ public:
 
     ~Zic_File_Audio()
     {
+        close();
+    }
+
+    void close()
+    {
         if (file) {
             sf_close(file);
         }
@@ -28,6 +32,8 @@ public:
 
     void* open(const char* filename)
     {
+        close();
+
         if (!(file = sf_open(filename, SFM_READ, &sfinfo))) {
             printf("Error: could not open file %s\n", filename);
             return NULL;
@@ -37,10 +43,8 @@ public:
 
     float readSampleFloat()
     {
-        // return (float)readSampleInt16() / 32768.0f;
         float sample;
         sf_read_float(file, &sample, 1);
-        // printf("readSampleFloat: %f\n", sample);
         return sample;
     }
 
@@ -53,7 +57,6 @@ public:
 
     void seekToSample(uint64_t pos)
     {
-        // seekFromStart(audioDataStart + (pos * bytesPerSample));
         sf_seek(file, pos, SEEK_SET);
     }
 
