@@ -8,9 +8,9 @@ class Zic_File_Audio {
 public:
     SF_INFO sfinfo;
 
-    uint64_t sampleCount = 256;
+    uint64_t sampleCount = 0;
     uint32_t wavetableCount = 64;
-    uint8_t bytesPerSample = sizeof(float);
+    // uint8_t bytesPerSample = sizeof(float);
     SNDFILE* file = NULL;
 
     Zic_File_Audio()
@@ -38,6 +38,7 @@ public:
             printf("Error: could not open file %s\n", filename);
             return NULL;
         }
+        sampleCount = sfinfo.frames;
         return file;
     }
 
