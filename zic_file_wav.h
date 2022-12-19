@@ -105,7 +105,8 @@ public:
     }
 
     float readSampleFloat() {
-        return (float)readSampleInt16() / 32768.0f;
+        float sample = readSampleInt16() / 32768.0;
+        return sample;
     }
 
     int16_t readSampleInt16() {
