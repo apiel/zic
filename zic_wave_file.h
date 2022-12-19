@@ -11,9 +11,8 @@ protected:
     uint64_t sampleCount = 0;
     uint64_t start = 0;
 
-    int16_t sample()
+    float sample()
     {
-        int16_t bit = 0;
         if (isWavetable) {
             // TODO should we use linear interpolation for the wavetable? https://www.youtube.com/watch?v=fufNzqgjej0
             sampleIndex += sampleStep;
@@ -22,10 +21,8 @@ protected:
             }
             audioFile.seekToSample((uint64_t)sampleIndex + start);
         }
-        audioFile.read(&bit, sizeof(bit));
-        // printf("sampleIndex: %f, sampleStep: %f, sampleCount: %ld, bit: %d\n", sampleIndex, sampleStep, sampleCount, bit);
 
-        return bit * amplitude / 100;
+        return audioFile.readSampleFloat() * amplitude;
     }
 
     void frequencyUpdated() override
@@ -83,6 +80,7 @@ public:
             setSampleParams((uint64_t)(value * sampleCount), sampleCount);
         }
     }
+    
     float getMorph()
     {
         if (isWavetable) {

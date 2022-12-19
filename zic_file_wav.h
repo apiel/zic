@@ -2,6 +2,11 @@
 #define ZIC_FILE_WAV_H_
 
 #include "zic_file.h"
+#include <stdlib.h>
+
+// Might want to use https://github.com/libsndfile/libsndfile
+// https://github.com/libsndfile/libsndfile/blob/master/examples/sfprocess.c
+// http://www.mega-nerd.com/libsndfile/api.html
 
 class Zic_File_Wav : public Zic_File {
 protected:
@@ -97,6 +102,16 @@ public:
             return NULL;
         }
         return loadWav();
+    }
+
+    float readSampleFloat() {
+        return (float)readSampleInt16() / 32768.0f;
+    }
+
+    int16_t readSampleInt16() {
+        int16_t sample;
+        Zic_File::read(&sample, sizeof(int16_t));
+        return sample;
     }
 
     /**

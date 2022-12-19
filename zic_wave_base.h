@@ -10,21 +10,17 @@ class Zic_Wave_Base {
 protected:
     float time = 0.0;
 
-    virtual int16_t sample() { return 0; }
+    virtual float sample() { return 0; }
     float frequency = 103.82617439443122f; // C3
 
     bool skipSample = false;
     bool mute = false;
-    int8_t level = 100;
-    int8_t amplitude = 100;
-    // int8_t velocity = 100;
-    // float pitch = 1.0f;
-
-    uint16_t phase = 0; // 0 to 360
+    float level = 1.0;
+    float amplitude = 1.0;
 
     virtual bool setSkipSample()
     {
-        skipSample = mute || amplitude <= 0;
+        skipSample = mute || amplitude <= 0.0;
         return skipSample;
     }
 
@@ -39,16 +35,13 @@ protected:
     }
 
 public:
-    int16_t next()
+    float next()
     {
         if (skipSample) {
             return 0;
         }
 
-        // use bitwise >> 8 to reduce amplitude (division by 256)
-        // we could have a higher quality wavetable to int32 using a higher bitwise value
-        // but is it really necessary? int16 make a gain on firmware size!
-        return (level * sample()) >> 8;
+        return level * sample();
     }
 
     /**
@@ -74,42 +67,22 @@ public:
     }
 
     /**
-     * @brief Set the Phase of the wave
-     *
-     * @param value between 0° and 360°
-     */
-    void setPhase(uint16_t value)
-    {
-        phase = range(value, 0, 360);
-    }
-
-    /**
-     * @brief Get the Phase of the wave
-     *
-     * @return uint16_t
-     */
-    uint16_t getPhase()
-    {
-        return phase;
-    }
-
-    /**
      * @brief Set the Amplitude of the wave
      *
-     * @param value between 0 and 100
+     * @param value between 0.0 and 1.0
      */
-    void setAmplitude(int8_t value)
+    void setAmplitude(float value)
     {
-        amplitude = range(value, 0, 100);
+        amplitude = range(value, 0.0, 1.0);
         setLevel();
     }
 
     /**
      * @brief Get the Amplitude of the wave
      *
-     * @return uint16_t
+     * @return float
      */
-    uint16_t getAmplitude()
+    float getAmplitude()
     {
         return amplitude;
     }
