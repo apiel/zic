@@ -17,9 +17,6 @@ protected:
         uint32_t chunkID;
         uint32_t chunkSize;
         while (fileChunks.read(&chunkID, 4)) {
-            // printf("(%d) %c%c%c%c\n", chunkID, (char)(chunkID & 0xFF), (char)((chunkID >> 8) & 0xFF), (char)((chunkID >> 16) & 0xFF), (char)((chunkID >> 24) & 0xFF));
-            // Could check that first chunk is RIFF and 3th one is WAVE
-            // convert "data" 4 char[] to uint32 in order to compare it to chunkID
             if (chunkID == *(uint32_t*)"data") {
                 fileChunks.read(&chunkSize, 4);
                 fileChunks.seekFromCurrent(chunkSize);

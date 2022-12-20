@@ -32,9 +32,6 @@ protected:
 
     void frequencyUpdated() override
     {
-        // could even cache frequency / SAMPLE_RATE or even the whole calc for each frequency
-        // however, this happen only once every noteOn, it is not that much that it would require
-        // to cache it
         sampleStep = sampleCount * frequency / SAMPLE_RATE;
     }
 
