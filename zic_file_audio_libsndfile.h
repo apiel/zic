@@ -41,7 +41,7 @@ public:
             return NULL;
         }
         sampleCount = sfinfo.frames;
-        // printf("Audio file %s sampleCount %ld\n", filename, (long)sampleCount);
+        printf("Audio file %s sampleCount %ld\n", filename, (long)sampleCount);
         return file;
     }
 

@@ -1,8 +1,12 @@
 #ifndef ZIC_WAVE_FILE_H_
 #define ZIC_WAVE_FILE_H_
 
-// #include "zic_file_audio.h"
-#include "zic_file_audio2.h"
+#if ZIC_USE_LIBSNDFILE == 1
+#include "zic_file_audio_libsndfile.h"
+#else
+#include "zic_file_audio_custom.h"
+#endif
+
 #include "zic_wave_base.h"
 
 class Zic_Wave_File : public Zic_Wave_Base {
