@@ -73,6 +73,9 @@ protected:
         }
         sampleCount = audioDataCount / bytesPerSample; // * header.NumChannels
 
+        // printf("Audio file sampleCount %ld\n", (long)sampleCount);
+
+
         // printf("Audio file %s bitPerSample %d  format %d chan %d rate %d start %ld sampleCount %ld\n", filename,
         //     header.BitsPerSample, header.AudioFormat, header.NumChannels, header.SampleRate,
         //     (long)audioDataStart, (long)sampleCount);

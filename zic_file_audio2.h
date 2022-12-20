@@ -9,6 +9,8 @@ public:
     SF_INFO sfinfo;
 
     uint64_t sampleCount = 0;
+    // FIXME
+    // uint32_t wavetableCount = 1;
     uint32_t wavetableCount = 64;
     // uint8_t bytesPerSample = sizeof(float);
     SNDFILE* file = NULL;
@@ -39,6 +41,7 @@ public:
             return NULL;
         }
         sampleCount = sfinfo.frames;
+        // printf("Audio file %s sampleCount %ld\n", filename, (long)sampleCount);
         return file;
     }
 
