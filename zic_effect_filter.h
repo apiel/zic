@@ -10,10 +10,10 @@
 
 class Zic_Effect_Filter {
 protected:
-    int16_t buf0 = 0;
-    int16_t buf1 = 0;
-    int16_t buf2 = 0;
-    int16_t buf3 = 0;
+    float buf0 = 0;
+    float buf1 = 0;
+    float buf2 = 0;
+    float buf3 = 0;
 
     float Q1;
     float feedback;
@@ -29,7 +29,7 @@ protected:
         Q1 = 1 / (resonance * resonance * 1000 + 0.7); // 1000 value set randomly, might need to find better value?!
     }
 
-    int16_t nextResonantFilter(int16_t inputValue)
+    float nextResonantFilter(float inputValue)
     {
         // https://www.musicdsp.org/en/latest/Filters/29-resonant-filter.html
         // https://www.martin-finke.de/articles/audio-plugins-013-filter/
@@ -55,13 +55,13 @@ protected:
         }
     }
 
-    int16_t nextStateVariableFilter(int16_t inputValue)
+    float nextStateVariableFilter(float inputValue)
     {
         // https://www.musicdsp.org/en/latest/Filters/142-state-variable-filter-chamberlin-version.html
-        int16_t lowpass = buf1 + cutoff * buf0;
-        int16_t highpass = inputValue - lowpass - Q1 * buf0;
-        int16_t bandpass = cutoff * highpass + buf0;
-        int16_t notch = highpass + lowpass;
+        float lowpass = buf1 + cutoff * buf0;
+        float highpass = inputValue - lowpass - Q1 * buf0;
+        float bandpass = cutoff * highpass + buf0;
+        float notch = highpass + lowpass;
 
         buf0 = bandpass;
         buf1 = lowpass;
@@ -100,7 +100,7 @@ public:
     uint16_t frequency = 8000;
     float cutoff = 0.99;
     float resonance = 0.0;
-    uint8_t mode = FILTER_MODE_LOWPASS_24;
+    uint8_t mode = FILTER_MODE_OFF;
 
     Zic_Effect_Filter()
     {
@@ -108,7 +108,7 @@ public:
         setFrequency(frequency);
     };
 
-    int16_t next(int16_t inputValue)
+    float next(float inputValue)
     {
         if (mode == FILTER_MODE_OFF || inputValue == 0) {
             return inputValue;
