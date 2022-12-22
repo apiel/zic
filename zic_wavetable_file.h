@@ -43,9 +43,21 @@ protected:
 public:
     Zic_File_Audio audioFile;
 
-    bool isWavetable = false;
+    float next()
+    {
+        return next(0.0, 0.0, 0.0);
+    }
 
-    void open(const char* filename, bool _isWavetable = false)
+    float next(float modAmplitude, float modPitch, float modMorph)
+    {
+        if (skipSample) {
+            return 0;
+        }
+
+        return level * sample();
+    }
+
+    void open(const char* filename)
     {
         audioFile.open(filename);
         sampleCount = (float)audioFile.sampleCount / (float)audioFile.wavetableCount;
@@ -67,7 +79,7 @@ public:
             sampleCount = _sampleCount;
 
             audioFile.seekToSample(start);
-            for(uint64_t i = 0; i < APP_WAVETABLES_MAX && i < sampleCount; i++) {
+            for (uint64_t i = 0; i < APP_WAVETABLES_MAX && i < sampleCount; i++) {
                 table[i] = audioFile.readSampleFloat();
             }
         }

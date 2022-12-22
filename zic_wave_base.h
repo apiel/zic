@@ -37,11 +37,6 @@ protected:
 public:
     float next()
     {
-        return next(0.0, 0.0, 0.0);
-    }
-
-    float next(float modAmplitude, float modPitch, float modMorph)
-    {
         if (skipSample) {
             return 0;
         }
