@@ -45,7 +45,13 @@ public:
 
     float next()
     {
-        return next(0.0, 0.0, 0.0);
+        // return next(0.0, 0.0, 0.0);
+
+        if (skipSample) {
+            return 0;
+        }
+
+        return sample() * level;
     }
 
     float next(float modAmplitude, float modPitch, float modMorph)
@@ -54,7 +60,11 @@ public:
             return 0;
         }
 
-        return level * sample();
+        if (modAmplitude > 0.0) {
+            printf("modAmplitude %f\n", modAmplitude);
+        }
+
+        return sample() * ((level + modAmplitude) * 0.5f);
     }
 
     void open(const char* filename)
