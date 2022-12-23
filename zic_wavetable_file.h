@@ -45,8 +45,6 @@ public:
 
     float next()
     {
-        // return next(0.0, 0.0, 0.0);
-
         if (skipSample) {
             return 0;
         }
@@ -58,10 +56,6 @@ public:
     {
         if (skipSample) {
             return 0;
-        }
-
-        if (modAmplitude > 0.0) {
-            printf("modAmplitude %f\n", modAmplitude);
         }
 
         return sample() * ((level + modAmplitude) * 0.5f);
