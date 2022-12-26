@@ -19,24 +19,29 @@ protected:
     float feedback;
     void calculateVar()
     {
-        if (cutoff == 1.0) {
-            feedback = resonance + resonance;
+        calculateVar(cutoff, resonance);
+    }
+
+    void calculateVar(float _cutoff, float _resonance)
+    {
+        if (_cutoff == 1.0) {
+            feedback = _resonance + _resonance;
         } else {
-            feedback = resonance + resonance / (1.0 - cutoff);
+            feedback = _resonance + _resonance / (1.0 - _cutoff);
         }
 
         // Q1 is for the second filtering method
-        Q1 = 1 / (resonance * resonance * 1000 + 0.7); // 1000 value set randomly, might need to find better value?!
+        Q1 = 1 / (_resonance * _resonance * 1000 + 0.7); // 1000 value set randomly, might need to find better value?!
     }
 
-    float nextResonantFilter(float inputValue)
+    float nextResonantFilter(float inputValue, float _cutoff)
     {
         // https://www.musicdsp.org/en/latest/Filters/29-resonant-filter.html
         // https://www.martin-finke.de/articles/audio-plugins-013-filter/
-        buf0 += cutoff * (inputValue - buf0 + feedback * (buf0 - buf1));
-        buf1 += cutoff * (buf0 - buf1);
-        buf2 += cutoff * (buf1 - buf2);
-        buf3 += cutoff * (buf2 - buf3);
+        buf0 += _cutoff * (inputValue - buf0 + feedback * (buf0 - buf1));
+        buf1 += _cutoff * (buf0 - buf1);
+        buf2 += _cutoff * (buf1 - buf2);
+        buf3 += _cutoff * (buf2 - buf3);
         switch (mode) {
         case FILTER_MODE_LOWPASS_12:
             return buf1;
@@ -55,12 +60,12 @@ protected:
         }
     }
 
-    float nextStateVariableFilter(float inputValue)
+    float nextStateVariableFilter(float inputValue, float _cutoff)
     {
         // https://www.musicdsp.org/en/latest/Filters/142-state-variable-filter-chamberlin-version.html
-        float lowpass = buf1 + cutoff * buf0;
+        float lowpass = buf1 + _cutoff * buf0;
         float highpass = inputValue - lowpass - Q1 * buf0;
-        float bandpass = cutoff * highpass + buf0;
+        float bandpass = _cutoff * highpass + buf0;
         float notch = highpass + lowpass;
 
         buf0 = bandpass;
@@ -78,6 +83,19 @@ protected:
         default:
             return 0;
         }
+    }
+
+    float next(float inputValue, float _cutoff)
+    {
+        if (mode == FILTER_MODE_OFF || inputValue == 0) {
+            return inputValue;
+        }
+
+        if (mode >= FILTER_MODE_LOWPASS_STATE_VARIABLE) {
+            return nextStateVariableFilter(inputValue, _cutoff);
+        }
+
+        return nextResonantFilter(inputValue, _cutoff);
     }
 
 public:
@@ -110,15 +128,16 @@ public:
 
     float next(float inputValue)
     {
-        if (mode == FILTER_MODE_OFF || inputValue == 0) {
-            return inputValue;
-        }
+        return next(inputValue, cutoff);
+    }
 
-        if (mode >= FILTER_MODE_LOWPASS_STATE_VARIABLE) {
-            return nextStateVariableFilter(inputValue);
-        }
+    float next(float inputValue, float modCutoff, float modResonance)
+    {
+        float _cutoff = cutoff + ((1.0 - cutoff) * modCutoff);
+        float _resonance = resonance + ((1.0 - resonance) * modResonance);
+        calculateVar(_cutoff, _resonance);
 
-        return nextResonantFilter(inputValue);
+        return next(inputValue, _cutoff);
     }
 
     Zic_Effect_Filter* setFrequency(uint16_t freq)

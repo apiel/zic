@@ -31,7 +31,12 @@ protected:
 
     void frequencyUpdated() override
     {
-        sampleStep = sampleCount * frequency / SAMPLE_RATE;
+        frequencyUpdated(frequency);
+    }
+
+    void frequencyUpdated(float _frequency)
+    {
+        sampleStep = sampleCount * _frequency / SAMPLE_RATE;
     }
 
     bool setSkipSample() override
@@ -57,6 +62,12 @@ public:
         if (skipSample) {
             return 0;
         }
+
+        // Maybe not the way to apply pitch modulation but it does something... :p
+        frequencyUpdated(frequency + (modPitch * frequency));
+
+        // modMorph
+        // to make modulation on morph, we would have to load the whole wavetable in memory
 
         return sample() * ((level + modAmplitude) * 0.5f);
     }
