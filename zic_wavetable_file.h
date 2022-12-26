@@ -100,6 +100,12 @@ public:
         }
     }
 
+    void morphPct(float value)
+    {
+        value = range(value, 0.0f, 1.0f);
+        morph(value * (float)audioFile.wavetableCount);
+    }
+
     void morph(float value)
     {
         value = range(value, 0.0f, (float)audioFile.wavetableCount - 1.0f);
