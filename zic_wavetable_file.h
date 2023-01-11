@@ -21,6 +21,10 @@ protected:
 
     float sample()
     {
+        if (sampleCount <= 0) {
+            return 0.0f;
+        }
+
         // TODO should we use linear interpolation for the wavetable? https://www.youtube.com/watch?v=fufNzqgjej0
         sampleIndex += sampleStep;
         while (sampleIndex >= sampleCount) {
@@ -47,6 +51,13 @@ protected:
 
 public:
     Zic_File_Audio audioFile;
+
+    Zic_Wavetable_File()
+    {
+        for (uint64_t i = 0; i < APP_WAVETABLES_MAX && i < sampleCount; i++) {
+            table[i] = 0.0f;
+        }
+    }
 
     float next()
     {
