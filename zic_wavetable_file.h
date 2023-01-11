@@ -94,8 +94,7 @@ public:
 
         setSampleParams(start, sampleCount);
 
-        printf("Zic_Wavetable_File open %s %ld\n", filename, sampleCount);
-
+        // printf("Zic_Wavetable_File open %s %ld\n", filename, sampleCount);
         // printf("open file %s (%p) sample count %ld sample step %f skipSample %d\n", filename, audioFile.file, sampleCount, sampleStep, skipSample);
     }
 
