@@ -109,7 +109,7 @@ public:
     }
 
     int16_t readSampleInt16() {
-        int16_t sample;
+        int16_t sample = 0;
         Zic_File::read(&sample, sizeof(int16_t));
         return sample;
     }
