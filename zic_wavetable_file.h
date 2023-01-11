@@ -57,6 +57,7 @@ public:
         for (uint64_t i = 0; i < APP_WAVETABLES_MAX && i < sampleCount; i++) {
             table[i] = 0.0f;
         }
+        // printf("Zic_Wavetable_File %ld\n", sampleCount);
     }
 
     float next()
@@ -92,6 +93,8 @@ public:
         setFrequency(frequency);
 
         setSampleParams(start, sampleCount);
+
+        printf("Zic_Wavetable_File open %s %ld\n", filename, sampleCount);
 
         // printf("open file %s (%p) sample count %ld sample step %f skipSample %d\n", filename, audioFile.file, sampleCount, sampleStep, skipSample);
     }
