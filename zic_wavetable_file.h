@@ -8,9 +8,13 @@
 #endif
 
 #include "zic_wave_base.h"
+#include "./wavetables/wavetable_sine.h"
 
 #define APP_WAVETABLES_MAX 2048
 
+// NOTE is wavetable_file necessary? Wouldn't just geneirc wavetable enough?
+// And then there would be a separate object to feed the table with data...
+// TODO at least it should inherit from Zic_Wavetable!!!
 class Zic_Wavetable_File : public Zic_Wave_Base {
 protected:
     float sampleIndex = 0.0f;
@@ -54,8 +58,10 @@ public:
 
     Zic_Wavetable_File()
     {
+        // Load default wavetable
+        sampleCount = wavetable_Sine.sampleCount;
         for (uint64_t i = 0; i < APP_WAVETABLES_MAX && i < sampleCount; i++) {
-            table[i] = 0.0f;
+            table[i] = wavetable_Sine.table[i] / 32768.0f;
         }
         // printf("Zic_Wavetable_File %ld\n", sampleCount);
     }

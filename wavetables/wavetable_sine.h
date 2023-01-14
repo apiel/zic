@@ -4,14 +4,15 @@
 
 #include "../zic_wavetable_base.h"
 
-class Wavetable_Sine : public Zic_Wavetable_Base
-{
+class Wavetable_Sine : public Zic_Wavetable_Base {
 public:
-    Wavetable_Sine() : Zic_Wavetable_Base(&_table[0], 2048, 2048)
+    Wavetable_Sine()
+        : Zic_Wavetable_Base(&_table[0], 2048, 2048)
     {
     }
 
 protected:
+    // FIXME convert to float
     int16_t _table[2048] = {
         0,
         15,
