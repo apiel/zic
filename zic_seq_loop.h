@@ -10,6 +10,7 @@ public:
     Zic_Seq_Pattern* pattern = NULL;
     bool playing = false;
     uint8_t* currentStepSync = NULL;
+    uint16_t dataId = 0;
 
     void set(Zic_Seq_LoopState* state)
     {
