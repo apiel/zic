@@ -31,7 +31,7 @@ protected:
 public:
     Zic_Drum_Kick23()
     {
-        // sampleDurationCounter = -1;
+        sampleDurationCounter = -1;
         // distortion.setDistortion(0.5f);
     }
 
