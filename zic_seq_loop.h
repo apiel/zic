@@ -89,14 +89,14 @@ public:
 
     virtual void next()
     {
-        if (currentStep == 0) {
-            setNextState();
-        }
-
         stepOff = stepOn;
         if (state.pattern && state.playing) {
             stepOn = currentStep;
             setNextStep();
+        }
+
+        if (currentStep == 0) {
+            setNextState();
         }
     }
 };
