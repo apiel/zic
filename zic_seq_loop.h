@@ -18,6 +18,7 @@ public:
         pattern = state->pattern;
         playing = state->playing;
         currentStepSync = state->currentStepSync;
+        dataId = state->dataId;
     }
 
     void set(int8_t _detune)
