@@ -5,41 +5,43 @@
 
 #include "./zic_def.h"
 #include "./zic_effect_distortion.h"
+#include "zic_wavetable_file.h"
 
-#define ENVELOP_STEPS 6
-#define POT_COUNT 3
+#define ZIC_KICK_ENVELOP_STEPS 6
 
-class Zic_Drum_Kick23 {
+class Zic_Drum_Kick23 : public Zic_Wavetable_File {
 protected:
     float frequency = 600.0f;
-    float morph = 0.0f;
-    unsigned int wavetablePos = 0;
     unsigned int duration = 300; // in ms
     float volume = 1.0f;
 
     unsigned int sampleCountDuration = duration * SAMPLE_PER_MS;
-    unsigned int sampleCount = -1; // set it to max uint value so it will not trigger the kick at the beginning
+    unsigned int sampleDurationCounter = 0;
 
     // The first 2 steps are readonly, so for amp env there is very short ramp up to avoid clicking noize
     // The last step is also readonly, so the amp and freq end to 0.0f
-    float envelopAmp[ENVELOP_STEPS][2] = { { 0.0f, 0.0f }, { 1.0f, 0.01f }, { 0.3f, 0.4f }, { 0.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 1.0f } };
-    float envelopFreq[ENVELOP_STEPS][2] = { { 1.0f, 0.0f }, { 1.0f, 0.0f }, { 0.26f, 0.03f }, { 0.24f, 0.35f }, { 0.22f, 0.4f }, { 0.0f, 1.0f } };
+    float envelopAmp[ZIC_KICK_ENVELOP_STEPS][2] = { { 0.0f, 0.0f }, { 1.0f, 0.01f }, { 0.3f, 0.4f }, { 0.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 1.0f } };
+    float envelopFreq[ZIC_KICK_ENVELOP_STEPS][2] = { { 1.0f, 0.0f }, { 1.0f, 0.0f }, { 0.26f, 0.03f }, { 0.24f, 0.35f }, { 0.22f, 0.4f }, { 0.0f, 1.0f } };
 
     unsigned int envelopAmpIndex = 0;
     unsigned int envelopFreqIndex = 0;
 
     Zic_Effect_Distortion distortion;
 
-    float sampleIndex = 0.0f;
-
 public:
+    Zic_Drum_Kick23()
+    {
+        // sampleDurationCounter = -1;
+        // distortion.setDistortion(0.5f);
+    }
+
     float envelop(float (*envelop)[2], unsigned int* envelopIndex)
     {
-        if (envelopFreqIndex > ENVELOP_STEPS - 1) {
+        if (envelopFreqIndex > ZIC_KICK_ENVELOP_STEPS - 1) {
             return 0.0f;
         }
 
-        float time = (float)sampleCount / (float)sampleCountDuration;
+        float time = (float)sampleDurationCounter / (float)sampleCountDuration;
         if (time >= envelop[*envelopIndex + 1][1]) {
             (*envelopIndex)++;
         }
@@ -48,38 +50,29 @@ public:
         return (envelop[*envelopIndex + 1][0] - envelop[*envelopIndex][0]) * timeRatio + envelop[*envelopIndex][0];
     }
 
-    void noteon()
+    void noteOn()
     {
-        sampleCount = 0;
+        sampleIndex = 0;
+        sampleDurationCounter = 0;
         envelopAmpIndex = 0;
         envelopFreqIndex = 0;
     }
 
     float sample()
     {
-        if (sampleCount < sampleCountDuration) {
+        // printf("sampleCount: %ld, sampleCountDuration: %ld\n", sampleCount, sampleCountDuration);
+        if (sampleCount && sampleDurationCounter < sampleCountDuration) {
             float envFreq = envelop(envelopFreq, &envelopFreqIndex);
             float envAmp = envelop(envelopAmp, &envelopAmpIndex);
 
-            sampleIndex += WAVETABLE_SIZE * (frequency * envFreq) / SAMPLE_RATE;
-            while (sampleIndex >= WAVETABLE_SIZE) {
-                sampleIndex -= WAVETABLE_SIZE;
+            sampleIndex += sampleCount * (frequency * envFreq) / SAMPLE_RATE;
+            while (sampleIndex >= sampleCount) {
+                sampleIndex -= sampleCount;
             }
-            sampleCount++;
-            return distortion.next(wavetable[wavetablePos + (uint16_t)sampleIndex] * envAmp * volume);
+            sampleDurationCounter++;
+            return distortion.next(table[(uint16_t)sampleIndex] * envAmp * volume);
         }
-        return 0;
-    }
-
-    void updateMorph(float _morph)
-    {
-        morph = _morph;
-        if (morph < 0.0f) {
-            morph = 0.0f;
-        } else if (morph > WAVETABLE_COUNT) {
-            morph = WAVETABLE_COUNT;
-        }
-        wavetablePos = (uint16_t)(morph / WAVETABLE_COUNT * (WAVETABLE_TOTAL_SIZE - WAVETABLE_SIZE));
+        return 0.0;
     }
 
     /**
