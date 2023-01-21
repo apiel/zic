@@ -48,6 +48,16 @@ public:
         }
     }
 
+    float getValueAt(uint64_t index)
+    {
+        return table[index];
+    }
+
+    uint64_t getSampleCount()
+    {
+        return sampleCount;
+    }
+
     void open(const char* filename)
     {
         audioFile.open(filename);
