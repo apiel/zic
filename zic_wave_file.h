@@ -7,9 +7,12 @@
 #include "zic_file_audio_custom.h"
 #endif
 
-#include "zic_wave_base.h"
+#include "zic_osc_base.h"
 
-class Zic_Wave_File : public Zic_Wave_Base {
+// FIXME seem to be very similar to zic_osc_wavetable!!!...
+// the only diff is that is can also play samples
+
+class Zic_Wave_File : public Zic_Osc_Base {
 protected:
     float sampleIndex = 0.0f;
     float sampleStep = 0.0f;
@@ -37,7 +40,7 @@ protected:
 
     bool setSkipSample() override
     {
-        skipSample = Zic_Wave_Base::setSkipSample() || !audioFile.file;
+        skipSample = Zic_Osc_Base::setSkipSample() || !audioFile.file;
         return skipSample;
     }
 

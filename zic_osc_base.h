@@ -1,12 +1,12 @@
-#ifndef ZIC_WAVE_BASE_H_
-#define ZIC_WAVE_BASE_H_
+#ifndef ZIC_OSC_BASE_H_
+#define ZIC_OSC_BASE_H_
 
 #include <math.h>
 
 #include "zic_def.h"
 #include "zic_note.h"
 
-class Zic_Wave_Base {
+class Zic_Osc_Base {
 protected:
     float time = 0.0;
 

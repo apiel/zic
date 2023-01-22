@@ -7,19 +7,15 @@
 #include "zic_file_audio_custom.h"
 #endif
 
-#include "zic_wave_base.h"
 #include "./wavetables/wavetable_sine.h"
 
 #ifndef ZIC_WAVETABLES_MAX_SAMPLES
 #define ZIC_WAVETABLES_MAX_SAMPLES 2048
 #endif
 
-class Zic_Wavetable_File : public Zic_Wave_Base {
+class Zic_Wavetable_File {
 protected:
-    float sampleIndex = 0.0f;
-    uint64_t sampleCount = 0;
     uint64_t start = 0;
-    float table[ZIC_WAVETABLES_MAX_SAMPLES];
 
     void setSampleParams(uint64_t _start, uint64_t _sampleCount)
     {
@@ -37,6 +33,10 @@ protected:
     }
 
 public:
+    float sampleIndex = 0.0f;
+    uint64_t sampleCount = 0;
+    float table[ZIC_WAVETABLES_MAX_SAMPLES];
+
     Zic_File_Audio audioFile;
 
     Zic_Wavetable_File()
@@ -62,9 +62,6 @@ public:
     {
         audioFile.open(filename);
         sampleCount = (float)audioFile.sampleCount / (float)audioFile.wavetableCount;
-
-        setSkipSample();
-        setFrequency(frequency);
 
         setSampleParams(start, sampleCount);
     }

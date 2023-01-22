@@ -1,24 +1,25 @@
 #ifndef ZIC_OSC_WAVETABLE_H_
 #define ZIC_OSC_WAVETABLE_H_
 
+#include "zic_osc_base.h"
 #include "zic_wavetable_file.h"
 
-class Zic_Osc_Wavetable: public Zic_Wavetable_File {
+class Zic_Osc_Wavetable : public Zic_Osc_Base {
 protected:
     float sampleStep = 0.0f;
 
     float sample()
     {
-        if (sampleCount <= 0) {
+        if (wavetable.sampleCount <= 0) {
             return 0.0f;
         }
 
         // TODO should we use linear interpolation for the wavetable? https://www.youtube.com/watch?v=fufNzqgjej0
-        sampleIndex += sampleStep;
-        while (sampleIndex >= sampleCount) {
-            sampleIndex -= sampleCount;
+        wavetable.sampleIndex += sampleStep;
+        while (wavetable.sampleIndex >= wavetable.sampleCount) {
+            wavetable.sampleIndex -= wavetable.sampleCount;
         }
-        return table[(uint16_t)sampleIndex] * amplitude;
+        return wavetable.table[(uint16_t)wavetable.sampleIndex] * amplitude;
     }
 
     void frequencyUpdated() override
@@ -28,16 +29,30 @@ protected:
 
     void frequencyUpdated(float _frequency)
     {
-        sampleStep = sampleCount * _frequency / SAMPLE_RATE;
+        sampleStep = wavetable.sampleCount * _frequency / SAMPLE_RATE;
     }
 
     bool setSkipSample() override
     {
-        skipSample = Zic_Wave_Base::setSkipSample() || !audioFile.file;
+        skipSample = Zic_Osc_Base::setSkipSample() || !wavetable.audioFile.file;
         return skipSample;
     }
 
 public:
+    Zic_Wavetable_File wavetable;
+
+    Zic_Osc_Wavetable()
+    {
+        setFrequency(frequency);
+    }
+
+    void open(const char* filename)
+    {
+        wavetable.open(filename);
+        setSkipSample();
+        setFrequency(frequency);
+    }
+
     float next()
     {
         if (skipSample) {
