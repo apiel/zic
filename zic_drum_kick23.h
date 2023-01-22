@@ -9,7 +9,7 @@
 
 #define ZIC_KICK_ENVELOP_STEPS 6
 
-class Zic_Drum_Kick23 : public Zic_Wavetable_File {
+class Zic_Drum_Kick23 {
 protected:
     float frequency = 600.0f;
     unsigned int duration = 300; // in ms
@@ -24,6 +24,7 @@ protected:
     Zic_Effect_Distortion distortion;
 
 public:
+    Zic_Wavetable_File wavetable;
     // The first 2 steps are readonly, so for amp env there is very short ramp up to avoid clicking noize
     // The last step is also readonly, so the amp and freq end to 0.0f
     float envelopAmp[ZIC_KICK_ENVELOP_STEPS][2] = { { 0.0f, 0.0f }, { 1.0f, 0.01f }, { 0.3f, 0.4f }, { 0.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 1.0f } };
@@ -52,7 +53,7 @@ public:
 
     void noteOn()
     {
-        sampleIndex = 0;
+        wavetable.sampleIndex = 0;
         sampleDurationCounter = 0;
         envelopAmpIndex = 0;
         envelopFreqIndex = 0;
@@ -61,16 +62,16 @@ public:
     float sample()
     {
         // printf("sampleCount: %ld, sampleCountDuration: %ld\n", sampleCount, sampleCountDuration);
-        if (sampleCount && sampleDurationCounter < sampleCountDuration) {
+        if (wavetable.sampleCount && sampleDurationCounter < sampleCountDuration) {
             float envFreq = envelop(envelopFreq, &envelopFreqIndex);
             float envAmp = envelop(envelopAmp, &envelopAmpIndex);
 
-            sampleIndex += sampleCount * (frequency * envFreq) / SAMPLE_RATE;
-            while (sampleIndex >= sampleCount) {
-                sampleIndex -= sampleCount;
+            wavetable.sampleIndex += wavetable.sampleCount * (frequency * envFreq) / SAMPLE_RATE;
+            while (wavetable.sampleIndex >= wavetable.sampleCount) {
+                wavetable.sampleIndex -= wavetable.sampleCount;
             }
             sampleDurationCounter++;
-            return distortion.next(table[(uint16_t)sampleIndex] * envAmp * volume);
+            return distortion.next(wavetable.table[(uint16_t)wavetable.sampleIndex] * envAmp * volume);
         }
         return 0.0;
     }
