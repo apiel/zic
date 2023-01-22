@@ -1,16 +1,17 @@
 import { writeFileSync } from 'fs';
 
+// FIXME fine a way to get ZIC_WAVETABLES_MAX_SAMPLES from c++...
 export const WAVETABLE_SIZE = 2048;
 
-export function save(table: number[], name: string, float = false) {
+export function save(table: number[], name: string, float = true) {
     const capName = name[0].toUpperCase() + name.slice(1);
 
     const data = float ? `
-    float _table[${WAVETABLE_SIZE}] = {${table
+    float table[ZIC_WAVETABLES_MAX_SAMPLES] = {${table
         .map((val) => (val === 0 || val === 1 || val === -1 ? `${val}.0f` : `${val}f`))
         .join(', ')},};
     `: `
-    int16_t _table[${WAVETABLE_SIZE}] = {${table
+    int16_t table[ZIC_WAVETABLES_MAX_SAMPLES] = {${table
         .map((val) => Math.round(val * 10000))
         .join(', ')},};
     `;
@@ -19,19 +20,15 @@ export function save(table: number[], name: string, float = false) {
 #ifndef WAVETABLE_${name.toUpperCase()}_H_
 #define WAVETABLE_${name.toUpperCase()}_H_
 
-#include "../zic_wavetable_base.h"
+#ifndef ZIC_WAVETABLES_MAX_SAMPLES
+#define ZIC_WAVETABLES_MAX_SAMPLES 2048
+#endif
 
-class Wavetable_${capName} : public Zic_Wavetable_Base
+class Wavetable_${capName}
 {
 public:
-    Wavetable_${capName}() : Zic_Wavetable_Base(&_table[0], ${WAVETABLE_SIZE}, ${WAVETABLE_SIZE})
-    {
-    }
-protected:
 ${data}
 };
-
-Wavetable_${capName} wavetable_${capName};
 
 #endif
 `;

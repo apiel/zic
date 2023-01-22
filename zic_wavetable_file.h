@@ -7,13 +7,13 @@
 #include "zic_file_audio_custom.h"
 #endif
 
-#include "./wavetables/wavetable_sine.h"
-
 #ifndef ZIC_WAVETABLES_MAX_SAMPLES
 #define ZIC_WAVETABLES_MAX_SAMPLES 2048
 #endif
 
-class Zic_Wavetable_File {
+#include "./wavetables/wavetable_sine.h"
+
+class Zic_Wavetable_File: public Wavetable_Sine {
 protected:
     uint64_t start = 0;
 
@@ -34,19 +34,9 @@ protected:
 
 public:
     float sampleIndex = 0.0f;
-    uint64_t sampleCount = 0;
-    float table[ZIC_WAVETABLES_MAX_SAMPLES];
+    uint64_t sampleCount = ZIC_WAVETABLES_MAX_SAMPLES;
 
     Zic_File_Audio audioFile;
-
-    Zic_Wavetable_File()
-    {
-        // Load default wavetable
-        sampleCount = wavetable_Sine.sampleCount;
-        for (uint64_t i = 0; i < ZIC_WAVETABLES_MAX_SAMPLES && i < sampleCount; i++) {
-            table[i] = wavetable_Sine.table[i] / 32768.0f;
-        }
-    }
 
     float getValueAt(uint64_t index)
     {
