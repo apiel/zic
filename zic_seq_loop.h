@@ -21,6 +21,7 @@ public:
         playing = state->playing;
         currentStepSync = state->currentStepSync;
         dataId = state->dataId;
+        patch.set(&state->patch);
     }
 
     void set(int8_t _detune)

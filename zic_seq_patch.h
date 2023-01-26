@@ -22,6 +22,7 @@
 
 class Zic_Seq_Patch {
 public:
+    uint16_t id = -1; // Set to biggest number to avoid conflicts
     float floats[ZIC_PATCH_MAX_FLOATS];
     char strings[ZIC_PATCH_MAX_STRINGS][ZIC_PATCH_STRING_LENGTH];
     // Keep it simple for the moment and not have voice/channel for cc
@@ -33,8 +34,11 @@ public:
 
     void set(Zic_Seq_Patch* patch)
     {
+        id = patch->id;
+        
         floatsCount = patch->floatsCount;
         stringsCount = patch->stringsCount;
+        ccCount = patch->ccCount;
         for (uint16_t i = 0; i < floatsCount; i++) {
             floats[i] = patch->floats[i];
         }
@@ -89,7 +93,23 @@ public:
         if (index < stringsCount) {
             return strings[index];
         }
-        return (char *)"";
+        return (char*)"";
+    }
+
+    void clear()
+    {
+        for (uint16_t i = 0; i < floatsCount; i++) {
+            floats[i] = 0.0f;
+        }
+        for (uint16_t i = 0; i < stringsCount; i++) {
+            strcpy(strings[i], "");
+        }
+        for (uint16_t i = 0; i < ccCount; i++) {
+            cc[i] = 0;
+        }
+        floatsCount = 0;
+        stringsCount = 0;
+        ccCount = 0;
     }
 };
 
