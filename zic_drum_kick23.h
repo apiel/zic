@@ -21,9 +21,8 @@ protected:
     unsigned int envelopAmpIndex = 0;
     unsigned int envelopFreqIndex = 0;
 
-    Zic_Effect_Distortion distortion;
-
 public:
+    Zic_Effect_Distortion distortion;
     Zic_Wavetable_File wavetable;
     // The first 2 steps are readonly, so for amp env there is very short ramp up to avoid clicking noize
     // The last step is also readonly, so the amp and freq end to 0.0f
