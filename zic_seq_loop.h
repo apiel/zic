@@ -89,7 +89,7 @@ public:
         return state.pattern->stepCount - (currentStep + 1);
     }
 
-    virtual void next()
+    virtual bool next()
     {
         stepOff = stepOn;
         if (state.pattern && state.playing) {
@@ -99,7 +99,9 @@ public:
 
         if (currentStep == 0) {
             setNextState();
+            return true;
         }
+        return false;
     }
 };
 

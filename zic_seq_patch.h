@@ -24,6 +24,7 @@ class Zic_Seq_Patch {
 public:
     float floats[ZIC_PATCH_MAX_FLOATS];
     char strings[ZIC_PATCH_MAX_STRINGS][ZIC_PATCH_STRING_LENGTH];
+    // Keep it simple for the moment and not have voice/channel for cc
     uint8_t cc[ZIC_PATCH_MAX_CC];
 
     uint16_t floatsCount = 0;
@@ -88,7 +89,7 @@ public:
         if (index < stringsCount) {
             return strings[index];
         }
-        return "";
+        return (char *)"";
     }
 };
 
