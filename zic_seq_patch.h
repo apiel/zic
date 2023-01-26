@@ -2,7 +2,7 @@
 #define ZIC_SEQ_PATCH_H_
 
 #ifndef ZIC_PATCH_MAX_FLOATS
-#define ZIC_PATCH_MAX_FLOATS 1000
+#define ZIC_PATCH_MAX_FLOATS 500
 #endif
 
 #ifndef ZIC_PATCH_MAX_STRINGS
@@ -66,10 +66,10 @@ public:
         }
     }
 
-    void setString(uint16_t index, char* value)
+    void setString(uint16_t index, const char* value)
     {
         if (index < ZIC_PATCH_MAX_STRINGS) {
-            strcpy(strings[index], value);
+            strncpy(strings[index], value, ZIC_PATCH_STRING_LENGTH);
             if (index >= stringsCount) {
                 stringsCount = index + 1;
             }
