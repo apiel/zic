@@ -108,7 +108,7 @@ public:
         if (frequency < 10.0f) {
             frequency = 0.0f;
         } else if (frequency > 2000.0f) {
-            frequency = 20000.0f;
+            frequency = 2000.0f;
         }
     }
 };
