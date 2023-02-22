@@ -56,7 +56,7 @@ protected:
         case FILTER_MODE_BANDPASS_24:
             return buf0 - buf3;
         default:
-            return 0;
+            return inputValue;
         }
     }
 
@@ -81,7 +81,7 @@ protected:
         case FILTER_MODE_NOTCH_STATE_VARIABLE:
             return notch;
         default:
-            return 0;
+            return inputValue;
         }
     }
 
