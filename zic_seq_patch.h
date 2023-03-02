@@ -20,9 +20,12 @@
 #include <stdint.h>
 #include <string.h>
 
+uint16_t updateIdState = 0;
+
 class Zic_Seq_Patch {
 public:
     uint16_t id = -1; // Set to biggest number to avoid conflicts
+    uint16_t updateId = 0;
     float floats[ZIC_PATCH_MAX_FLOATS];
     char strings[ZIC_PATCH_MAX_STRINGS][ZIC_PATCH_STRING_LENGTH];
     // Keep it simple for the moment and not have voice/channel for cc
@@ -32,27 +35,29 @@ public:
     uint16_t stringsCount = 0;
     uint16_t ccCount = 0;
 
-    void set(Zic_Seq_Patch* patch)
+    void set(Zic_Seq_Patch& patch)
     {
-        id = patch->id;
+        id = patch.id;
+        updateId = ++updateIdState;
         
-        floatsCount = patch->floatsCount;
-        stringsCount = patch->stringsCount;
-        ccCount = patch->ccCount;
+        floatsCount = patch.floatsCount;
+        stringsCount = patch.stringsCount;
+        ccCount = patch.ccCount;
         for (uint16_t i = 0; i < floatsCount; i++) {
-            floats[i] = patch->floats[i];
+            floats[i] = patch.floats[i];
         }
         for (uint16_t i = 0; i < stringsCount; i++) {
-            strcpy(strings[i], patch->strings[i]);
+            strcpy(strings[i], patch.strings[i]);
         }
         for (uint16_t i = 0; i < ccCount; i++) {
-            cc[i] = patch->cc[i];
+            cc[i] = patch.cc[i];
         }
     }
 
     void setCc(uint8_t index, uint8_t value)
     {
         if (index < ZIC_PATCH_MAX_CC) {
+            updateId = ++updateIdState;
             cc[index] = value;
             if (index >= ccCount) {
                 ccCount = index + 1;
@@ -63,6 +68,7 @@ public:
     void setFloat(uint16_t index, float value)
     {
         if (index < ZIC_PATCH_MAX_FLOATS) {
+            updateId = ++updateIdState;
             floats[index] = value;
             if (index >= floatsCount) {
                 floatsCount = index + 1;
@@ -73,6 +79,7 @@ public:
     void setString(uint16_t index, const char* value)
     {
         if (index < ZIC_PATCH_MAX_STRINGS) {
+            updateId = ++updateIdState;
             strncpy(strings[index], value, ZIC_PATCH_STRING_LENGTH);
             if (index >= stringsCount) {
                 stringsCount = index + 1;
@@ -98,6 +105,7 @@ public:
 
     void clear()
     {
+        updateId = ++updateIdState;
         for (uint16_t i = 0; i < floatsCount; i++) {
             floats[i] = 0.0f;
         }
