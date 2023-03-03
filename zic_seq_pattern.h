@@ -26,24 +26,13 @@ public:
     uint8_t note = 0;
     uint8_t velocity = 127;
     // TODO to be implemented in looper
-    // -- , 01-99 , /2, /3, /4, /5, /6, /7, /8 
+    // -- , 01-99 , /2, /3, /4, /5, /6, /7, /8
     // 1 every step, 2 every 2nd step, 3 every 3rd step, 4 every 4th step... '!' could be only once
     // NEED probability
     // need also condition to play only the first time or the 2 first times '!' '!2'
     uint8_t condition = 0;
+    uint16_t patchId = 0;
     bool tie = false;
-
-    Zic_Seq_Step() { }
-
-    Zic_Seq_Step(uint8_t _note, bool _tie)
-    {
-        set(_note, _tie);
-    }
-
-    Zic_Seq_Step(uint8_t _instrument, uint8_t _note, bool _tie)
-    {
-        set(_instrument, _note, _tie);
-    }
 
     void reset()
     {
@@ -55,30 +44,23 @@ public:
 
     void set(Zic_Seq_Step* step)
     {
-        set(step->instrument, step->note, step->velocity, step->tie);
-    }
-
-    void set(uint8_t _note)
-    {
-        note = _note;
+        set(step->instrument, step->note, step->velocity, step->tie, step->condition, step->patchId);
     }
 
     void set(uint8_t _note, bool _tie)
     {
+        note = _note;
         tie = _tie;
-        set(_note);
     }
 
-    void set(uint8_t _instrument, uint8_t _note, bool _tie)
+    void set(uint8_t _instrument, uint8_t _note, uint8_t _velocity, bool _tie, uint8_t _condition, uint16_t _patchId)
     {
         instrument = _instrument;
-        set(_note, _tie);
-    }
-
-    void set(uint8_t _instrument, uint8_t _note, uint8_t _velocity, bool _tie)
-    {
+        note = _note;
         velocity = _velocity;
-        set(_instrument, _note, _tie);
+        tie = _tie;
+        condition = _condition;
+        patchId = _patchId;
     }
 
     void setCondition(int8_t _condition)
@@ -86,7 +68,7 @@ public:
         condition = range(_condition, 0, STEP_CONDITION_MAX);
     }
 
-    void setCondition(char * _cond)
+    void setCondition(char* _cond)
     {
         if (_cond[0] == '-') {
             condition = 0;
@@ -98,7 +80,7 @@ public:
     }
 
     // must be char[3]
-    void getConditionName(char * name)
+    void getConditionName(char* name)
     {
         if (condition == 0) {
             name[0] = '-';
@@ -113,7 +95,7 @@ public:
     }
 
     // must be char[22]
-    void getConditionFullname(char * name)
+    void getConditionFullname(char* name)
     {
         if (condition == 0) {
             sprintf(name, "none");
