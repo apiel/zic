@@ -2,14 +2,12 @@
 #define ZIC_SEQ_LOOP_H_
 
 #include "zic_note.h"
-#include "zic_seq_patch.h"
 #include "zic_seq_pattern.h"
 
 class Zic_Seq_LoopState {
 public:
     int8_t detune = 0;
     Zic_Seq_Pattern* pattern = NULL;
-    Zic_Seq_Patch patch;
     bool playing = false;
     uint8_t* currentStepSync = NULL;
     uint16_t dataId = 0;
@@ -21,7 +19,6 @@ public:
         playing = state->playing;
         currentStepSync = state->currentStepSync;
         dataId = state->dataId;
-        patch.set(state->patch);
     }
 
     void set(int8_t _detune)
