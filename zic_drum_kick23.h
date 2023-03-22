@@ -7,7 +7,7 @@
 #include "./zic_effect_distortion.h"
 #include "zic_wavetable_file.h"
 
-#define ZIC_KICK_ENVELOP_STEPS 6
+#define ZIC_KICK_ENVELOP_STEPS 7
 
 class Zic_Drum_Kick23 {
 protected:
@@ -26,8 +26,8 @@ public:
     Zic_Wavetable_File wavetable;
     // The first 2 steps are readonly, so for amp env there is very short ramp up to avoid clicking noize
     // The last step is also readonly, so the amp and freq end to 0.0f
-    float envelopAmp[ZIC_KICK_ENVELOP_STEPS][2] = { { 0.0f, 0.0f }, { 1.0f, 0.01f }, { 0.3f, 0.4f }, { 0.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 1.0f } };
-    float envelopFreq[ZIC_KICK_ENVELOP_STEPS][2] = { { 1.0f, 0.0f }, { 1.0f, 0.0f }, { 0.26f, 0.03f }, { 0.24f, 0.35f }, { 0.22f, 0.4f }, { 0.0f, 1.0f } };
+    float envelopAmp[ZIC_KICK_ENVELOP_STEPS][2] = { { 0.0f, 0.0f }, { 1.0f, 0.01f }, { 0.3f, 0.4f }, { 0.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 1.0f }, { 0.0f, 1.0f } };
+    float envelopFreq[ZIC_KICK_ENVELOP_STEPS][2] = { { 1.0f, 0.0f }, { 1.0f, 0.0f }, { 0.26f, 0.03f }, { 0.24f, 0.35f }, { 0.22f, 0.4f }, { 0.0f, 1.0f }, { 0.0f, 1.0f } };
 
     Zic_Drum_Kick23()
     {
