@@ -189,6 +189,8 @@ public:
     {
         mode = value % FILTER_MODE_COUNT;
 
+        // printf("setFilterMode %d %d\n", value, mode);
+
         return this;
     }
 
