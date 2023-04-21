@@ -24,11 +24,9 @@ protected:
 
     void calculateVar(float _cutoff, float _resonance)
     {
-        if (_cutoff == 1.0) {
-            feedback = _resonance + _resonance;
-        } else {
-            feedback = _resonance + _resonance / (1.0 - _cutoff);
-        }
+        // could be optimzed: e.g. if resonance is 0, then feedback is 0
+        // also might not need calculate feedback if it's not used...
+        feedback = _resonance + _resonance / (1.0 - _cutoff);
 
         // Q1 is for the second filtering method
         Q1 = 1 / (_resonance * _resonance * 1000 + 0.7); // 1000 value set randomly, might need to find better value?!
@@ -133,7 +131,9 @@ public:
 
     float next(float inputValue, float modCutoff, float modResonance)
     {
-        float _cutoff = cutoff + ((1.0 - cutoff) * modCutoff);
+        // FIXME?
+        // Those this wrong...
+        float _cutoff = range(cutoff + ((1.0 - cutoff) * modCutoff), 0.00001, 0.999999);
         float _resonance = resonance + ((1.0 - resonance) * modResonance);
         calculateVar(_cutoff, _resonance);
 
@@ -142,12 +142,8 @@ public:
 
     Zic_Effect_Filter* setFrequency(uint16_t freq)
     {
-        // Human can hear frequency between 20Hz and 20kHz. While 20 to 20,000Hz forms the absolute borders
-        // of the human hearing range, our hearing is most sensitive in the 2000 - 5000 Hz frequency range.
-        // But establishing the effect of sounds with frequencies under about 250 Hz has been harder. Even
-        // though they're above the lower limit of 20 Hz, these low-frequency sounds tend to be either
-        // inaudible or barely audible.
-        frequency = range(freq, 200, 8000);
+        // At 7350 cutoff is = 1 and then no sound, then over 7350, cutoff will be over 1
+        frequency = range(freq, 50, 7300);
         cutoff = 2.0 * sin(M_PI * frequency / SAMPLE_RATE);
         calculateVar();
 
@@ -162,10 +158,7 @@ public:
     // look up table is most likely the best option!
     Zic_Effect_Filter* setCutoff(float _cutoff)
     {
-        // cutoff cannot be 1.0 else div by zero
-        // cutoff = range(_cutoff, 0.01, 0.99);
-
-        cutoff = _cutoff;
+        cutoff = range(_cutoff, 0.00001, 0.999999);
         calculateVar();
 
         return this;
